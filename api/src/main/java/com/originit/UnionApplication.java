@@ -1,4 +1,4 @@
-package com.originit.union;
+package com.originit;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

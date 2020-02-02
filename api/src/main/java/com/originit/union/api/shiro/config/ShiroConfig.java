@@ -16,6 +16,7 @@ import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
@@ -31,6 +32,7 @@ import java.util.Set;
  * @CreateTime 2019/6/10 17:42
  */
 @Configuration
+@Profile("deploy")
 public class ShiroConfig {
 
     private final String CACHE_KEY = "shiro:cache:";

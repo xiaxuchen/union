@@ -4,6 +4,7 @@ import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.originit.union.api.interceptor.CorsInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 

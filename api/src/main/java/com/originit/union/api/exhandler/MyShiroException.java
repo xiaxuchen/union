@@ -19,6 +19,6 @@ public class MyShiroException {
     @ResponseBody
     @ExceptionHandler(value = AuthorizationException.class)
     public PlatformResult defaultErrorHandler(){
-        return new PlatformResult<>(403, "权限不足", null);
+        return new PlatformResult<>(false,403, "权限不足", null);
     }
 }
