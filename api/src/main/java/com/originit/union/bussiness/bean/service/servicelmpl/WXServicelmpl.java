@@ -1,5 +1,6 @@
 package com.originit.union.bussiness.bean.service.servicelmpl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.originit.union.api.util.WXDateUtil;
 import com.originit.union.bussiness.bean.TagList;
@@ -26,8 +27,9 @@ public class WXServicelmpl implements WXService {
     @Autowired
     private IService iService;
 
-    private String USER_INFO="https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
+    private String USER_INFO="https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";//获取用户信息
     private String USER_LIST = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN";//获取用户列表
+    String GET_TAG="https://api.weixin.qq.com/cgi-bin/tags/get?access_token=ACCESS_TOKEN";//获取标签列表
     @Override
     public UserList getUserList(String token,int tagList,int curPage,int pageSize) throws WxErrorException {
         List<UserInfo>  listuser=new ArrayList<UserInfo>();
@@ -36,7 +38,7 @@ public class WXServicelmpl implements WXService {
         //josn转化为map
         Map<String,Object> jsonToMap = JSONObject.parseObject(s);
         String b=((JSONObject) jsonToMap).getString("data");
-        int  total= (int) jsonToMap.get("total");
+        int  total= Integer.parseInt(jsonToMap.get("total").toString());
         System.out.println(total);
         int totalPage=0;
         if ( total%pageSize==0)
@@ -56,7 +58,7 @@ public class WXServicelmpl implements WXService {
             //josn转化为map
             Map<String,Object> jsonToMap3 = JSONObject.parseObject(user);
             UserInfo userInfoEntity=new UserInfo();
-            userInfoEntity.setId(i);
+            userInfoEntity.setId(list.get(i));
             userInfoEntity.setName((String) jsonToMap3.get("nickname"));
             userInfoEntity.setSex((Integer) jsonToMap3.get("sex"));
             userInfoEntity.setHeadImg((String) jsonToMap3.get("headimgurl"));
@@ -70,5 +72,26 @@ public class WXServicelmpl implements WXService {
         userListEntity.setTotal(listuser.size());
         userListEntity.setUserInfo(listuser);
         return userListEntity;
+    }
+//{"tags":[{"id":2,"name":"星标组","count":0},{"id":114,"name":"10","count":2}]}
+    @Override
+    public List<TagList> getTagList() throws WxErrorException {
+     //   System.out.println(iService.get(GET_TAG.replace("ACCESS_TOKEN",iService.getAccessToken()),null));
+        String taglisturl=iService.get(GET_TAG.replace("ACCESS_TOKEN",iService.getAccessToken()),null);
+        Map<String,Object> jsonToMap = JSONObject.parseObject(taglisturl);
+        //String taglist1=jsonToMap.get("tags").toString().replace("[","").replace("]","");
+        List<Map> jsonToList = JSONArray.parseArray(jsonToMap.get("tags").toString(),Map.class);
+        List<TagList> tagLists = new ArrayList<TagList>();
+        for (int i=0;i<jsonToList.size();i++){
+            int a= (int) jsonToList.get(i).get("id");
+            TagList tagList=new TagList(a, (String) jsonToList.get(i).get("name"));
+            tagLists.add(tagList);
+            System.out.println("jsonToList："+tagLists.toString());
+        }
+
+
+      //  Map<String,Object> jsonToMap1 = JSONObject.parseObject(taglist1);
+      //  System.out.println(jsonToMap1.toString());
+          return  tagLists;
     }
 }

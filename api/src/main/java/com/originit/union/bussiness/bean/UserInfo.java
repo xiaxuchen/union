@@ -1,5 +1,6 @@
 package com.originit.union.bussiness.bean;
 
+import lombok.Data;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -7,8 +8,9 @@ import org.springframework.context.annotation.Bean;
  * @date 2020/2/2 16:24
  * @description 执念
  */
+@Data
 public class UserInfo {
-    private  int id;
+    private  String id;
     private String name;
     private String  headImg;
     private String phone;
@@ -16,11 +18,11 @@ public class UserInfo {
     private int sex;
     private String subscribeTime;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
