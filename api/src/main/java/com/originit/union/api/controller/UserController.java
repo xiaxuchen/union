@@ -31,10 +31,10 @@ public class UserController {
 
     public static final String TOKEN = "token";
 
-    @Autowired
+   /* @Autowired
     private SysUserService sysUserService;
     @Autowired
-    private SysUserRoleService sysUserRoleService;
+    private SysUserRoleService sysUserRoleService;*/
 
     /**
      * 登录
@@ -63,8 +63,8 @@ public class UserController {
         return map;
     }
 
-    @RequestMapping("/test")
+  /*  @RequestMapping("/test")
     public List<SysUserEntity> test() {
         return sysUserService.list();
-    }
+    }*/
 }

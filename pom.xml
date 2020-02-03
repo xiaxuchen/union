@@ -61,6 +61,7 @@
         <module>api</module>
         <module>service</module>
         <module>common</module>
+        <module>bussiness</module>
     </modules>
 
 
