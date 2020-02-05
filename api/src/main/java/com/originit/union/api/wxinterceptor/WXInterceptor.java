@@ -11,10 +11,10 @@ public interface WXInterceptor {
      * @param response 响应
      * @return 是否拦截
      */
-    Boolean intercept(HttpServletRequest request, HttpServletResponse response);
+    Boolean intercept(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /**
      * 处理请求
      */
-    void handle(HttpServletRequest request, HttpServletResponse response);
+    void handle(HttpServletRequest request, HttpServletResponse response) throws Exception;
 }
