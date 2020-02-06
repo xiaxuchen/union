@@ -3,7 +3,6 @@ package com.originit.union.WXbussiness.service;
 import com.originit.union.WXbussiness.bean.MaterialItemBean;
 import com.originit.union.WXbussiness.bean.TagListBean;
 import com.originit.union.WXbussiness.bean.UserListBean;
-import com.originit.union.entity.SysUserBindEnity;
 import com.soecode.wxtools.exception.WxErrorException;
 
 import java.io.IOException;
