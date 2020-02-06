@@ -8,12 +8,11 @@ import com.originit.union.api.protocol.CardCode;
 import com.originit.union.api.protocol.CardInfo;
 import com.originit.union.api.protocol.MaterialsList;
 import com.originit.union.api.util.WXDateUtil;
-import com.originit.union.entity.SysUserBindEnity;
+import com.originit.union.entity.UserBindEntity;
 import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.exception.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,7 +151,7 @@ public class WXServicelmpl implements WXService {
         List<String> list = Arrays.asList(d.split(","));
         List<String> openidlist=new ArrayList<String>();
         List<String>  codelist=new ArrayList<String>();
-        List<UserBindBean> userBindBeanList=new ArrayList<UserBindBean>();
+        List<UserBindEntity> userBindBeanList=new ArrayList<UserBindEntity>();
         for (int i=0;i<=100;i++){//i=opendidlist
             String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",list.get(i)),null);
             //josn转化为map
@@ -171,11 +170,11 @@ public class WXServicelmpl implements WXService {
                 //josn转化为map
                 Map<String,Object> jsonToMap6 = JSONObject.parseObject(a);
                 if (jsonToMap6.get("membership_number").toString().isEmpty()==false){
-                    UserBindBean userBindBean = new UserBindBean();
-                    userBindBean.setOpenid(openidlist.get(i));
+                    UserBindEntity userBindBean = new UserBindEntity();
+                    userBindBean.setOpenId(openidlist.get(i));
                     userBindBean.setPhone((String) jsonToMap6.get("membership_number"));
                     userBindBeanList.add(userBindBean);
-                    System.out.println(userBindBean.toJson());
+                    System.out.println(userBindBean.toString());
                 }
             }
         }
