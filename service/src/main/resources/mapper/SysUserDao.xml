@@ -21,5 +21,11 @@
         <result property="modifyUser" column="modify_user"/>
     </resultMap>
 
-
+    <insert id="insertUsersIfNotExist" >
+        INSERT IGNORE INTO user_bind(open_id,phone,agent_id,gmt_last_use)
+        VALUES
+        <foreach collection="userList" item="user" separator=",">
+            (#{user.openId},#{user.phone},#{user.agentId},#{user.gmtLastUse})
+        </foreach>
+    </insert>
 </mapper>

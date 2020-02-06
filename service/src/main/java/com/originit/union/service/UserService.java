@@ -15,10 +15,10 @@ import java.util.List;
 public interface UserService extends IService<UserBindEntity> {
     /**
      * 添加用户openid信息
-     * @param openidlist 将传入的openId列表插入用户绑定表中，如果openId在数据库已存在则不插入
+     * @param openIdList 将传入的openId列表插入用户绑定表中，如果openId在数据库已存在则不插入
      * @return
      */
-      void addUserIfNotExist(List<String> openidlist);
+      void addUserIfNotExist(List<String> openIdList);
 
     /**
      *
