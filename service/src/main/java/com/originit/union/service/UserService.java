@@ -2,10 +2,33 @@ package com.originit.union.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.originit.union.entity.UserBindEntity;
+import com.originit.union.entity.dto.UserBindDto;
 import com.originit.union.mapper.UserDao;
 
+import java.util.List;
 /**
- * 访问用户相关表的Service
+ * @Description 访问用户相关表的Service
+ * @Author
+ * @CreateTime
  */
+
 public interface UserService extends IService<UserBindEntity> {
+    /**
+     * 添加用户openid信息
+     * @param openIdList 将传入的openId列表插入用户绑定表中，如果openId在数据库已存在则不插入
+     * @return
+     */
+      void addUserIfNotExist(List<String> openIdList);
+
+    /**
+     *
+     * @return List<String>   获取列表中phone为空值的openid
+     */
+      List<String> getOpenidListWithoutPhone();
+
+    /**
+     *
+     * @param userBindDtoList 根据getOpenidListWithoutPhone更新用户绑定的的phone信息
+     */
+      void updateUserBind(List<UserBindDto> userBindDtoList);
 }
