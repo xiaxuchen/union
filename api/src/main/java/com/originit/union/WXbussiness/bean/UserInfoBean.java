@@ -1,7 +1,6 @@
-package com.originit.union.bussiness.bean;
+package com.originit.union.WXbussiness.bean;
 
 import lombok.Data;
-import org.springframework.context.annotation.Bean;
 
 /**
  * @author super
@@ -9,12 +8,13 @@ import org.springframework.context.annotation.Bean;
  * @description 执念
  */
 @Data
-public class UserInfo {
+public class UserInfoBean {
+    private  String openid;
     private  String id;
     private String name;
     private String  headImg;
     private String phone;
-    private TagList tagList;
+    private TagListBean tagListBean;
     private int sex;
     private String subscribeTime;
 
@@ -50,12 +50,12 @@ public class UserInfo {
         this.phone = phone;
     }
 
-    public TagList getTagList() {
-        return tagList;
+    public TagListBean getTagListBean() {
+        return tagListBean;
     }
 
-    public void setTagList(TagList tagList) {
-        this.tagList = tagList;
+    public void setTagListBean(TagListBean tagListBean) {
+        this.tagListBean = tagListBean;
     }
 
     public int getSex() {
@@ -74,14 +74,23 @@ public class UserInfo {
         this.subscribeTime = subscribeTime;
     }
 
+    public String getOpenid() {
+        return openid;
+    }
+
+    public void setOpenid(String openid) {
+        this.openid = openid;
+    }
+
     @Override
     public String toString() {
-        return "UserInfo{" +
-                "id=" + id +
+        return "UserInfoBean{" +
+                "openid='" + openid + '\'' +
+                ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", headImg='" + headImg + '\'' +
                 ", phone='" + phone + '\'' +
-                ", tagList=" + tagList +
+                ", tagListBean=" + tagListBean +
                 ", sex=" + sex +
                 ", subscribeTime='" + subscribeTime + '\'' +
                 '}';

@@ -1,11 +1,11 @@
-package com.originit.union.bussiness.bean;
+package com.originit.union.WXbussiness.bean;
 
 /**
  * @author super
  * @date 2020/2/2 16:26
  * @description 执念
  */
-public class TagList {
+public class TagListBean {
     private int id;
     private String name;
 
@@ -25,14 +25,14 @@ public class TagList {
         this.name = name;
     }
 
-    public TagList(int id, String name) {
+    public TagListBean(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
     @Override
     public String toString() {
-        return "TagList{" +
+        return "TagListBean{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
