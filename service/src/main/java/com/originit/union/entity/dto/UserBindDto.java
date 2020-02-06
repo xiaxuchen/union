@@ -4,12 +4,11 @@ import lombok.Data;
 
 /**
  * @author super
- * @date 2020/2/6 21:19
+ * @date 2020/2/6 22:42
  * @description 执念
  */
 @Data
 public class UserBindDto {
-    private  String  openid;
-    private String phone;
-
+    private String openid;
+    private  String phone ;
 }

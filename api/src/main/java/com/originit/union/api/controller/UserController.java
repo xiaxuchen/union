@@ -1,12 +1,9 @@
 package com.originit.union.api.controller;
 
-import com.originit.union.WXbussiness.service.WXService;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.union.service.SysUserRoleService;
 import com.originit.union.service.SysUserService;
 import com.originit.union.api.util.ShiroUtils;
-import com.soecode.wxtools.api.IService;
-import com.soecode.wxtools.exception.WxErrorException;
 import com.xxc.response.anotation.ResponseResult;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -33,12 +30,11 @@ import java.util.Map;
 public class UserController {
 
     public static final String TOKEN = "token";
+
     @Autowired
-    WXService wxService;
-   /* @Autowired
     private SysUserService sysUserService;
     @Autowired
-    private SysUserRoleService sysUserRoleService;*/
+    private SysUserRoleService sysUserRoleService;
 
     /**
      * 登录
@@ -67,5 +63,8 @@ public class UserController {
         return map;
     }
 
-
+    @RequestMapping("/test")
+    public List<SysUserEntity> test() {
+        return sysUserService.list();
+    }
 }
