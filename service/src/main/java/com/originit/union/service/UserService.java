@@ -6,12 +6,13 @@ import com.originit.union.entity.dto.UserBindDto;
 import com.originit.union.mapper.UserDao;
 
 import java.util.List;
-
 /**
- * 访问用户相关表的Service
+ * @Description 访问用户相关表的Service
+ * @Author
+ * @CreateTime
  */
-public interface UserService extends IService<UserBindEntity> {
 
+public interface UserService extends IService<UserBindEntity> {
     /**
      * 添加用户openid信息
      * @param openidlist 将传入的openId列表插入用户绑定表中，如果openId在数据库已存在则不插入
@@ -23,7 +24,7 @@ public interface UserService extends IService<UserBindEntity> {
      *
      * @return List<String>   获取列表中phone为空值的openid
      */
-     List<String> getOpenidListWithoutPhone();
+      List<String> getOpenidListWithoutPhone();
 
     /**
      *
