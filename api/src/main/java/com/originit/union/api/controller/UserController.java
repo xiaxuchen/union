@@ -62,7 +62,6 @@ public class UserController {
         map.put("name","good");
         return map;
     }
-
     @RequestMapping("/test")
     public List<SysUserEntity> test() {
         return sysUserService.list();
