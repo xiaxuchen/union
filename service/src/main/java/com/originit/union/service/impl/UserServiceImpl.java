@@ -20,9 +20,11 @@ import java.util.stream.Stream;
 public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implements UserService {
     @Override
     public void addUserIfNotExist(List<String> openIdList) {
+        // 1. 校验信息的正确性
         if (openIdList == null || openIdList.size() == 0) {
             throw new IllegalArgumentException("openId 列表不能为空");
         }
+        // 2. 将数据库转换并插入数据库
         baseMapper.insertUsersIfNotExist(openIdList.stream()
                 .map(openId -> UserBindEntity.builder().openId(openId).build())
                 .collect(Collectors.toList()));
