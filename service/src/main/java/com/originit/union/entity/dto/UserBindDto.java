@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author super
- * @date 2020/2/6 22:42
+ * @date 2020/2/6 21:19
  * @description 执念
  */
 @Data
@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserBindDto {
-    private String openid;
-    private  String phone ;
+    private  String  openid;
+    private String phone;
+
 }

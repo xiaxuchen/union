@@ -1,8 +1,13 @@
 package com.originit.union.api.controller;
 
+import com.originit.union.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -15,6 +20,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -29,15 +37,38 @@ public class UserControllerTest {
     private MockMvc mvc;
     private MockHttpSession session;
 
+    // 这里是模拟对象
+    @Mock
+    private UserService userService;
+
+    // 这里是将模拟的对象注入到spring中去
+    @Autowired
+    @InjectMocks // 被注入mock对象的类一般是被测试类
+    private UserController userController;
+
     @Before
     public void setupMockMvc(){
+        MockitoAnnotations.initMocks(this);
         mvc = MockMvcBuilders.webAppContextSetup(wac).build(); //初始化MockMvc对象
         session = new MockHttpSession();
     }
 
     @Test
+    public void name() {
+        // 这里就说明模拟对象被我注入到userController中了，我现在去掉了@Autowired，spring就不会自动注入，现在就当userService没有实现类
+        // 确实注入了，看到了吧
+        // 然后有mock有什么用，咱们可以模拟他的行为,除了点问题,我自己研究一会，你消化消化，然后apizza新增了接口，有时间实现一下同时 定义下层
+//        Mockito.when(userService.getOpenidListWithoutPhone()).thenReturn(Arrays.asList("hahah"));
+        userController.userService = userService;
+        System.out.println(userController.testMock());
+//        System.out.println(userController.userService == userService);
+    }
+
+    @Test
     public void login() throws Exception {
         String json="{\"author\":\"HAHAHAA\",\"title\":\"Spring\",\"url\":\"http://tengj.top/\"}";
+        // 在这边，通过这个MockMvc可以通过url进行调用，这里就是测试登录方法，我们可以通过同样的方式去访问刚刚的方法，
+        // 但是一般情况下依赖的下层接口是没有实现的，那咱们就没法直接调用，我们可以mock模拟对象注入，我要查一查，我下层测试是没有模拟的
         mvc.perform(MockMvcRequestBuilders.post("/manager/login")
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .param("username","xxcisbest")
