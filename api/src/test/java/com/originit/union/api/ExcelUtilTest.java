@@ -24,7 +24,7 @@ import java.util.List;
  * @date 2020/2/8 13:08
  * @description 执念
  */
-public class ExcelPIOTest {
+public class ExcelUtilTest {
     @Test
     public   void importXLS(){
         ArrayList<ExcelUserBean> list = new ArrayList<>();

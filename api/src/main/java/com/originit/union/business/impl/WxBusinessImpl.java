@@ -2,7 +2,7 @@ package com.originit.union.business.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.originit.union.business.ExcelPIO;
+import com.originit.union.api.util.ExcelUtil;
 import com.originit.union.business.bean.*;
 import com.originit.union.business.WxBusiness;
 import com.originit.union.api.protocol.CardCode;
@@ -235,7 +235,7 @@ public class WxBusinessImpl implements WxBusiness {
     public List<String> getUseridByExclePhone(String filename) {
         List<ExcelUserBean> excelUserBeanList=new ArrayList<ExcelUserBean>();
      //   String filename="C:/Users/Super丶执念/Desktop/会员信息.xlsx";
-        excelUserBeanList= ExcelPIO.importXLS(filename);
+        excelUserBeanList= ExcelUtil.importXLS(filename);
         List<String>  phonelist=new ArrayList<String>();
         for (int i=0;i<=excelUserBeanList.size(); i++){
             phonelist.add(excelUserBeanList.get(i).getUserphone());

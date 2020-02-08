@@ -1,4 +1,4 @@
-package com.originit.union.business;
+package com.originit.union.api.util;
 
 import com.originit.union.business.bean.ExcelUserBean;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author super
+ * @author super  //从指定路径读取Excel的数据
  * @date 2020/2/8 13:08
  * @description 执念
  */
-public class ExcelPIO {
+public class ExcelUtil {
     public  static   List<ExcelUserBean> importXLS(String file){
         ArrayList<ExcelUserBean> list = new ArrayList<>();
         try {

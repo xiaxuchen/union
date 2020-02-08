@@ -99,7 +99,7 @@ public class PushController {
         String filename="C:/Users/Super丶执念/Desktop/会员信息.xlsx";
        List<String>  phonelist =wxBusiness.getUseridByExclePhone(filename);
        //2 根据获取的phonelist查找用户的openid
-       List<String> openidlist= userService.getUseridByphone(phonelist);
+  //     List<String> openidlist= userService.getUseridByphone(phonelist);
        /* List<String> list=new ArrayList<>();
         list.add(0,"o1U3TjoBfIKeo_dyR380-Z4Vw_vU");
         list.add(1,"o1U3TjjBpjnPviGDxd7HSKjlH0y0");
