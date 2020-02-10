@@ -42,5 +42,5 @@ public interface UserService extends IService<UserBindEntity> {
      * 获取所有的会员信息
      * @return 会员信息列表
      */
-    List<UserBindDto> getAllUserBindInfo();
+    List<UserBindDto> getAllUserBindInfo(int curPage,int pagesize);
 }
