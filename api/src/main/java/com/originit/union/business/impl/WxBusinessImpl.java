@@ -9,16 +9,20 @@ import com.originit.union.api.protocol.CardCode;
 import com.originit.union.api.protocol.CardInfo;
 import com.originit.union.api.protocol.MaterialsList;
 import com.originit.union.api.util.WXDateUtil;
+import com.originit.union.entity.dto.PushInfoDto;
 import com.originit.union.entity.dto.UserBindDto;
 import com.soecode.wxtools.api.IService;
+import com.soecode.wxtools.api.WxConsts;
+import com.soecode.wxtools.bean.SenderContent;
+import com.soecode.wxtools.bean.WxOpenidSender;
+import com.soecode.wxtools.bean.WxUserList;
+import com.soecode.wxtools.bean.result.SenderResult;
 import com.soecode.wxtools.exception.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author super
@@ -42,10 +46,6 @@ public class WxBusinessImpl implements WxBusiness {
      */
     private static  final  String  CARD_INFO="https://api.weixin.qq.com/card/membercard/userinfo/get?access_token=TOKEN";
     /**
-     * 获取用户信息
-     */
-    private String USER_INFO="https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
-    /**
      *获取用户列表
      */
     private String USER_LIST = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN";
@@ -57,6 +57,7 @@ public class WxBusinessImpl implements WxBusiness {
      * post 获取素材列表
      */
     String  MATER_LIST="https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=ACCESS_TOKEN";
+    String USER_INFO="https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
 
     /**
      *
@@ -66,7 +67,8 @@ public class WxBusinessImpl implements WxBusiness {
      */
     @Override
     public String getUserInfo(String openid) throws WxErrorException {
-        String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",openid),null);
+        WxUserList.WxUser user = iService.getUserInfoByOpenId(new WxUserList.WxUser.WxUserGet(openid, WxConsts.LANG_CHINA));
+        // String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",openid),null);
         return user.toString();
     }
 
@@ -81,7 +83,7 @@ public class WxBusinessImpl implements WxBusiness {
      */
 
     @Override
-    public UserListBean getUserList(String token, int tagList, int curPage, int pageSize) throws WxErrorException {
+    public UserListBean getUserList(String token, int tagList, int curPage, int pageSize) throws WxErrorException, IOException {
         List<UserInfoBean>  listuser=new ArrayList<UserInfoBean>();
         UserListBean userListBeanEntity =new UserListBean();
         String s=iService.get(USER_LIST.replace("ACCESS_TOKEN",iService.getAccessToken()),null);
@@ -102,8 +104,13 @@ public class WxBusinessImpl implements WxBusiness {
         String d= c.replace("[","").replace("]","").replace("\"","");
         //string转化为list
         List<String> list = Arrays.asList(d.split(","));
+        long startTime = System.currentTimeMillis(); // 获取开始时间
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+        System.out.println(df.format(new Date()));// new Date()为获取当前系统时间
+        System.out.println("程序开始执行时间："+startTime);
         for (int i=(curPage-1)*pageSize;i<=(curPage-1)*pageSize+pageSize-1;i++){
             String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",list.get(i)),null);
+           // WxUserList.WxUser user = iService.getUserInfoByOpenId(new WxUserList.WxUser.WxUserGet(list.get(i), WxConsts.LANG_CHINA));
            // System.out.println(user);
             //json转化为map
             Map<String,Object> jsonToMap3 = JSONObject.parseObject(user);
@@ -114,8 +121,7 @@ public class WxBusinessImpl implements WxBusiness {
             userInfoBeanEntity.setSex((Integer) jsonToMap3.get("sex"));
             userInfoBeanEntity.setHeadImg((String) jsonToMap3.get("headimgurl"));
             userInfoBeanEntity.setPhone("123");
-            System.out.println("tagid_list:"+jsonToMap3.get("tagid_list"));
-            userInfoBeanEntity.setSubscribeTime( WXDateUtil.GetDateTimeWithTimeStamp((int) jsonToMap3.get("subscribe_time")));
+            userInfoBeanEntity.setSubscribeTime( WXDateUtil.GetDateTimeWithTimeStamp(Integer.parseInt(jsonToMap3.get("subscribe_time").toString()) ));
             TagListBean tag=new TagListBean(1,"VIP用户");
             userInfoBeanEntity.setTagListBean(tag);
           //  listuser.add(userInfoBeanEntity);
@@ -123,6 +129,10 @@ public class WxBusinessImpl implements WxBusiness {
         }
         userListBeanEntity.setTotal(listuser.size());
         userListBeanEntity.setUserInfoBean(listuser);
+        long endTime = System.currentTimeMillis(); // 获取结束时间
+        System.out.println("程序结束执行时间："+endTime);
+        System.out.println(df.format(new Date()));// new Date()为获取当前系统时间
+        System.out.println("程序总运行时间： " + (endTime - startTime) + "ms");
         return userListBeanEntity;
     }
     //获取标签列表
@@ -144,12 +154,19 @@ public class WxBusinessImpl implements WxBusiness {
         }
           return tagListBeans;
     }
-     //获取素材列表
+
+    /**
+     * //获取素材列表
+     * @return
+     * @throws WxErrorException
+     * @throws IOException
+     */
     @Override
     public List<MaterialItemBean> getMaterialList() throws WxErrorException, IOException {
-        MaterialsList materialsList=new MaterialsList("image",0,3);
+        MaterialsList materialsList=new MaterialsList("news",0,3);
         //      System.out.println(materialsList.toJson());
         String s=iService.post(MATER_LIST.replace("ACCESS_TOKEN",iService.getAccessToken()),materialsList.toJson());
+        System.out.println("素材列表"+s);
         Map<String,Object> jsonToMap = JSONObject.parseObject(s);
         MaterialListBean materialListBean =new MaterialListBean();
         materialListBean.setItem_count((int) jsonToMap.get("item_count"));
@@ -159,10 +176,22 @@ public class WxBusinessImpl implements WxBusiness {
         for (int i=0;i<jsonToList.size();i++){
             MaterialItemBean materialItemBean = new MaterialItemBean();
             materialItemBean.setMedia_id((String) jsonToList.get(i).get("media_id"));
-            materialItemBean.setName((String) jsonToList.get(i).get("name"));
+            Map<String,Object> jsonToMap1 = JSONObject.parseObject(jsonToList.get(i).get("content").toString());
+            System.out.println("测试："+jsonToList.get(i).get("content").toString());
+            //字符串的截取
+            String d=jsonToList.get(i).get("content").toString();
+            int x=d.indexOf("\"title\":\"");
+            int y=d.indexOf("\",\"content\"");
+            int m=d.indexOf("\"thumb_url\":\"");
+            int n=d.indexOf("\",\"thumb_media_id\"");
+            String test3before=d.substring(x,y);
+            String title =test3before.replace("\"title\":\"","");
+            String url=d.substring(m,n).replace("\"thumb_url\":\"","");
+            System.out.println(url);
+            materialItemBean.setName(title);
+            materialItemBean.setUrl(url);
             materialItemBean.setTags(null);
             materialItemBean.setUpdate_time(WXDateUtil.GetDateTimeWithTimeStamp((int)jsonToList.get(i).get("update_time")));
-            materialItemBean.setUrl((String) jsonToList.get(i).get("url"));
             materialItemBeans.add(materialItemBean);
         }
         materialListBean.setMaterialItemBeans(materialItemBeans);
@@ -203,9 +232,10 @@ public class WxBusinessImpl implements WxBusiness {
         int listsize=list.size();
         //i=list
           for (int i=9100;i<=listsize ;i++){
-            String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",list.get(i)),null);
+              WxUserList.WxUser user = iService.getUserInfoByOpenId(new WxUserList.WxUser.WxUserGet(list.get(i), WxConsts.LANG_CHINA));
+         //   String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",list.get(i)),null);
             //josn转化为map
-            Map<String,Object> jsonToMap3 = JSONObject.parseObject(user);
+            Map<String,Object> jsonToMap3 = JSONObject.parseObject(user.toString());
             list.add((String) jsonToMap3.get("openid"));
             String url= GET_CARD_CODE.replace("TOKEN",iService.getAccessToken());
             String cardCode=iService.post(url,new CardCode(list.get(i),card_id).toJson());
@@ -245,75 +275,48 @@ public class WxBusinessImpl implements WxBusiness {
 
     @Override
     public  List<UserInfoBean>  getUserListByid(List<String> openidlist) throws WxErrorException {
-        List<UserInfoBean>  listuser=new ArrayList<UserInfoBean>();
-        for (int i=0;i<openidlist.size();i++){
+        List<UserInfoBean> listuser = new ArrayList<UserInfoBean>();
+        for (int i = 0; i < openidlist.size(); i++) {
             System.out.println(openidlist.get(1));
-            String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",openidlist.get(i)),null);
+            String user = iService.get(USER_INFO.replace("ACCESS_TOKEN", iService.getAccessToken()).replace("OPENID", openidlist.get(i)), null);
+            //  WxUserList.WxUser user = iService.getUserInfoByOpenId(new WxUserList.WxUser.WxUserGet(openidlist.get(i), WxConsts.LANG_CHINA));
             //json转化为map
-            Map<String,Object> jsonToMap3 = JSONObject.parseObject(user);
-            UserInfoBean userInfoBeanEntity =new UserInfoBean();
+            Map<String, Object> jsonToMap3 = JSONObject.parseObject(user.toString());
+            UserInfoBean userInfoBeanEntity = new UserInfoBean();
             userInfoBeanEntity.setOpenid(openidlist.get(i));
             userInfoBeanEntity.setId(String.valueOf(i));
             userInfoBeanEntity.setName((String) jsonToMap3.get("nickname"));
             userInfoBeanEntity.setSex((Integer) jsonToMap3.get("sex"));
             userInfoBeanEntity.setHeadImg((String) jsonToMap3.get("headimgurl"));
             userInfoBeanEntity.setPhone("123");
-          //  System.out.println("tagid_list:"+jsonToMap3.get("tagid_list"));
-            userInfoBeanEntity.setSubscribeTime( WXDateUtil.GetDateTimeWithTimeStamp((int) jsonToMap3.get("subscribe_time")));
-            TagListBean tag=new TagListBean(1,"VIP用户");
+            //  System.out.println("tagid_list:"+jsonToMap3.get("tagid_list"));
+            userInfoBeanEntity.setSubscribeTime(WXDateUtil.GetDateTimeWithTimeStamp((int) jsonToMap3.get("subscribe_time")));
+            TagListBean tag = new TagListBean(1, "VIP用户");
             userInfoBeanEntity.setTagListBean(tag);
             //  listuser.add(userInfoBeanEntity);
             listuser.add(userInfoBeanEntity);
         }
-        return  listuser;
+        return listuser;
     }
-/*//用户绑定
-    @Override
-    public List<String> setUserBind() throws WxErrorException, IOException {
-        String s=iService.get(USER_LIST.replace("ACCESS_TOKEN",iService.getAccessToken()),null);
-        //josn转化为map
-        Map<String,Object> jsonToMap = JSONObject.parseObject(s);
-        String b=((JSONObject) jsonToMap).getString("data");
-        int  total= Integer.parseInt(jsonToMap.get("total").toString());
-        //josn转化为map
-        Map<String,Object> jsonToMap2 = JSONObject.parseObject(b);
-        String c=((JSONObject) jsonToMap2).getString("openid");
-        //整理字符串格式
-        String d= c.replace("[","").replace("]","").replace("\"","");
-        //string转化为list
-        List<String> list = Arrays.asList(d.split(","));
-        List<String> openidlist=new ArrayList<String>();
-        List<String>  codelist=new ArrayList<String>();
-        List<UserBindEntity> userBindBeanList=new ArrayList<UserBindEntity>();
-        //i=opendidlist
-        for (int i=0;i<=100;i++){
-            String user=iService.get(USER_INFO.replace("ACCESS_TOKEN",iService.getAccessToken()).replace("OPENID",list.get(i)),null);
-            //josn转化为map
-            Map<String,Object> jsonToMap3 = JSONObject.parseObject(user);
-            openidlist.add((String) jsonToMap3.get("openid"));
-            String url=GET_CARD_CODE.replace("TOKEN",iService.getAccessToken());
-            String cardcode=iService.post(url,new CardCode(openidlist.get(i),card_id).toJson());
-            Map<String,Object> jsonToMap4 = JSONObject.parseObject(cardcode);
-            //整理字符串格式
-            String e= jsonToMap4.get("card_list").toString().replace("[","").replace("]","");
-            if (e.isEmpty()==false){
-                Map<String,Object> jsonToMap5 = JSONObject.parseObject(e);
-                codelist.add((String) jsonToMap5.get("code"));
-                System.out.println(jsonToMap5.get("code"));
-                String a=  iService.post(CARD_INFO.replace("TOKEN",iService.getAccessToken()), new CardInfo(card_id, (String) jsonToMap5.get("code")).toJson());
-                //josn转化为map
-                Map<String,Object> jsonToMap6 = JSONObject.parseObject(a);
-                if (jsonToMap6.get("membership_number").toString().isEmpty()==false){
-                    UserBindEntity userBindBean = new UserBindEntity();
-                    userBindBean.setOpenId(openidlist.get(i));
-                    userBindBean.setPhone((String) jsonToMap6.get("membership_number"));
-                    userBindBeanList.add(userBindBean);
-                    System.out.println(userBindBean.toString());
-                }
-            }
-        }
-        System.out.println(userBindBeanList.toString());
-        return userBindBeanList.toString();
-    }*/
 
+    @Override
+    public void PushInfo(List<String> openidList, PushInfoDto pushInfoDto) {
+        WxOpenidSender sender = new WxOpenidSender();
+        sender.setTouser(openidList);
+        if (pushInfoDto.getType()==1){
+            sender.setMsgtype("text");
+            //群发文本内容
+            sender.setText(new SenderContent.Text(pushInfoDto.getContent()));
+        }else  if (pushInfoDto.getType()==2){
+            sender.setMsgtype("mpnews");
+            //群发文本内容
+            sender.setText(new SenderContent.Text(pushInfoDto.getContent()));
+        }
+        try {
+            SenderResult result = iService.sendAllByOpenid(sender);
+            System.out.println(result.toString());
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+        }
+    }
 }

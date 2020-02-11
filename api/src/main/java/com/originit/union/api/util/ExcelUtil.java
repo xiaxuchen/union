@@ -24,7 +24,8 @@ public class ExcelUtil {
     public  static   List<ExcelUserBean> importXLS(String file){
         ArrayList<ExcelUserBean> list = new ArrayList<>();
         try {
-            String filename="C:/Users/Super丶执念/Desktop/会员信息.xlsx";
+            //String filename="C:/Users/Super丶执念/Desktop/会员信息.xlsx";
+            String filename="static\\会员导入信息模板.xls";
             //1、获取文件输入流
             InputStream inputStream = new FileInputStream(filename);
             //2、获取Excel工作簿对象

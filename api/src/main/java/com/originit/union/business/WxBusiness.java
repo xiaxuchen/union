@@ -4,6 +4,7 @@ import com.originit.union.business.bean.MaterialItemBean;
 import com.originit.union.business.bean.TagListBean;
 import com.originit.union.business.bean.UserInfoBean;
 import com.originit.union.business.bean.UserListBean;
+import com.originit.union.entity.dto.PushInfoDto;
 import com.originit.union.entity.dto.UserBindDto;
 import com.soecode.wxtools.exception.WxErrorException;
 
@@ -32,7 +33,7 @@ public interface WxBusiness {
      * @return  getUserList
      * @throws WxErrorException
      */
-     UserListBean getUserList(String token, int tagList, int curPage, int pageSize) throws WxErrorException;
+     UserListBean getUserList(String token, int tagList, int curPage, int pageSize) throws WxErrorException, IOException;
 
     /**
      * //获取标签列表
@@ -78,4 +79,12 @@ public interface WxBusiness {
      * @throws WxErrorException
      */
     List<UserInfoBean>  getUserListByid(List<String> openidlist) throws WxErrorException;
+
+
+    /**
+     * 推送信息到指定用户 （目前支持文字信息和图文信息）
+     * @param openidList 用户列表
+     * @param pushInfoDto   其中的，type为1表示文本消息，为2表示图文消息，content对应为文本内容和微信公众平台的media_id
+     */
+    void PushInfo(List<String> openidList, PushInfoDto pushInfoDto);
 }
