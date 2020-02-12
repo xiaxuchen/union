@@ -31,4 +31,16 @@ public interface UserService extends IService<UserBindEntity> {
      * @param userBindDtoList 根据getOpenidListWithoutPhone更新用户绑定的的phone信息
      */
       void updateUserBind(List<UserBindDto> userBindDtoList);
+    /**
+     * 根据用户的电话列表获取用户openid
+     * @param phonelist  电话列表
+     * @return   openid列表
+     */
+    List<String> getUseridByphone(List<String> phonelist);
+
+    /**
+     * 获取所有的会员信息
+     * @return 会员信息列表
+     */
+    List<UserBindDto> getAllUserBindInfo(int curPage,int pagesize);
 }
