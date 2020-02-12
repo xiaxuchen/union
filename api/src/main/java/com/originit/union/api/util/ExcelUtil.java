@@ -21,11 +21,11 @@ import java.util.List;
  * @description 执念
  */
 public class ExcelUtil {
-    public  static   List<ExcelUserBean> importXLS(String file){
+    public  static   List<ExcelUserBean> importXLS(String filename){
         ArrayList<ExcelUserBean> list = new ArrayList<>();
         try {
             //String filename="C:/Users/Super丶执念/Desktop/会员信息.xlsx";
-            String filename="static\\会员导入信息模板.xls";
+
             //1、获取文件输入流
             InputStream inputStream = new FileInputStream(filename);
             //2、获取Excel工作簿对象
@@ -42,11 +42,11 @@ public class ExcelUtil {
                     //读取当前行中单元格数据，索引从0开始
                     row.getCell(0).setCellType(Cell.CELL_TYPE_STRING);
                     String userphone = row.getCell(0).getStringCellValue();
-                    row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
-                    String usertag = row.getCell(1).getStringCellValue();
+                  /*  row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+                    String usertag = row.getCell(1).getStringCellValue();*/
                     ExcelUserBean excelUserBean = new ExcelUserBean();
                     excelUserBean.setUserphone(userphone);
-                    excelUserBean.setUsertag(usertag);
+                   // excelUserBean.setUsertag(usertag);
                     list.add(excelUserBean);
                 }
                 //5、关闭流
@@ -65,11 +65,11 @@ public class ExcelUtil {
                     //读取当前行中单元格数据，索引从0开始
                     row.getCell(0).setCellType(Cell.CELL_TYPE_STRING);
                     String userphone = row.getCell(0).getStringCellValue();
-                    row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
-                    String usertag = row.getCell(1).getStringCellValue();
+                   /* row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+                    String usertag = row.getCell(1).getStringCellValue();*/
                     ExcelUserBean excelUserBean = new ExcelUserBean();
                     excelUserBean.setUserphone(userphone);
-                    excelUserBean.setUsertag(usertag);
+                    //excelUserBean.setUsertag(usertag);
                     list.add(excelUserBean);
                 }
                 //5、关闭流

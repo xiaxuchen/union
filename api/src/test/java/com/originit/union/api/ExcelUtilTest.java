@@ -46,11 +46,11 @@ public class ExcelUtilTest {
                     //读取当前行中单元格数据，索引从0开始
                     row.getCell(0).setCellType(Cell.CELL_TYPE_STRING);
                     String userphone = row.getCell(0).getStringCellValue();
-                    row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
-                    String usertag = row.getCell(1).getStringCellValue();
+                  /*  row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+                    String usertag = row.getCell(1).getStringCellValue();*/
                     ExcelUserBean excelUserBean = new ExcelUserBean();
                     excelUserBean.setUserphone(userphone);
-                    excelUserBean.setUsertag(usertag);
+                   // excelUserBean.setUsertag(usertag);
                     list.add(excelUserBean);
                 }
                 //5、关闭流
@@ -69,11 +69,11 @@ public class ExcelUtilTest {
                     //读取当前行中单元格数据，索引从0开始
                     row.getCell(0).setCellType(Cell.CELL_TYPE_STRING);
                     String userphone = row.getCell(0).getStringCellValue();
-                    row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
-                    String usertag = row.getCell(1).getStringCellValue();
+                   /* row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+                    String usertag = row.getCell(1).getStringCellValue();*/
                     ExcelUserBean excelUserBean = new ExcelUserBean();
                     excelUserBean.setUserphone(userphone);
-                    excelUserBean.setUsertag(usertag);
+                   // excelUserBean.setUsertag(usertag);
                     list.add(excelUserBean);
                 }
                 //5、关闭流

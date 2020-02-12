@@ -108,7 +108,7 @@ public class PushController {
     @ResponseBody
     public List<String> getUserInfoById() throws WxErrorException {
         //1 根据上传的Excel获取相关的phone值
-       String filename="C:/Users/Super丶执念/Desktop/会员信息.xlsx";
+        String filename="C:/Users/Super丶执念/Desktop/会员信息.xlsx";
 
       //  String  filename="static/会员导入信息模板.xlsx";
        List<String>  phonelist =wxBusiness.getUseridByExclePhone(filename);
@@ -129,7 +129,7 @@ public class PushController {
      * @throws WxErrorException
      * @throws IOException
      */
-    @RequestMapping("/pushtext")
+    @RequestMapping("/push")
     @ResponseBody
     public void addPushInfo(List<String> openidList, PushInfoDto pushInfoDto) throws WxErrorException, IOException {
 

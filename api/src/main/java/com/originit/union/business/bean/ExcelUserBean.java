@@ -10,5 +10,4 @@ import lombok.Data;
 @Data
 public class ExcelUserBean {
     private  String userphone;
-    private String usertag;
 }

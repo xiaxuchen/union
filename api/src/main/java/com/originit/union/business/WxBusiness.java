@@ -29,7 +29,7 @@ public interface WxBusiness {
      * @param token
      * @param tagList  标签
      * @param curPage   当前页数
-     * @param pageSize  一页显示几条数据
+     * @param pageSize  一页显示几条数据(不能超过100)
      * @return  getUserList
      * @throws WxErrorException
      */
@@ -61,25 +61,23 @@ public interface WxBusiness {
 
     /**
      *  获取会员的绑定信息的值，会筛选掉非会员用户（具体参考{@link UserBindDto}）
-     * @param list   openid列表
+     * @param openidList   openid列表
      * @return  UserBindDto  返回openid和phone的值
      */
-    List<UserBindDto> getUserBindDtos(List<String> list) throws WxErrorException, IOException;
-
+    List<UserBindDto> getUserBindDtos(List<String> openidList) throws WxErrorException, IOException;
     /**
      * 根据Excel表格获取用户的phone
      * @return phone的list
      */
-    List<String>   getUseridByExclePhone(String filename);
+    List<String>   getUseridByExclePhone(String fileName);
 
     /**
      * 根据用户id获取用户信息
-     * @param openidlist
+     * @param openidList
      * @return  用户信息列表
      * @throws WxErrorException
      */
-    List<UserInfoBean>  getUserListByid(List<String> openidlist) throws WxErrorException;
-
+    List<UserInfoBean>  getUserListByid(List<String> openidList) throws WxErrorException;
 
     /**
      * 推送信息到指定用户 （目前支持文字信息和图文信息）

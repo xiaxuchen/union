@@ -1,10 +1,12 @@
 package com.originit.union.api.controller;
 
 import com.originit.union.business.WxBusiness;
+import com.originit.union.business.bean.UserInfoBean;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.union.entity.dto.UserBindDto;
 import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.service.UserService;
+import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.exception.WxErrorException;
 import com.xxc.response.anotation.ResponseResult;
 import org.apache.shiro.SecurityUtils;
@@ -18,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description 用户登录
@@ -36,7 +35,8 @@ public class UserController {
     public static final String TOKEN = "token";
     @Autowired
     WxBusiness wxBusiness;
-
+    @Autowired
+    IService iService;
     @Autowired
     UserService userService;
    /* @Autowired
@@ -108,6 +108,14 @@ public class UserController {
 
     public List<String> testMock () {
         return userService.getOpenidListWithoutPhone();
+    }
+    @RequestMapping("/test")
+    @ResponseBody
+    public List<UserInfoBean> test() throws WxErrorException, IOException {
+        List<String> list=new ArrayList<>();
+        list.add(0,"o1U3TjoBfIKeo_dyR380-Z4Vw_vU");
+        list.add(1,"o1U3TjjBpjnPviGDxd7HSKjlH0y0");
+      return wxBusiness.getUserListByid(list);
     }
 
 }
