@@ -54,7 +54,6 @@ public class CoreController {
             context.setAttribute("timestamp",timestamp);
             context.setAttribute("nonce",nonce);
             context.setAttribute("appId",WxConfig.getInstance().getAppId());
-
             return echostr;
         }
         return null;
@@ -73,10 +72,8 @@ public class CoreController {
         WxJsapiConfig jsapiConfig = iService.createJsapiConfig(url, apis);
         //由于该方法不会设置appid，故需通过WxConfig对象获取
         jsapiConfig.setAppid(WxConfig.getInstance().getAppId());
-        System.out.println("WxJsapiConfig:");
         return jsapiConfig;
     }
-
 
     @PostMapping
     public void handle(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
@@ -85,16 +82,18 @@ public class CoreController {
         PrintWriter out = response.getWriter();
         try {
             // 微信服务器推送过来的是XML格式。
-            WxXmlMessage wxXmlMessage = XStreamTransformer.fromXml(WxXmlMessage.class, request.getInputStream());
-            System.out.println(wxXmlMessage.toString());
+//            WxXmlMessage wxXmlMessage = XStreamTransformer.fromXml(WxXmlMessage.class, request.getInputStream());
             for (WXInterceptor interceptor : interceptors) {
                 if(interceptor.intercept(request,response))
                 {
-                    interceptor.handle(request,response);
+                    try{
+                        interceptor.handle(request,response);
+                    }catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
-
-
 //            System.out.println(wx.getContent());
 //            String openId = wx.getFromUserName();
             //自动登录

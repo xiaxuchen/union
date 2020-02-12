@@ -2,8 +2,6 @@ package com.originit.union.api.wxinterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public interface WXInterceptor {
 
@@ -13,10 +11,10 @@ public interface WXInterceptor {
      * @param response 响应
      * @return 是否拦截
      */
-    Boolean intercept(HttpServletRequest request, HttpServletResponse response);
+    Boolean intercept(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /**
      * 处理请求
      */
-    void handle(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void handle(HttpServletRequest request, HttpServletResponse response) throws Exception;
 }
