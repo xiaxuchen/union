@@ -1,5 +1,5 @@
 server:
-  port: 8089
+  port: 8080
 # 配置数据库连接池和数据库
 spring:
   datasource:
