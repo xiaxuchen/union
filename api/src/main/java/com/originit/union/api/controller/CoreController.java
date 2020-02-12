@@ -82,11 +82,16 @@ public class CoreController {
         PrintWriter out = response.getWriter();
         try {
             // 微信服务器推送过来的是XML格式。
-            WxXmlMessage wxXmlMessage = XStreamTransformer.fromXml(WxXmlMessage.class, request.getInputStream());
+//            WxXmlMessage wxXmlMessage = XStreamTransformer.fromXml(WxXmlMessage.class, request.getInputStream());
             for (WXInterceptor interceptor : interceptors) {
                 if(interceptor.intercept(request,response))
                 {
-                    interceptor.handle(request,response);
+                    try{
+                        interceptor.handle(request,response);
+                    }catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
 //            System.out.println(wx.getContent());
