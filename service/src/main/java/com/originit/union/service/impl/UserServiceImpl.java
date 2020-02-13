@@ -4,25 +4,32 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.originit.common.page.Pager;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.dto.UserBindDto;
+import com.originit.union.entity.mapper.UserBindMapper;
 import com.originit.union.mapper.UserDao;
 import com.originit.union.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+/**
+ * @author xxc、
+ */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implements UserService {
     @Override
     public void addUserIfNotExist(List<String> openIdList) {
+        // 1. 校验信息的正确性
         if (openIdList == null || openIdList.size() == 0) {
-            throw new IllegalArgumentException("openId 列表不能为空");
+            throw new IllegalArgumentException("openid 列表不能为空");
         }
+        // 2. 将数据库转换并插入数据库
         baseMapper.insertUsersIfNotExist(openIdList.stream()
                 .map(openId -> UserBindEntity.builder().openId(openId).build())
                 .collect(Collectors.toList()));
@@ -56,4 +63,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
             baseMapper.update(userBindEntity,updateWrapper);
         });
     }
+
+    @Override
+    public List<String> getUseridByphone(List<String> phoneList) {
+        final LambdaQueryWrapper<UserBindEntity> qw = new QueryWrapper<UserBindEntity>().lambda();
+        qw.select(UserBindEntity::getOpenId).in(UserBindEntity::getPhone,phoneList);
+        return baseMapper.selectList(qw).stream()
+                .map(UserBindEntity::getOpenId)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Pager<UserBindDto> getAllUserBindInfo(int curPage, int pageSize) {
+        final IPage<UserBindEntity> userBindData = baseMapper.selectPage(new Page<>(curPage, pageSize), new QueryWrapper<UserBindEntity>().lambda()
+                .select(UserBindEntity::getOpenId, UserBindEntity::getPhone));
+        return new Pager<>(UserBindMapper.INSTANCE.to(userBindData.getRecords()),userBindData.getTotal());
+    }
+
 }

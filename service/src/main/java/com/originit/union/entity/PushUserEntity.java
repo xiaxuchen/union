@@ -1,11 +1,28 @@
 package com.originit.union.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @TableName("push_user")
-public class PushUserEntity extends PK {
+public class PushUserEntity {
+
+    private Long id;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime gmtCreate;
+
+    /**
+     * 修改时间
+     */
+    private LocalDateTime gmtModified;
 
     /**
      * 接受者的Id
@@ -13,7 +30,7 @@ public class PushUserEntity extends PK {
     private Long receiverId;
 
     /**
-     * 推送者的Id
+     * 推送的Id
      */
-    private Long pusherId;
+    private Long pushId;
 }

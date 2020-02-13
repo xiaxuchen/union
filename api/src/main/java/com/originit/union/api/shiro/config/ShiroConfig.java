@@ -32,7 +32,7 @@ import java.util.Set;
  * @CreateTime 2019/6/10 17:42
  */
 @Configuration
-@Profile("deploy")
+@Profile("beta")
 public class ShiroConfig {
 
     private final String CACHE_KEY = "shiro:cache:";

@@ -1,23 +1,43 @@
 package com.originit.union.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 /**
  * 用于存储推送的信息
+ * @author xxc、
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @TableName("push_info")
-public class PushInfoEntity extends PK{
+public class PushInfoEntity{
+
+    private Long id;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime gmtCreate;
+
+    /**
+     * 修改时间
+     */
+    private LocalDateTime gmtModified;
+
     /**
      * 推送人id
       */
     private Long pusher;
 
     /**
-     * 推送类型
+     * 推送类型 1代表文本，2代表媒体类型
      */
     private Integer type;
 
@@ -29,7 +49,7 @@ public class PushInfoEntity extends PK{
     /**
      * 推送的id，这个是微信公众平台的id
      */
-    private String pushId;
+    private Long pushId;
 
 
 }
