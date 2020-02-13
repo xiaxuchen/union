@@ -3,15 +3,12 @@ package com.originit.union.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.originit.union.entity.PushInfoEntity;
 import com.originit.union.entity.dto.PushInfoDto;
-import com.soecode.wxtools.exception.WxErrorException;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
  * 通过此类可以访问推送消息表
+ * @author xxc、
  */
 public interface PushInfoService extends IService<PushInfoEntity> {
     /**

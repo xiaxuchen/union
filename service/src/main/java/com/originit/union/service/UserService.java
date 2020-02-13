@@ -1,9 +1,9 @@
 package com.originit.union.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.originit.common.page.Pager;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.dto.UserBindDto;
-import com.originit.union.mapper.UserDao;
 
 import java.util.List;
 /**
@@ -33,14 +33,14 @@ public interface UserService extends IService<UserBindEntity> {
       void updateUserBind(List<UserBindDto> userBindDtoList);
     /**
      * 根据用户的电话列表获取用户openid
-     * @param phonelist  电话列表
+     * @param phoneList  电话列表
      * @return   openid列表
      */
-    List<String> getUseridByphone(List<String> phonelist);
+    List<String> getUseridByphone(List<String> phoneList);
 
     /**
-     * 获取所有的会员信息
-     * @return 会员信息列表
+     * 分页获取所有的会员信息
+     * @return 会员信息分页
      */
-    List<UserBindDto> getAllUserBindInfo(int curPage,int pagesize);
+    Pager<UserBindDto> getAllUserBindInfo(int curPage, int pageSize);
 }

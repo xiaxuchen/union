@@ -28,6 +28,11 @@ public class SysRoleEntity implements Serializable {
 	private String roleName;
 
 	/**
+	 * 是否为系统定义，系统不可删除
+	 */
+	private Boolean isSys;
+
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime gmtCreate;

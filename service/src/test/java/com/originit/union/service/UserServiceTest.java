@@ -3,16 +3,12 @@ package com.originit.union.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.dto.UserBindDto;
-import com.originit.union.mapper.UserDaoTest;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,4 +76,14 @@ public class UserServiceTest {
         userService.updateUserBind(new ArrayList<>());
     }
 
+    @Test
+    public void getUseridByphone() {
+        assertEquals(userService.getUseridByphone(Arrays.asList("18679990891","15607998858","18507993375","18879157697")).size(),4);
+    }
+
+    @Test
+    public void getAllUserBindInfo() {
+        final int size = userService.getAllUserBindInfo(1, 10).getData().size();
+        assertTrue(size >= 0 && size <= 10);
+    }
 }
