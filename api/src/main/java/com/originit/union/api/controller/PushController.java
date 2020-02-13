@@ -87,20 +87,22 @@ public class PushController {
     }
     @RequestMapping("/test")
     @ResponseBody
-    public String getCard() throws WxErrorException, IOException {
+    public String test()  {
         PreviewSender sender = new PreviewSender();
         //设置openid或者微信号，优先级为wxname高
         sender.setTouser(openid);
         sender.setMsgtype("mpnews");
-        sender.setMpnews(new SenderContent.Media("wSlKNDaFbswh6rGTiNma_1E6xIe2c_4GHF_6fGSEjbo"));
+        sender.setMpnews(new SenderContent.Media("wSlKNDaFbswh6rGTiNma__oVrm6SkiUbCm54Hthk2DI"));
+        Long a=null;
         try {
             SenderResult result = iService.sendAllPreview(sender);
             System.out.println(result.toString());
+             a =  result.getMsg_id();
         } catch (WxErrorException e) {
             e.printStackTrace();
         }
-        return  null;
 
+        return  a.toString();
     }
 
 

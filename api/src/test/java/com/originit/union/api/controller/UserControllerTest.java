@@ -60,6 +60,7 @@ public class UserControllerTest {
         // 然后有mock有什么用，咱们可以模拟他的行为,除了点问题,我自己研究一会，你消化消化，然后apizza新增了接口，有时间实现一下同时 定义下层
 //        Mockito.when(userService.getOpenidListWithoutPhone()).thenReturn(Arrays.asList("hahah"));
         userController.userService = userService;
+
         System.out.println(userController.testMock());
 //        System.out.println(userController.userService == userService);
     }

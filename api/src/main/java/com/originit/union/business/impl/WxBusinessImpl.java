@@ -150,11 +150,13 @@ public class WxBusinessImpl implements WxBusiness {
         List<MaterialItemBean> materialItemBeans = new ArrayList<MaterialItemBean>();
         try {
             //图文信息
-            WxBatchGetMaterialResult result = iService.batchGetMeterial(WxConsts.MASS_MSG_MPNEWS, 0, 20);
+            WxBatchGetMaterialResult result = iService.batchGetMeterial("news", 0, 20);
+            System.out.println("name:"+result.getItem().get(1));
             for (int i=0;i<result.getItem_count();i++){
                 MaterialItemBean materialItemBean = new MaterialItemBean();
-                materialItemBean.setName(result.getItem().get(i).getName());
-                materialItemBean.setUrl(result.getItem().get(i).getUrl());
+                materialItemBean.setMedia_id(result.getItem().get(1).getMedia_id());
+                materialItemBean.setName(result.getItem().get(i).getContent().getNews_item().get(0).getTitle());
+                materialItemBean.setUrl(result.getItem().get(i).getContent().getNews_item().get(0).getUrl());
                 materialItemBean.setUpdate_time(WXDateUtil.GetDateTimeWithTimeStamp(Integer.parseInt(result.getItem().get(i).getUpdate_time())));
                 materialItemBeans.add(materialItemBean);
             }
