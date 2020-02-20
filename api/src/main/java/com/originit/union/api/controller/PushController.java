@@ -5,6 +5,7 @@ import com.originit.union.business.bean.TagListBean;
 import com.originit.union.business.bean.UserListBean;
 import com.originit.union.business.WxBusiness;
 import com.originit.union.entity.dto.PushInfoDto;
+import com.originit.union.service.PushInfoService;
 import com.originit.union.service.UserService;
 import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.bean.*;
@@ -35,17 +36,20 @@ public class PushController {
     private static  final  String  CARD_INFO="https://api.weixin.qq.com/card/membercard/userinfo/get?access_token=TOKEN";
     @Autowired
     private IService iService;
-
     WxBusiness wxBusiness;
     @Autowired
     public void setWxBusiness(WxBusiness wxBusiness) {
         this.wxBusiness = wxBusiness;
     }
-
     private UserService userService;
     @Autowired
     public void setUserService(UserService userService){
         this.userService=userService;
+    }
+    private PushInfoService pushInfoService;
+    @Autowired
+    public void setPushInfoService(PushInfoService pushInfoService) {
+        this.pushInfoService = pushInfoService;
     }
     /**
      *
@@ -102,7 +106,7 @@ public class PushController {
             e.printStackTrace();
         }
 
-        return  a.toString();
+        return null;
     }
 
 
@@ -133,8 +137,12 @@ public class PushController {
      */
     @RequestMapping("/push")
     @ResponseBody
-    public void addPushInfo(List<String> openidList, PushInfoDto pushInfoDto) throws WxErrorException, IOException {
-
+    public void addPushInfo(List<String> openidList, PushInfoDto pushInfoDto)  {
+        if (pushInfoDto.getType()!=1||pushInfoDto.getType()!=2) {
+            Long pushId = wxBusiness.PushInfo(openidList, pushInfoDto);
+            pushInfoDto.setPushId(pushId);
+            pushInfoService.addPushInfo(openidList, pushInfoDto);
+        }
     }
 
 }

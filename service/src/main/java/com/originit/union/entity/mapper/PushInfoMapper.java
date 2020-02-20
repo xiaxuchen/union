@@ -2,8 +2,8 @@ package com.originit.union.entity.mapper;
 
 import com.originit.union.entity.PushInfoEntity;
 import com.originit.union.entity.dto.PushInfoDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.apache.ibatis.annotations.Mapper;
+
 import org.mapstruct.factory.Mappers;
 
 @Mapper

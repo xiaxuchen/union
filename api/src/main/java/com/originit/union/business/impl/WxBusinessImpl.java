@@ -248,8 +248,9 @@ public class WxBusinessImpl implements WxBusiness {
     }
 
     @Override
-    public void PushInfo(List<String> openidList, PushInfoDto pushInfoDto) {
+    public Long PushInfo(List<String> openidList, PushInfoDto pushInfoDto) {
         WxOpenidSender sender = new WxOpenidSender();
+        SenderResult result = null;
         sender.setTouser(openidList);
         if (pushInfoDto.getType()==1){
             sender.setMsgtype("text");
@@ -261,10 +262,12 @@ public class WxBusinessImpl implements WxBusiness {
             sender.setText(new SenderContent.Text(pushInfoDto.getContent()));
         }
         try {
-            SenderResult result = iService.sendAllByOpenid(sender);
+             result = iService.sendAllByOpenid(sender);
             System.out.println(result.toString());
+
         } catch (WxErrorException e) {
             e.printStackTrace();
         }
+        return  result.getMsg_id();
     }
 }

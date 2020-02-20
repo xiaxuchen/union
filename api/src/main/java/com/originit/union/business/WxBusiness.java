@@ -84,5 +84,5 @@ public interface WxBusiness {
      * @param openidList 用户列表
      * @param pushInfoDto   其中的，type为1表示文本消息，为2表示图文消息，content对应为文本内容和微信公众平台的media_id
      */
-    void PushInfo(List<String> openidList, PushInfoDto pushInfoDto);
+    Long PushInfo(List<String> openidList, PushInfoDto pushInfoDto);
 }
