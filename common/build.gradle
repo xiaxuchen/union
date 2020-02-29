@@ -1,0 +1,28 @@
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile "com.soecode.wx-tools:wx-tools:2.1.4-RELEASE"
+    compile "org.springframework.boot:spring-boot-starter-data-redis-reactive"
+
+    compile "org.apache.commons:commons-lang3:3.5"
+
+    compile "org.apache.shiro:shiro-spring:1.4.0"
+
+    compile "com.google.code.gson:gson:2.8.5"
+
+    compile "org.crazycake:shiro-redis:3.1.0"
+
+    compile "org.apache.poi:poi-ooxml:3.14"
+
+    compile "org.apache.poi:poi:3.14"
+
+    compile "org.quartz-scheduler:quartz:2.2.1"
+}

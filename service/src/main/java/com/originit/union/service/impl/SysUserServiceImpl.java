@@ -1,0 +1,100 @@
+package com.originit.union.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.originit.common.page.Pager;
+import com.originit.common.validator.group.CreateGroup;
+import com.originit.union.entity.AgentInfoEntity;
+import com.originit.union.entity.SysUserEntity;
+import com.originit.union.entity.SysUserRoleEntity;
+import com.originit.union.entity.dto.SysUserDto;
+import com.originit.union.entity.dto.SysUserQueryDto;
+import com.originit.union.entity.vo.SysUserVO;
+import com.originit.union.mapper.AgentInfoDao;
+import com.originit.union.mapper.SysUserDao;
+import com.originit.union.mapper.SysUserRoleDao;
+import com.originit.union.service.SysUserRoleService;
+import com.originit.union.service.SysUserService;
+import com.originit.union.util.PagerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+
+/**
+ * @Description 系统用户业务实现
+ * @Author Sans
+ * @CreateTime 2019/6/14 15:57
+ */
+@Service("sysUserService")
+public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> implements SysUserService {
+
+
+    private AgentInfoDao agentInfoDao;
+
+    private SysUserRoleDao sysUserRoleDao;
+
+    @Autowired
+    public void setSysUserRoleDao(SysUserRoleDao sysUserRoleDao) {
+        this.sysUserRoleDao = sysUserRoleDao;
+    }
+
+    @Autowired
+    public void setAgentInfoDao(AgentInfoDao agentInfoDao) {
+        this.agentInfoDao = agentInfoDao;
+    }
+
+    /**
+     * 根据用户名查询实体
+     * @Author Sans
+     * @CreateTime 2019/6/14 16:30
+     * @Param  username 用户名
+     * @Return SysUserEntity 用户实体
+     */
+    @Override
+    public SysUserEntity selectUserByName(String username) {
+        QueryWrapper<SysUserEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(SysUserEntity::getUsername,username);
+        return this.baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long addSysUser(@Validated(CreateGroup.class) SysUserDto sysUserDto) {
+        // 添加到用户表
+        SysUserEntity sysUser = SysUserEntity.builder()
+                .headImg(sysUserDto.getHeadImg())
+                .username(sysUserDto.getUsername())
+                .phone(sysUserDto.getPhone())
+                .password(sysUserDto.getPassword())
+                .salt(sysUserDto.getSlat())
+                .build();
+        baseMapper.insert(sysUser);
+        if (sysUserDto.getIsAgent()) {
+            // 添加客服角色
+            sysUserRoleDao.insert(SysUserRoleEntity.builder()
+                    .roleId(2L)
+                    .userId(sysUser.getUserId())
+                    .build());
+            // 添加客户经理信息
+            agentInfoDao.insert(AgentInfoEntity.builder()
+                    .account(sysUserDto.getAccount())
+                    .des(sysUserDto.getDes())
+                    .name(sysUserDto.getName())
+                    .sex(sysUserDto.getSex())
+                    .sysUserId(sysUser.getUserId())
+                    .build());
+        }
+        return sysUser.getUserId();
+    }
+
+    @Override
+    public Pager<SysUserVO> search(SysUserQueryDto queryDto) {
+        IPage<SysUserVO> sysUserVOIPage = baseMapper.selectByConditions(PagerUtil.createPage(queryDto.getCurPage(), queryDto.getPageSize()), queryDto);
+        return PagerUtil.fromIPage(sysUserVOIPage);
+    }
+}

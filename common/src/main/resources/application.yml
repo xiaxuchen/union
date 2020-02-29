@@ -1,0 +1,13 @@
+# 配置数据库连接池和数据库
+spring:
+  # @ResponseBody返回的json字符集校正
+  http:
+    encoding:
+      force: true
+    multipart:
+      enabled: true
+  # 激活Profile
+  profiles:
+    active: dev
+server:
+  port: 80

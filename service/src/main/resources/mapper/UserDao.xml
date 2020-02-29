@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.originit.union.mapper.UserDao">
+
+    <resultMap id="UserInfoMap" type="com.originit.union.entity.domain.UserInfo" autoMapping="true">
+        <id property="openId" column="open_id" />
+        <result property="phone" column="phone" />
+        <collection property="tags" javaType="java.util.ArrayList" ofType="com.originit.union.entity.TagEntity">
+            <id property="id" column="tagId" />
+            <result property="name" column="tagName"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertOrUpdateUser" useGeneratedKeys="true">
+        INSERT INTO user_bind(open_id,name,sex,phone,head_img,subscribe_time)
+        VALUES(#{openId},#{name},#{sex},#{phone},#{headImg},#{subscribeTime})
+        ON DUPLICATE KEY UPDATE name=#{name},sex=#{sex},phone=#{phone},head_img=#{headImg},subscribe_time=#{subscribeTime}
+    </insert>
+
+    <select id="selectUserByPhonesAndTags" resultMap="UserInfoMap">
+        SELECT user_bind.open_id,user_bind.phone,
+        user_bind.subscribe_time,user_bind.head_img,
+        user_bind.push_count,user_bind.name,
+        user_bind.sex,tag.id tagId,tag.name tagName
+        FROM user_bind
+        LEFT JOIN user_tag ON user_bind.id = user_tag.bind_user_id
+        LEFT JOIN tag ON user_tag.tag_id = tag.id
+        <where>
+            <if test="tagList != null and tagList.size() > 0">
+                AND user_tag.tag_id in
+                <foreach collection="tagList" item="tag" open="(" close=")" separator=",">
+                    #{tag}
+                </foreach>
+            </if>
+            <if test="phoneList != null and phoneList.size() > 0">
+                AND user_bind.phone in
+                <foreach collection="phoneList" item="phone" open="(" close=")" separator=",">
+                    #{phone}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

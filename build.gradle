@@ -1,0 +1,70 @@
+//应用于gradle 编译
+buildscript {
+    //定义
+    ext {
+        springBootVersion = "2.0.5.RELEASE"
+    }
+    repositories {
+        repositories {
+            maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        }
+        //maven 中央仓库
+        mavenCentral()
+    }
+
+    dependencies {
+        // 指定gradle spring boot plugin 版本 用于spring boot 版本依赖控制
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+// 所有子项目的通用配置
+subprojects {
+
+    //指定中央仓库 项目使用
+    repositories {
+        repositories {
+            maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        }
+        //maven 中央仓库
+        mavenCentral()
+    }
+
+    //应用插件
+    apply plugin: 'java'
+
+    apply plugin: 'org.springframework.boot'
+
+    //用于spring boot 版本jar依赖
+    apply plugin: 'io.spring.dependency-management'
+
+    //指定jdk版本
+    sourceCompatibility = 1.8
+
+    //设置group id
+    group 'com.originit'
+
+    //设置版本
+    version '1.0.0'
+
+    description 'project'
+
+    //依赖
+    dependencies {
+        testCompile('org.springframework.boot:spring-boot-starter-test')
+        compile('org.springframework.boot:spring-boot-starter')
+        compile('org.springframework.boot:spring-boot-starter-web')
+        implementation "org.springframework.boot:spring-boot-starter-aop"
+        compile "org.projectlombok:lombok:1.16.18"
+        //quartz依赖
+        implementation "org.springframework.boot:spring-boot-starter-quartz"
+        implementation "org.mapstruct:mapstruct-jdk8:1.2.0.Final"
+        annotationProcessor "org.mapstruct:mapstruct-processor:1.2.0.Final"
+    }
+
+    //这里一定得要。在多模块下，不然编译失败，因为不会把信赖模块给打包。
+    jar {
+        enabled = true
+    }
+}
+
