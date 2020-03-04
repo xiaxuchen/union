@@ -20,6 +20,10 @@ package com.originit.union.api.shiro.realm;
 //import java.util.List;
 //import java.util.Set;
 
+import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.UserException;
+import com.originit.common.exceptions.UserNotLoginException;
+import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.entity.SysMenuEntity;
 import com.originit.union.entity.SysRoleEntity;
 import com.originit.union.entity.SysUserEntity;
@@ -97,11 +101,11 @@ public class ShiroRealm extends AuthorizingRealm {
         SysUserEntity user = sysUserService.selectUserByName(username);
         //判断账号是否存在
         if (user == null) {
-            throw new AuthenticationException();
+            throw new UserException(ResultCode.USER_NOT_EXIST);
         }
         //判断账号是否被冻结
         if (user.getState()==null||user.getState().equals("PROHIBIT")){
-            throw new LockedAccountException();
+            throw new UserException(ResultCode.USER_ACCOUNT_FORBIDDEN);
         }
         //进行验证
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
@@ -114,7 +118,7 @@ public class ShiroRealm extends AuthorizingRealm {
                 getName()
         );
         //验证成功开始踢人(清除缓存和Session)
-//        ShiroUtils.deleteCache(username,true);
+        ShiroUtils.deleteCache(user.getUserId(),true);
         return authenticationInfo;
     }
 }

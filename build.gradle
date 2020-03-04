@@ -23,9 +23,7 @@ subprojects {
 
     //指定中央仓库 项目使用
     repositories {
-        repositories {
-            maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         //maven 中央仓库
         mavenCentral()
     }
@@ -47,19 +45,17 @@ subprojects {
     //设置版本
     version '1.0.0'
 
-    description 'project'
-
     //依赖
     dependencies {
         testCompile('org.springframework.boot:spring-boot-starter-test')
         compile('org.springframework.boot:spring-boot-starter')
         compile('org.springframework.boot:spring-boot-starter-web')
         implementation "org.springframework.boot:spring-boot-starter-aop"
-        compile "org.projectlombok:lombok:1.16.18"
+        annotationProcessor 'org.projectlombok:lombok:1.18.2'
+
+        compileOnly 'org.projectlombok:lombok:1.18.2'
         //quartz依赖
         implementation "org.springframework.boot:spring-boot-starter-quartz"
-        implementation "org.mapstruct:mapstruct-jdk8:1.2.0.Final"
-        annotationProcessor "org.mapstruct:mapstruct-processor:1.2.0.Final"
     }
 
     //这里一定得要。在多模块下，不然编译失败，因为不会把信赖模块给打包。
@@ -68,3 +64,10 @@ subprojects {
     }
 }
 
+this.afterEvaluate {
+    subprojects.each {Project pro ->
+        pro.tasks.getByName('clean').doLast {
+            file(pro.getProjectDir().absolutePath + '/out').deleteDir()
+        }
+    }
+}

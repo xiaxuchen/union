@@ -1,8 +1,8 @@
 package com.originit.union.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.common.page.Pager;
 import com.originit.common.validator.group.CreateGroup;
@@ -11,11 +11,11 @@ import com.originit.union.entity.SysUserEntity;
 import com.originit.union.entity.SysUserRoleEntity;
 import com.originit.union.entity.dto.SysUserDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
+import com.originit.union.entity.dto.SysUserUpdateDto;
 import com.originit.union.entity.vo.SysUserVO;
 import com.originit.union.mapper.AgentInfoDao;
 import com.originit.union.mapper.SysUserDao;
 import com.originit.union.mapper.SysUserRoleDao;
-import com.originit.union.service.SysUserRoleService;
 import com.originit.union.service.SysUserService;
 import com.originit.union.util.PagerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 /**
  * @Description 系统用户业务实现
@@ -96,5 +96,44 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
     public Pager<SysUserVO> search(SysUserQueryDto queryDto) {
         IPage<SysUserVO> sysUserVOIPage = baseMapper.selectByConditions(PagerUtil.createPage(queryDto.getCurPage(), queryDto.getPageSize()), queryDto);
         return PagerUtil.fromIPage(sysUserVOIPage);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSysUser(SysUserUpdateDto sysUserDto) {
+        final SysUserEntity sysUser = SysUserEntity.builder()
+                .headImg(sysUserDto.getHeadImg())
+                .username(sysUserDto.getUsername())
+                .phone(sysUserDto.getPhone())
+                .password(sysUserDto.getPassword())
+                .salt(sysUserDto.getSalt())
+                .state(sysUserDto.getIsInValid()? SysUserEntity.FORBID:SysUserEntity.ENABLE)
+                .gmtModified(LocalDateTime.now())
+                .build();
+        // 更新系统用户表
+        baseMapper.update(sysUser,new QueryWrapper<SysUserEntity>().lambda().
+                eq(SysUserEntity::getUserId,sysUserDto.getUserId()));
+        final LambdaQueryWrapper<AgentInfoEntity> qw = new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, sysUserDto.getUserId());
+        if (sysUserDto.getIsAgent()) {
+            final AgentInfoEntity agentInfo = AgentInfoEntity.builder()
+                    .account(sysUserDto.getAccount())
+                    .des(sysUserDto.getDes())
+                    .name(sysUserDto.getName())
+                    .sex(sysUserDto.getSex())
+                    .id(sysUserDto.getAgentId())
+                    .sysUserId(sysUserDto.getUserId())
+                    .gmtModified(LocalDateTime.now())
+                    .build();
+            if (agentInfoDao.selectCount(qw) != 0) {
+                // 已存在则更新
+                agentInfoDao.update(agentInfo,qw);
+            } else {
+                // 添加客户经理信息
+                agentInfoDao.insert(agentInfo);
+            }
+        } else {
+            // 如果不是经理则删除经理信息，没有就删除不了
+            agentInfoDao.delete(qw);
+        }
     }
 }

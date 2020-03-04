@@ -1,16 +1,34 @@
 package com.originit.union.entity.vo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+/**
+ * 用户信息vo
+ * @author xxc、
+ */
 @Data
 public class SysUserVO {
     /**
      * 用户ID
      */
     private Long userId;
+
+    /**
+     * 客户经理信息
+     */
+    private AgentInfoVO agentInfo;
+
+    /**
+     * 用户的角色
+     */
+    private List<RoleVO> roles;
     /**
      * 用户名
      */
@@ -32,32 +50,8 @@ public class SysUserVO {
     private Integer state;
 
     /**
-     * 客户经理id
-     */
-    private Long agentId;
-
-    /**
-     * 客户经理姓名
-     */
-    private String name;
-
-    /**
-     * 性别
-     */
-    private Integer sex;
-
-    /**
-     * 客服账号
-     */
-    private String account;
-
-    /**
-     * 简介
-     */
-    private String des;
-
-    /**
      * 创建时间
      */
-    private LocalDateTime gmtCreate;
+    private LocalDateTime createTime;
+
 }

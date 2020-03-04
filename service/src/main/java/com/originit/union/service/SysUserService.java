@@ -6,6 +6,7 @@ import com.originit.common.page.Pager;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.union.entity.dto.SysUserDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
+import com.originit.union.entity.dto.SysUserUpdateDto;
 import com.originit.union.entity.vo.SysUserVO;
 
 import java.util.List;
@@ -39,5 +40,11 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @return 用户信息列表
      */
     Pager<SysUserVO> search(SysUserQueryDto queryDto);
+
+    /**
+     * 更新系统用户信息
+     * @param sysUserEntity 系统用户信息
+     */
+    void updateSysUser (SysUserUpdateDto sysUserEntity);
 }
 

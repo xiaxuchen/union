@@ -3,8 +3,11 @@ package com.originit.union.entity.dto;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * 更新系统用户的dto
+ */
 @Data
-public class SysUserDto {
+public class SysUserUpdateDto {
 
     /**
      * 用户id
@@ -25,6 +28,12 @@ public class SysUserDto {
      */
     private String password;
 
+
+    /**
+     * 密码的盐值
+     */
+    private String salt;
+
     /**
      * 是否为客服
      */
@@ -33,14 +42,17 @@ public class SysUserDto {
     /**
      * 是否有效
      */
-    private Boolean isValid;
+    private Boolean isInValid;
 
+
+    /**
+     * 客户经理id
+     */
+    private Long agentId;
     /**
      * 客户经理姓名
      */
     private String name;
-
-    private String slat;
 
     /**
      * 电话号码

@@ -59,11 +59,11 @@ public class ShiroUtils {
      * 删除用户缓存信息
      * @Author Sans
      * @CreateTime 2019/6/17 13:57
-     * @Param  username  用户名称
+     * @Param  userId  用户名称
      * @Param  isRemoveSession 是否删除Session
      * @Return void
      */
-    public static void deleteCache(String username, boolean isRemoveSession){
+    public static void deleteCache(Long userId, boolean isRemoveSession){
         //从缓存中获取Session
         Session session = null;
         Collection<Session> sessions = redisSessionDAO.getActiveSessions();
@@ -79,7 +79,7 @@ public class ShiroUtils {
             if (sysUserEntity == null) {
                 continue;
             }
-            if (Objects.equals(sysUserEntity.getUsername(), username)) {
+            if (Objects.equals(sysUserEntity.getUserId(), userId)) {
                 session=sessionInfo;
                 break;
             }

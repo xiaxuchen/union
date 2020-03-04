@@ -1,6 +1,7 @@
 package com.originit.union.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,6 +60,12 @@ public class SysUserEntity implements Serializable {
 	 * 状态:NORMAL正常  PROHIBIT禁用
 	 */
 	private Integer state;
+
+	/**
+	 * 是否已删除
+	 */
+	@TableLogic
+	private Integer deleted;
 
 	/**
 	 * 创建时间

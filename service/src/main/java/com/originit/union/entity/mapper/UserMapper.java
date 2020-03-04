@@ -1,5 +1,6 @@
 package com.originit.union.entity.mapper;
 
+import com.originit.union.entity.domain.UserInfo;
 import com.originit.union.entity.vo.UserInfoVO;
 import com.originit.union.util.DateUtil;
 import com.soecode.wxtools.bean.WxUserList;
@@ -19,6 +20,15 @@ public interface UserMapper {
             @Mapping(source = "nickname",target = "name")
     })
     UserInfoVO to(WxUserList.WxUser user);
+
+    @Mappings({
+            @Mapping(target = "sex",expression = "java(UserMapper.convertSex(user.getSex()))"),
+            @Mapping(source = "openId",target = "id"),
+            @Mapping(source = "headImg",target = "headImg"),
+            @Mapping(source = "name",target = "name"),
+            @Mapping(source = "phone",target = "phone")
+    })
+    UserInfoVO to (UserInfo user);
 
     public static String convertSex(Integer sex) {
         if (sex == null) {

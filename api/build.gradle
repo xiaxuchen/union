@@ -1,8 +1,8 @@
 plugins {
-    id 'java'
+    id 'com.originit.gradle'
 }
 
-version 'unspecified'
+version '1.0'
 
 sourceCompatibility = 1.8
 

@@ -49,10 +49,6 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testQiniu() {
-    }
-
-    @Test
     public void login() throws Exception {
         String json="{\"author\":\"HAHAHAA\",\"title\":\"Spring\",\"url\":\"http://tengj.top/\"}";
         // 在这边，通过这个MockMvc可以通过url进行调用，这里就是测试登录方法，我们可以通过同样的方式去访问刚刚的方法，
@@ -66,11 +62,4 @@ public class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testRole() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/manager/testRole")
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-        )
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
 }

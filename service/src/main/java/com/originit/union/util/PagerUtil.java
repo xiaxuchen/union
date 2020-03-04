@@ -12,7 +12,7 @@ public class PagerUtil {
      * 简化转换操作
      */
     public static <T> Pager<T> fromIPage(IPage<T> iPage) {
-        return new Pager<>(iPage.getRecords(), iPage.getTotal());
+        return new Pager<T>(iPage.getRecords(), iPage.getTotal());
     }
 
     /**

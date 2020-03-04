@@ -1,20 +1,16 @@
 package com.originit.union.api.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.originit.common.page.Pager;
 import com.originit.union.api.util.SHA256Util;
 import com.originit.union.api.util.ShiroUtils;
-import com.originit.union.entity.AgentInfoEntity;
-import com.originit.union.entity.SysUserRoleEntity;
 import com.originit.union.entity.dto.SysUserDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
+import com.originit.union.entity.dto.SysUserUpdateDto;
 import com.originit.union.entity.vo.LoginUserVO;
+import com.originit.union.entity.vo.RoleVO;
 import com.originit.union.entity.vo.SysUserVO;
-import com.originit.union.service.AgentInfoService;
-import com.originit.union.service.SysUserRoleService;
+import com.originit.union.service.SysRoleService;
 import com.originit.union.service.SysUserService;
-import com.originit.union.service.UserService;
 import com.xxc.response.anotation.ResponseResult;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -25,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author xxc、
@@ -38,23 +36,16 @@ public class UserController {
     public static final String TOKEN = "token";
     private SysUserService sysUserService;
 
-    private SysUserRoleService sysUserRoleService;
-
-    private AgentInfoService agentInfoService;
-
-    @Autowired
-    public void setAgentInfoService(AgentInfoService agentInfoService) {
-        this.agentInfoService = agentInfoService;
-    }
-
-    @Autowired
-    public void setSysUserRoleService(SysUserRoleService sysUserRoleService) {
-        this.sysUserRoleService = sysUserRoleService;
-    }
+    private SysRoleService sysRoleService;
 
     @Autowired
     public void setSysUserService(SysUserService sysUserService) {
         this.sysUserService = sysUserService;
+    }
+
+    @Autowired
+    public void setSysRoleService(SysRoleService sysRoleService) {
+        this.sysRoleService = sysRoleService;
     }
 
     /**
@@ -79,6 +70,7 @@ public class UserController {
     @PostMapping("/logout")
     public void logout () {
         SecurityUtils.getSubject().logout();
+        ShiroUtils.deleteCache(ShiroUtils.getUserInfo().getUserId(),true);
     }
 
     /**
@@ -116,11 +108,26 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void deleteSysUser (@PathVariable("id") Long[] ids) {
-        for (Long id : ids) {
-            // 删除一个系统用户需要删除其用户信息、角色信息、客户经理信息
-            sysUserService.removeById(id);
-            sysUserRoleService.remove(new QueryWrapper<SysUserRoleEntity>().lambda().eq(SysUserRoleEntity::getUserId,id));
-            agentInfoService.remove(new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId,id));
+        // 删除用户
+        sysUserService.removeByIds(Arrays.asList(ids));
+    }
+
+    @PutMapping
+    public void updateSysUser (@RequestBody SysUserUpdateDto sysUserDto) {
+        String salt = ByteSource.Util.bytes(sysUserDto.getUsername()).toString();
+        if (sysUserDto.getPassword() != null) {
+            sysUserDto.setSalt(salt);
+            sysUserDto.setPassword(SHA256Util.sha256(sysUserDto.getPassword(),salt));
         }
+        sysUserService.updateSysUser(sysUserDto);
+    }
+
+    /**
+     * 获取所有的角色信息
+     * @return
+     */
+    @GetMapping("/roles")
+    public List<RoleVO> getRoles () {
+        return sysRoleService.list().stream().map(sysRoleEntity -> new RoleVO(sysRoleEntity.getRoleId(), sysRoleEntity.getRoleName())).collect(Collectors.toList());
     }
 }
