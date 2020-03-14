@@ -2,6 +2,7 @@ package com.originit.union.api.util;
 
 import com.originit.union.entity.SysUserEntity;
 import com.originit.common.util.SpringUtil;
+import com.originit.union.service.RedisService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.LogoutAware;
@@ -25,6 +26,8 @@ public class ShiroUtils {
 	private ShiroUtils(){ }
 
     private static RedisSessionDAO redisSessionDAO = SpringUtil.getBean(RedisSessionDAO.class);
+
+	private static RedisService redisService = SpringUtil.getBean(RedisService.class);
 
     /**
      * 获取当前用户Session
@@ -64,27 +67,17 @@ public class ShiroUtils {
      * @Return void
      */
     public static void deleteCache(Long userId, boolean isRemoveSession){
-        //从缓存中获取Session
-        Session session = null;
-        Collection<Session> sessions = redisSessionDAO.getActiveSessions();
-        SysUserEntity sysUserEntity;
-        Object attribute = null;
-        for(Session sessionInfo : sessions){
-            //遍历Session,找到该用户名称对应的Session
-            attribute = sessionInfo.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-            if (attribute == null) {
-                continue;
-            }
-            sysUserEntity = (SysUserEntity) ((SimplePrincipalCollection) attribute).getPrimaryPrincipal();
-            if (sysUserEntity == null) {
-                continue;
-            }
-            if (Objects.equals(sysUserEntity.getUserId(), userId)) {
-                session=sessionInfo;
-                break;
-            }
+        String sessionId = redisService.get(generateUserKey(userId), String.class);
+        if (sessionId == null) {
+            return;
         }
-        if (session == null||attribute == null) {
+        //从缓存中获取Session
+        final Session session = redisSessionDAO.readSession(sessionId);
+        if (session == null) {
+            return;
+        }
+        Object attribute = session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+        if (attribute == null) {
             return;
         }
         //删除session
@@ -96,4 +89,14 @@ public class ShiroUtils {
         Authenticator authc = securityManager.getAuthenticator();
         ((LogoutAware) authc).onLogout((SimplePrincipalCollection) attribute);
     }
+
+    /**
+     * 生成缓存的用户键
+     * @param userId 用户id
+     * @return 用户的键
+     */
+    public static String generateUserKey (Long userId) {
+        return "union_user_id:" + userId;
+    }
+
 }

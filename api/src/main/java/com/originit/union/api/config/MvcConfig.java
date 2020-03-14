@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -55,4 +56,5 @@ public class MvcConfig implements WebMvcConfigurer {
         tomcatServletWebServerFactory.setErrorPages(set);
         return tomcatServletWebServerFactory;
     }
+
 }

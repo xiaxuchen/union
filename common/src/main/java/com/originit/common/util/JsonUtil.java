@@ -12,7 +12,8 @@ public class JsonUtil {
         mapper=new ObjectMapper();
     }
     public static String toJson(Object obj) throws IOException {
-        String json = mapper.writeValueAsString(obj);
-        return json;
+        if (obj == null)
+            return "";
+        return mapper.writeValueAsString(obj);
     }
 }

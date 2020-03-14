@@ -44,7 +44,8 @@ public class ShiroConfig {
     private int port;
     @Value("${spring.redis.timeout}")
     private int timeout;
-
+    @Value("${spring.redis.password}")
+    private String password;
     /**
      * 开启Shiro-aop注解支持
      * @Attention 使用代理方式所以需要开启代码支持
@@ -75,7 +76,9 @@ public class ShiroConfig {
         // 注意过滤器配置顺序不能颠倒
         // 配置过滤:不会被拦截的链接
         filterChainDefinitionMap.put("/static/**", "anon");
+        filterChainDefinitionMap.put("/websocket/**","anon");
         filterChainDefinitionMap.put("/sysuser/login", "anon");
+        filterChainDefinitionMap.put("/sysuser/permit","anon");
         filterChainDefinitionMap.put("/core/**","anon");
         filterChainDefinitionMap.put("/resource/file/**","anon");
         filterChainDefinitionMap.put("/**", "authc");
@@ -140,6 +143,7 @@ public class ShiroConfig {
         RedisManager redisManager = new RedisManager();
         redisManager.setHost(host);
         redisManager.setPort(port);
+        redisManager.setPassword(password);
         redisManager.setTimeout(timeout);
         return redisManager;
     }

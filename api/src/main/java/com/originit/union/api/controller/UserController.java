@@ -3,12 +3,14 @@ package com.originit.union.api.controller;
 import com.originit.common.page.Pager;
 import com.originit.union.api.util.SHA256Util;
 import com.originit.union.api.util.ShiroUtils;
+import com.originit.union.entity.SysUserEntity;
 import com.originit.union.entity.dto.SysUserDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
 import com.originit.union.entity.dto.SysUserUpdateDto;
 import com.originit.union.entity.vo.LoginUserVO;
 import com.originit.union.entity.vo.RoleVO;
 import com.originit.union.entity.vo.SysUserVO;
+import com.originit.union.service.RedisService;
 import com.originit.union.service.SysRoleService;
 import com.originit.union.service.SysUserService;
 import com.xxc.response.anotation.ResponseResult;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Console;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +40,14 @@ public class UserController {
     private SysUserService sysUserService;
 
     private SysRoleService sysRoleService;
+
+    private RedisService redisService;
+
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
+    }
+
 
     @Autowired
     public void setSysUserService(SysUserService sysUserService) {
@@ -61,7 +72,12 @@ public class UserController {
         /* 进行登录操作 */
         subject.login(token);
         response.setHeader(TOKEN, request.getSession().getId());
-        return new LoginUserVO(ShiroUtils.getUserInfo().getUsername(),ShiroUtils.getUserInfo().getHeadImg());
+        SysUserEntity userInfo = ShiroUtils.getUserInfo();
+        // 更新用户和session的关系
+        final String userKey = ShiroUtils.generateUserKey(userInfo.getUserId());
+        redisService.set(userKey,ShiroUtils.getSession().getId().toString());
+        redisService.expire(userKey,1800 * 1000);
+        return new LoginUserVO(userInfo.getUserId(),userInfo.getUsername(), userInfo.getHeadImg());
     }
 
     /**
@@ -79,7 +95,7 @@ public class UserController {
      * @return 是否有权限跳转
      */
     @GetMapping("/permit")
-    public Boolean permit (String url) {
+    public Boolean permit (@RequestParam String url) {
         return true;
     }
 
@@ -129,5 +145,10 @@ public class UserController {
     @GetMapping("/roles")
     public List<RoleVO> getRoles () {
         return sysRoleService.list().stream().map(sysRoleEntity -> new RoleVO(sysRoleEntity.getRoleId(), sysRoleEntity.getRoleName())).collect(Collectors.toList());
+    }
+
+    public LoginUserVO getUserInfo () {
+        SysUserEntity userInfo = ShiroUtils.getUserInfo();
+        return new LoginUserVO(userInfo.getUserId(),userInfo.getUsername(), userInfo.getHeadImg());
     }
 }

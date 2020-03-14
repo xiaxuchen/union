@@ -1,7 +1,9 @@
 package com.originit.union.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;  
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Calendar;
 import java.util.Date;  
   
 public class DateUtil {
@@ -76,7 +78,16 @@ public class DateUtil {
                         time = split[1];  
                 }  
                 return time;  
-        }  
+        }
+
+        /**
+         * 得到时间  HH:mm:ss
+         * @param timeStamp   时间戳
+         * @return
+         */
+        public static LocalDateTime toLocalDateTime(long timeStamp) {
+                return LocalDateTime.ofEpochSecond(timeStamp, 0, ZoneOffset.ofHours(8));
+        }
           
         /** 
          * 将一个时间戳转换成提示性时间字符串，如刚刚，1秒前 

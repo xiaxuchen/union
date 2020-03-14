@@ -146,16 +146,9 @@ public class UserBusiness {
             }).collect(Collectors.toList());
             try {
                 // 从微信获取用户信息并转换为dto
-                List<UserBindEntity> list = wxService.batchGetUserInfo(gets).getUser_info_list().stream().map(user -> {
-                    return UserBindEntity.builder()
-                            .sex(user.getSex())
-                            .headImg(user.getHeadimgurl())
-                            .name(user.getNickname())
-                            .subscribeTime(LocalDateTime.ofEpochSecond(Long.parseLong(user.getSubscribe_time()), 0, ZoneOffset.ofHours(8)))
-                            .openId(user.getOpenid())
-                            .phone(getPhone(user.getOpenid()))
-                            .build();
-                }).collect(Collectors.toList());
+                List<UserBindEntity> list = wxService.batchGetUserInfo(gets)
+                        .getUser_info_list().stream().map(this::wxUserToUserBind)
+                        .collect(Collectors.toList());
                 users.addAll(list);
             } catch (WxErrorException e) {
                 log.error(e.getError().getErrmsg());
@@ -204,5 +197,37 @@ public class UserBusiness {
             e.printStackTrace();
             throw new RemoteAccessException("微信请求异常:" + e.getMessage());
         }
+    }
+
+    /**
+     * 通过openId从网络获取用户信息
+     * @param openId 用户openId
+     * @return 用户实体
+     */
+    public UserBindEntity getUserByOpenId (String openId) {
+        WxUserList.WxUser wxUser = null;
+        try {
+            wxUser = wxService.getUserInfoByOpenId(new WxUserList.WxUser.WxUserGet(openId, WeChatConstant.LANG));
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return wxUserToUserBind(wxUser);
+    }
+
+    /**
+     * 转换用户
+     * @param user 微信返回的用户格式
+     * @return 数据库用户实体
+     */
+    public UserBindEntity wxUserToUserBind (WxUserList.WxUser user) {
+        return UserBindEntity.builder()
+                .sex(user.getSex())
+                .headImg(user.getHeadimgurl())
+                .name(user.getNickname())
+                .subscribeTime(LocalDateTime.ofEpochSecond(Long.parseLong(user.getSubscribe_time()), 0, ZoneOffset.ofHours(8)))
+                .openId(user.getOpenid())
+                .phone(getPhone(user.getOpenid()))
+                .build();
     }
 }

@@ -82,12 +82,33 @@ spring:
     host: 47.105.61.4
     port: 6379
     timeout: 6000
+    password: xxcisbest
     jedis:
       pool:
         max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
         max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
         max-idle: 10      # 连接池中的最大空闲连接
         min-idle: 5       # 连接池中的最小空闲连接
+  #配置rabbitMq 服务器
+  rabbitmq:
+    host: 47.105.61.4
+    port: 5672
+    username: guest
+    password: 147258
+    # 回调
+    publisher-confirms: true
+    publisher-returns: true
+    template:
+      mandatory: true
+    virtual-host: /
+    connection-timeout: 15000
+    listener:
+      simple:
+        # 手动ack
+        acknowledge-mode: manual
+        # 配置消息投递速率
+        concurrency: 5
+        prefetch: 5 #限制每次发送接受5条数据。
 
 
 # mybatis-plus相关配置

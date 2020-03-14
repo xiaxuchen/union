@@ -1,5 +1,6 @@
 package com.originit.union.service;
 
+import com.originit.union.entity.UserBindEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -15,7 +17,15 @@ public class UserServiceTest {
     @Autowired
     UserService userService;
 
-//    /**
+    @Autowired
+    ThreadPoolExecutor executor;
+
+    @Test
+    public void addOrUpdateUsers() {
+    }
+
+
+    //    /**
 //     * 测试当传入空列表时是否抛异常
 //     */
 //    @Test(expected = IllegalArgumentException.class)

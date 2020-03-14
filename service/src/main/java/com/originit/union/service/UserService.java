@@ -15,6 +15,13 @@ import java.util.List;
 public interface UserService extends IService<UserBindEntity> {
 
     /**
+     * 通过openId去获取用户的信息
+     * @param openId 用户的openId
+     * @return 用户的信息
+     */
+    UserBindEntity getUserInfoByOpenId (String openId);
+
+    /**
      * 添加或更新用户列表
      * @param users 用户列表
      */

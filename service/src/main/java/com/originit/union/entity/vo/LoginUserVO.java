@@ -11,6 +11,11 @@ import lombok.Data;
 public class LoginUserVO {
 
     /**
+     * 用户id
+     */
+    private Long id;
+
+    /**
      * 用户名
      */
     private String username;

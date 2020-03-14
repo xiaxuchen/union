@@ -46,4 +46,14 @@ public interface WeChatConstant {
      * 阻止默认的输出
      */
     String PREVENT_DEFAULT_OUT = "prevent_default_out";
+
+    /**
+     * 开启客服
+     */
+    String CLIENT_SERVE_START = "#1";
+
+    /**
+     * 结束客服
+     */
+    String CLIENT_SERVE_END = "#2";
 }

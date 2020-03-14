@@ -1,9 +1,11 @@
 package com.originit.union.entity.mapper;
 
 import com.originit.union.entity.domain.UserInfo;
+import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.UserInfoVO;
 import com.originit.union.util.DateUtil;
 import com.soecode.wxtools.bean.WxUserList;
+import net.sf.saxon.expr.instruct.Message;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

@@ -27,6 +27,7 @@ import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.entity.SysMenuEntity;
 import com.originit.union.entity.SysRoleEntity;
 import com.originit.union.entity.SysUserEntity;
+import com.originit.union.service.RedisService;
 import com.originit.union.service.SysMenuService;
 import com.originit.union.service.SysRoleService;
 import com.originit.union.service.SysUserService;

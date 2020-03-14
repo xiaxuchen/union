@@ -43,7 +43,6 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
     @Override
     public Serializable getSessionId(ServletRequest request, ServletResponse response) {
         String token = WebUtils.toHttp(request).getHeader(AUTHORIZATION);
-        log.info("获取sessionId,请求头中原token为:" + token);
         //如果请求头中存在token 则从请求头中获取token
         if (!StringUtils.isEmpty(token)) {
             ((HttpServletResponse)response).setHeader(AUTHORIZATION,token);
@@ -52,10 +51,8 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
             request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_IS_VALID, Boolean.TRUE);
             return token;
         } else {
-            // 这里禁用掉Cookie获取方式
             // 按默认规则从Cookie取Token
-//             return super.getSessionId(request, response);
-            return null;
+             return super.getSessionId(request, response);
         }
     }
 
@@ -67,8 +64,6 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
      */
     @Override
     protected Session retrieveSession(SessionKey sessionKey) throws UnknownSessionException {
-        log.info(MessageFormat.format("获取session,其sessionId为{0},请求中的sessionId为{1}",
-                sessionKey.getSessionId(), RequestContextHolderUtil.getRequest().getHeader(AUTHORIZATION)));
         WebSessionKey webSessionKey = (WebSessionKey) sessionKey;
         final ServletRequest servletRequest = webSessionKey.getServletRequest();
         final Serializable sessionId = webSessionKey.getSessionId();
