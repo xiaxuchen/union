@@ -5,11 +5,16 @@ import lombok.*;
 import java.sql.Time;
 import java.time.LocalDateTime;
 
+/**
+ * @author xxc、
+ */
 @NoArgsConstructor
 @Data
 @Builder
 @AllArgsConstructor
 public class ChatMessageVO {
+
+    private Long id;
 
     private String userId;
 

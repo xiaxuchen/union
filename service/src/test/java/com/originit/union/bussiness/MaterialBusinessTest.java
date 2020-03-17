@@ -9,8 +9,12 @@ import com.soecode.wxtools.bean.result.QrCodeResult;
 import com.soecode.wxtools.bean.result.SenderResult;
 import com.soecode.wxtools.exception.WxErrorException;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,8 +22,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class MaterialBusinessTest {
 
     @Test
@@ -69,4 +73,5 @@ public class MaterialBusinessTest {
             e.printStackTrace();
         }
     }
+
 }

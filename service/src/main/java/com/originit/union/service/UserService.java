@@ -37,4 +37,8 @@ public interface UserService extends IService<UserBindEntity> {
      */
     Pager<UserInfoVO> getUserInfoList(List<String> phone, List<Integer> tagList, int curPage, int pageSize);
 
+    /**
+     * 导入用户信息到系统中
+     */
+    void importUsers();
 }

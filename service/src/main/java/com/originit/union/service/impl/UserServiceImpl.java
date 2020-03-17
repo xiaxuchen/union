@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.common.page.Pager;
+import com.originit.common.util.SpringUtil;
 import com.originit.common.validator.group.CreateGroup;
 import com.originit.union.bussiness.UserBusiness;
 import com.originit.union.entity.UserBindEntity;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author xxc、
@@ -36,6 +39,14 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
     private UserBusiness userBusiness;
 
     private SqlSessionTemplate sqlSessionTemplate;
+
+
+    private ThreadPoolExecutor executor;
+
+    @Autowired
+    public void setExecutor(ThreadPoolExecutor executor) {
+        this.executor = executor;
+    }
 
     @Autowired
     public void setSqlSessionTemplate(SqlSessionTemplate sqlSessionTemplate) {
@@ -50,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserBindEntity getUserInfoByOpenId(String openId) {
-        UserBindEntity user = null;
+        UserBindEntity user;
         user = getOne(new QueryWrapper<UserBindEntity>().lambda().eq(UserBindEntity::getOpenId, openId));
         if (user == null) {
             UserBindEntity entity = userBusiness.getUserByOpenId(openId);
@@ -66,20 +77,22 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
     @Transactional(rollbackFor = Exception.class)
     public void addOrUpdateUsers(List<UserBindEntity> users) {
         log.info("执行批量导入");
-        SqlSession sqlSession = sqlSessionTemplate.getSqlSessionFactory()
-                .openSession(ExecutorType.BATCH,false);
-        try  {
+        try (SqlSession sqlSession = sqlSessionTemplate.getSqlSessionFactory()
+                .openSession(ExecutorType.BATCH, false)) {
             UserDao userDao = sqlSession.getMapper(UserDao.class);
             for (int i = 0; i < users.size(); i++) {
-                userDao.insertOrUpdateUser(users.get(i));
+                UserBindEntity userBindEntity = users.get(i);
+                // 如果是空就跳过
+                if (userBindEntity == null) {
+                    continue;
+                }
+                userDao.insertOrUpdateUser(userBindEntity);
                 if (i >= 1 && i % 100 == 0) {
                     sqlSession.flushStatements();
                 }
             }
             sqlSession.flushStatements();
             sqlSession.commit();
-        } finally {
-            sqlSession.close();
         }
         log.info("执行批量成功");
     }
@@ -87,7 +100,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
     @Override
     public Pager<UserInfoVO> getUserInfoList(List<String> phone, List<Integer> tagList, int curPage, int pageSize) {
         // 获取用户openId、标签并转换
-        Pager<UserInfoVO> userInfoVOPager = PagerUtil.fromIPage(baseMapper.selectUserByPhonesAndTags(new Page<>(curPage, pageSize), phone, tagList), userInfo -> {
+        return PagerUtil.fromIPage(baseMapper.selectUserByPhonesAndTags(new Page<>(curPage, pageSize), phone, tagList), userInfo -> {
             UserInfoVO userInfoVO = new UserInfoVO();
             userInfoVO.setId(userInfo.getOpenId());
             userInfoVO.setHeadImg(userInfo.getHeadImg());
@@ -101,7 +114,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
             userInfoVO.setTags(TagMapper.INSTANCE.to(userInfo.getTags()));
             return userInfoVO;
         });
-        return userInfoVOPager;
     }
 
+    @Override
+    public void importUsers() {
+        userBusiness.batchGetAllUser(users -> executor.execute(() -> {
+            log.info("开始导入");
+            getService().addOrUpdateUsers(users);
+            log.info("导入结束");
+        }));
+    }
+
+    private UserService getService () {
+        return SpringUtil.getBean(this.getClass());
+    }
 }

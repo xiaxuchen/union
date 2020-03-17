@@ -1,11 +1,13 @@
 package com.originit.union.mq.consumer;
 
 import com.originit.union.entity.MessageEntity;
+import com.originit.union.service.MessageService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +25,17 @@ import java.util.Map;
 @Slf4j
 public class MessageListener {
 
+    private MessageService messageService;
+
+    @Autowired
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
+
     @RabbitHandler
     public void handle(MessageEntity messageEntity, Channel channel, Message message) throws IOException {
         log.info("process orderId:{},curListener:{}",messageEntity,this);
+        messageService.sendMessage(messageEntity);
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }
 }

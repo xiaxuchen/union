@@ -1,7 +1,11 @@
-package com.originit.union.api.chat;
+package com.originit.union.chat;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.originit.union.api.chat.data.ChatUser;
+import com.originit.common.exceptions.DataConflictException;
+import com.originit.common.exceptions.InternalServerException;
+import com.originit.common.exceptions.PermissionForbiddenException;
+import com.originit.union.bussiness.ClientServeBusiness;
+import com.originit.union.chat.data.ChatUser;
+import com.originit.union.constant.WeChatConstant;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
+ * 管理当前排队或接入的用户
  * @author xxc、
  */
 @Component
@@ -29,6 +34,13 @@ public class ChatUserManager {
     private UserService userService;
 
     private MessageManager messageManager;
+
+    private ChatSessionManager sessionManager;
+
+    @Autowired
+    public void setSessionManager(ChatSessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+    }
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -49,19 +61,42 @@ public class ChatUserManager {
      * 检查是否存在该用户，不存在则添加到等待列表
      * @param openId 用户的openId
      */
-    public void checkUser (String openId) {
+    public boolean checkUser (String openId, String message) {
         lock.lock();
         try {
+            Integer userStatus = getUserStatus(openId);
             /**
              * 如果当前不存在该用户则创建
              */
-            if (getUserStatus(openId) == ChatUser.STATE.NEVER) {
-                // 添加到等待队列中
-                waitUsers.put(openId,createNewUser(openId));
+            if (userStatus == ChatUser.STATE.NEVER) {
+                if (message != null && message.trim().equals(WeChatConstant.CLIENT_SERVE_START)){
+                    // 添加到等待队列中
+                    waitUsers.put(openId,createNewUser(openId));
+                    return false;
+                }
+            } else {
+                if (message != null && message.trim().equals(WeChatConstant.CLIENT_SERVE_END)){
+                    ChatUser chatUser = null;
+                    if (userStatus == ChatUser.STATE.WAIT) {
+                        waitUsers.remove(openId);
+                        messageManager.clearMessage(openId);
+                    } else if (userStatus == ChatUser.STATE.RECEIVED) {
+                        chatUser = respondUsers.remove(openId);
+                        messageManager.clearMessage(openId);
+                    }
+                    // 如果移除成功，则从移除同步到session
+                    if (chatUser != null) {
+                        sessionManager.disConnectUser(openId, chatUser.getReceiveAgent());
+                    }
+                    // 添加到等待队列中
+                    return false;
+                }
             }
         } finally {
             lock.unlock();
         }
+        // 将消息添加到列表中
+        return true;
     }
 
     /**
@@ -139,30 +174,57 @@ public class ChatUserManager {
      * 转换状态
      * @param openId 用户openId
      * @param status 用户的状态
+     * @param agentId 经理的id
      */
-    public void changeStatus (String openId,Integer status) {
+    public void changeStatus (String openId,Integer status, Long agentId) {
         lock.lock();
         try {
             switch (getUserStatus(openId)) {
+                // 如果没有则直接创建到指定列表中
                 case ChatUser.STATE.NEVER: {
-                    if (status == ChatUser.STATE.RECEIVED) {
+                    if (status == ChatUser.STATE.WAIT) {
                         waitUsers.put(openId,createNewUser(openId));
-                    } else if (status == ChatUser.STATE.WAIT) {
-                        respondUsers.put(openId,createNewUser(openId));
+                    } else if (status == ChatUser.STATE.RECEIVED) {
+                        // 接入后设置经理的id
+                        ChatUser newUser = createNewUser(openId);
+                        newUser.setReceiveAgent(agentId);
+                        respondUsers.put(openId,newUser);
                     }
                     break;
                 }
+                // 如果当前是已接受状态
                 case ChatUser.STATE.RECEIVED: {
                     if (status == ChatUser.STATE.WAIT) {
-                        waitUsers.put(openId,respondUsers.remove(openId));
+                        // 改变状态的用户不是原用户，抛异常
+                        if (!agentId.equals(respondUsers.get(openId).getReceiveAgent())) {
+                            throw new DataConflictException("该用户已被其他经理接入");
+                        }
+                        // 将用户从接受到等待将经理设空
+                        ChatUser chatUser = respondUsers.remove(openId);
+                        chatUser.setReceiveAgent(null);
+                        waitUsers.put(openId,chatUser);
+                        // 清除原来的消息
+                        messageManager.clearMessage(openId);
                     } else if (status == ChatUser.STATE.NEVER) {
+                        // 改变状态的用户不是原用户，抛异常
+                        if (!agentId.equals(respondUsers.get(openId).getReceiveAgent())) {
+                            throw new DataConflictException("该用户已被其他经理接入");
+                        }
                         respondUsers.remove(openId);
+                        // 清除原来的消息
+                        messageManager.clearMessage(openId);
+                    } else {
+                        // 用户已接受无法再次被接受
+                        throw new DataConflictException("当前用户已被接入");
                     }
                     break;
                 }
                 case ChatUser.STATE.WAIT: {
                     if (status == ChatUser.STATE.RECEIVED) {
-                        respondUsers.put(openId,waitUsers.remove(openId));
+                        // 接入的时候要同步agentId
+                        ChatUser chatUser = waitUsers.remove(openId);
+                        chatUser.setReceiveAgent(agentId);
+                        respondUsers.put(openId,chatUser);
                     } else if (status == ChatUser.STATE.NEVER) {
                         waitUsers.remove(openId);
                     }

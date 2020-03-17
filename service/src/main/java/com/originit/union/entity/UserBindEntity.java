@@ -36,11 +36,6 @@ public class UserBindEntity {
     private String phone;
 
     /**
-     * 客户经理的id
-     */
-    private Long agentId;
-
-    /**
      * 性别
      */
     private Integer sex;

@@ -1,8 +1,6 @@
 package com.originit.union.api.wxinterceptor;
 
 import com.originit.common.annotation.Interceptor;
-import com.originit.union.api.chat.ChatDoor;
-import com.originit.union.api.chat.data.Message;
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.mq.producer.MessageProducer;
 import com.originit.union.util.DateUtil;

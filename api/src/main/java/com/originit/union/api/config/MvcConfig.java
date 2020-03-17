@@ -4,6 +4,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.originit.union.api.interceptor.CorsInterceptor;
+import com.originit.union.api.interceptor.ShiroAnnotationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.ErrorPage;
@@ -25,6 +26,13 @@ public class MvcConfig implements WebMvcConfigurer {
 
     private CorsInterceptor corsInterceptor;
 
+    private ShiroAnnotationInterceptor annotationInterceptor;
+
+    @Autowired
+    public void setAnnotationInterceptor(ShiroAnnotationInterceptor annotationInterceptor) {
+        this.annotationInterceptor = annotationInterceptor;
+    }
+
     @Autowired
     public void setCorsInterceptor(CorsInterceptor corsInterceptor) {
         this.corsInterceptor = corsInterceptor;
@@ -33,6 +41,7 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(corsInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(annotationInterceptor).addPathPatterns("/**");
     }
 
     /**

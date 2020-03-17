@@ -80,6 +80,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/sysuser/login", "anon");
         filterChainDefinitionMap.put("/sysuser/permit","anon");
         filterChainDefinitionMap.put("/core/**","anon");
+        filterChainDefinitionMap.put("/test/**","anon");
         filterChainDefinitionMap.put("/resource/file/**","anon");
         filterChainDefinitionMap.put("/**", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

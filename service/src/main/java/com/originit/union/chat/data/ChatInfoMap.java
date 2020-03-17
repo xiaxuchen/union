@@ -1,13 +1,10 @@
-package com.originit.union.api.chat.data;
+package com.originit.union.chat.data;
 
 import com.originit.common.util.JsonUtil;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.stream.Collectors;
 
 @Getter
 @Component

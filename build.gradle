@@ -57,7 +57,6 @@ subprojects {
         //quartz依赖
         implementation "org.springframework.boot:spring-boot-starter-quartz"
 
-        compile("org.springframework.boot:spring-boot-devtools")
     }
 
     //这里一定得要。在多模块下，不然编译失败，因为不会把信赖模块给打包。

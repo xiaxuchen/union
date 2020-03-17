@@ -24,5 +24,7 @@ public class UserBusinessTest {
 
     @Test
     public void batchGetAllUser() {
+        System.out.println(this.getClass().getClassLoader().getResource("images").getPath());
     }
+
 }

@@ -69,7 +69,7 @@ public class FileUDUtil {
                 filename = realPath.substring(realPath.lastIndexOf("\\") + 1);
             }
             // 获取目录下的资源
-            File file = new File(ResourceUtils.getURL("classpath:").getPath(), realPath);
+            File file = new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), realPath);
             resp.reset();
 //          // 让浏览器显示下载文件对话框
             resp.setContentType(MediaType.parseMediaType(Files.probeContentType(Paths.get(file.getAbsolutePath()))).getType());
@@ -102,6 +102,27 @@ public class FileUDUtil {
         }
     }
 
+    /**
+     * 获取对应code的文件
+     * @param code 上传文件生成的code
+     */
+    public static File getFile (String code) {
+        if (code == null) {
+            return null;
+        }
+        String realPath = new String(Base64.getDecoder().decode(code), StandardCharsets.UTF_8);
+        // 获取目录下的资源
+        return new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), realPath);
+    }
+
+    /**
+     * 获取默认的头像
+     * @return 默认头像
+     */
+    public static File getDefaultHeadImg () {
+        return new File(FileUDUtil.class.getClassLoader().getResource("images").getPath(), "/default_logo.jpg");
+    }
+
 
     /**
      * 通过文件名获取hash
@@ -131,7 +152,7 @@ public class FileUDUtil {
         try {
             String path = getPath(filename);
             mkdirIfNotExist(path);
-            File file = new File(ResourceUtils.getURL("classpath:").getPath(), path);
+            File file = new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), path);
             FileUtils.copyInputStreamToFile(inputStream,file);
             // 返回base64编码
             return  Base64.getEncoder().encodeToString(path.getBytes(StandardCharsets.UTF_8));
@@ -146,13 +167,9 @@ public class FileUDUtil {
      * @param path 路径
      */
     private static void mkdirIfNotExist(String path) {
-        try {
-            File file = new File(ResourceUtils.getURL("classpath:").getPath(), path.substring(0,path.lastIndexOf("\\")));
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        File file = new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), path.substring(0,path.lastIndexOf("\\")));
+        if (!file.exists()) {
+            file.mkdirs();
         }
     }
 }

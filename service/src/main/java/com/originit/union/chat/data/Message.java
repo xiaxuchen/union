@@ -1,4 +1,4 @@
-package com.originit.union.api.chat.data;
+package com.originit.union.chat.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

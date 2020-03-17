@@ -31,6 +31,7 @@ import com.originit.union.service.RedisService;
 import com.originit.union.service.SysMenuService;
 import com.originit.union.service.SysRoleService;
 import com.originit.union.service.SysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -48,6 +49,7 @@ import java.util.Set;
  * @Author Sans
  * @CreateTime 2019/6/15 11:27
  */
+@Slf4j
 public class ShiroRealm extends AuthorizingRealm {
 
     @Autowired
@@ -105,7 +107,7 @@ public class ShiroRealm extends AuthorizingRealm {
             throw new UserException(ResultCode.USER_NOT_EXIST);
         }
         //判断账号是否被冻结
-        if (user.getState()==null||user.getState().equals("PROHIBIT")){
+        if (user.getState()==null || SysUserEntity.FORBID == user.getState()){
             throw new UserException(ResultCode.USER_ACCOUNT_FORBIDDEN);
         }
         //进行验证
@@ -119,7 +121,11 @@ public class ShiroRealm extends AuthorizingRealm {
                 getName()
         );
         //验证成功开始踢人(清除缓存和Session)
-        ShiroUtils.deleteCache(user.getUserId(),true);
+        try {
+            ShiroUtils.deleteCache(user.getUserId(),true);
+        } catch (Exception e) {
+            log.error("delete cache fail,the message is:{}",e.getMessage());
+        }
         return authenticationInfo;
     }
 }

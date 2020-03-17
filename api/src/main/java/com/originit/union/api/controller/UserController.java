@@ -76,7 +76,7 @@ public class UserController {
         // 更新用户和session的关系
         final String userKey = ShiroUtils.generateUserKey(userInfo.getUserId());
         redisService.set(userKey,ShiroUtils.getSession().getId().toString());
-        redisService.expire(userKey,1800 * 1000);
+        redisService.expire(userKey,1800);
         return new LoginUserVO(userInfo.getUserId(),userInfo.getUsername(), userInfo.getHeadImg());
     }
 

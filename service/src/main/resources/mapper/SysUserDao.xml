@@ -8,14 +8,6 @@
         <id property="userId" column="user_id"/>
     </resultMap>
 
-    <insert id="insertUsersIfNotExist" >
-        INSERT IGNORE INTO user_bind(open_id,phone,agent_id,gmt_last_use)
-        VALUES
-        <foreach collection="userList" item="user" separator=",">
-            (#{user.openId},#{user.phone},#{user.agentId},#{user.gmtLastUse})
-        </foreach>
-    </insert>
-
     <resultMap id="SysUserVOMap" type="com.originit.union.entity.vo.SysUserVO" autoMapping="true">
         <id property="userId" column="user_id" />
         <association property="agentInfo" javaType="com.originit.union.entity.vo.AgentInfoVO" autoMapping="true">

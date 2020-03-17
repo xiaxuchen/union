@@ -35,7 +35,7 @@ public class MessageEntity {
     private Integer type;
 
     /**
-     * 用户的id
+     * 用户的openId
      */
     private String userId;
 

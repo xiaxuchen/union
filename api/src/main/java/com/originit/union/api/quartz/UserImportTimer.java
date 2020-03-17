@@ -18,30 +18,14 @@ public class UserImportTimer extends QuartzJobBean {
 
     private UserService userService;
 
-    private UserBusiness business;
-
-    private ThreadPoolExecutor executor;
-
-    @Autowired
-    public void setExecutor(ThreadPoolExecutor executor) {
-        this.executor = executor;
-    }
-
-    @Autowired
-    public void setBusiness(UserBusiness business) {
-        this.business = business;
-    }
-
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext jobExecutionContext) {
         log.info("importing users start:" + DateUtil.timeStampToStr(System.currentTimeMillis()/1000));
-        business.batchGetAllUser(users -> {
-            userService.addOrUpdateUsers(users);
-        });
+        userService.importUsers();
     }
 }

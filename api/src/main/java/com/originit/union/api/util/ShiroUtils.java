@@ -3,6 +3,7 @@ package com.originit.union.api.util;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.common.util.SpringUtil;
 import com.originit.union.service.RedisService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.LogoutAware;
@@ -20,6 +21,7 @@ import java.util.Objects;
  * @Author Sans
  * @CreateTime 2019/6/15 16:11
  */
+@Slf4j
 public class ShiroUtils {
 
 	/** 私有构造器 **/
@@ -71,8 +73,13 @@ public class ShiroUtils {
         if (sessionId == null) {
             return;
         }
+        Session session = null;
         //从缓存中获取Session
-        final Session session = redisSessionDAO.readSession(sessionId);
+        try {
+            session = redisSessionDAO.readSession(sessionId);
+        } catch (Exception e) {
+            log.error("session with id {} is not exist",sessionId);
+        }
         if (session == null) {
             return;
         }

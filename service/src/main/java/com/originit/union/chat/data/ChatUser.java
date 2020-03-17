@@ -1,12 +1,14 @@
-package com.originit.union.api.chat.data;
+package com.originit.union.chat.data;
 
+import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.UserBindEntity;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 表示聊天是的用户信息，有附加的聊天状态、对话的会话经理、聊天消息列表等信息
+ */
 @Data
 public class ChatUser {
 
@@ -33,23 +35,12 @@ public class ChatUser {
     /**
      * 接收的客户经理
      */
-    private String receiveAgent;
+    private Long receiveAgent;
 
     /**
-     * 未读列表
+     * 消息列表
      */
-    private List<Message> messageList;
+    private List<MessageEntity> messageList;
 
-
-//    /**
-//     * 添加用户发送的消息
-//     * @param openId 用户id
-//     * @param message 消息
-//     * @param sendTime 发送时间
-//     */
-//    public void addMessage (String openId, String message, LocalDateTime sendTime) {
-//        this.messageList.add(ChatMessage.builder().content(message)
-//                .from(openId).isFromUser(true).createTime(sendTime).build());
-//    }
 
 }

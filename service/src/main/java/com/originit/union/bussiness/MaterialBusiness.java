@@ -7,11 +7,13 @@ import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxNewsInfo;
 import com.soecode.wxtools.bean.result.WxBatchGetMaterialResult;
+import com.soecode.wxtools.bean.result.WxMediaUploadResult;
 import com.soecode.wxtools.exception.WxErrorException;
 import org.apache.shiro.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,4 +50,19 @@ public class MaterialBusiness {
             throw new RemoteAccessException(e.getError());
         }
     }
+
+    /**
+     * 上传临时图片素材
+     * @param file 文件
+     * @return media相关的信息
+     */
+    public WxMediaUploadResult uploadTempMaterial (File file) {
+        try {
+            return wxService.uploadTempMedia(WxConsts.MEDIA_IMAGE,file);
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+            throw new RemoteAccessException(e.getError());
+        }
+    }
+
 }

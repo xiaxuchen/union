@@ -156,7 +156,7 @@ public class UserBusiness {
             }
             if (users.size() >= HANDLE_SIZE) {
                 consumer.accept(users);
-                users.clear();
+                users = new ArrayList<>(HANDLE_SIZE);
             }
             log.info(MessageFormat.format("当前用户导入执行状态:{0}-{1},总量为{2}",start,end,size));
             start = end;
@@ -164,7 +164,6 @@ public class UserBusiness {
         // 循环结束如果不为空则执行一次
         if (!users.isEmpty()) {
             consumer.accept(users);
-            users.clear();
         }
         log.info("用户导入执行结束");
     }
@@ -221,13 +220,16 @@ public class UserBusiness {
      * @return 数据库用户实体
      */
     public UserBindEntity wxUserToUserBind (WxUserList.WxUser user) {
-        return UserBindEntity.builder()
+        UserBindEntity userBindEntity = UserBindEntity.builder()
                 .sex(user.getSex())
                 .headImg(user.getHeadimgurl())
                 .name(user.getNickname())
-                .subscribeTime(LocalDateTime.ofEpochSecond(Long.parseLong(user.getSubscribe_time()), 0, ZoneOffset.ofHours(8)))
                 .openId(user.getOpenid())
                 .phone(getPhone(user.getOpenid()))
                 .build();
+        if (user.getSubscribe_time() != null) {
+            userBindEntity.setSubscribeTime(LocalDateTime.ofEpochSecond(Long.parseLong(user.getSubscribe_time()), 0, ZoneOffset.ofHours(8)));
+        }
+        return userBindEntity;
     }
 }

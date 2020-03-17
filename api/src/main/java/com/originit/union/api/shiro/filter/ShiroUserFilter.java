@@ -1,6 +1,8 @@
 package com.originit.union.api.shiro.filter;
 
 import com.originit.union.api.shiro.ShiroSessionManager;
+import com.originit.union.constant.ShiroConstant;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.web.filter.authc.UserFilter;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,6 +17,7 @@ import java.io.IOException;
  * 重写shiro的UserFilter，实现通过OPTIONS请求
  * @author MDY
  */
+@Slf4j
 public class ShiroUserFilter extends UserFilter {
 
     /**
@@ -28,7 +31,15 @@ public class ShiroUserFilter extends UserFilter {
             setHeader(httpRequest,httpResponse);
             return true;
         }
-        return super.preHandle(request,response);
+        boolean result;
+        try {
+            result = super.preHandle(request,response);
+        } catch (Exception e) {
+            log.info("交由下层处理");
+            request.setAttribute(ShiroConstant.SHIRO_AUTH_RESULT,false);
+            return true;
+        }
+        return result;
     }
 
     /**
