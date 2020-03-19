@@ -1,8 +1,12 @@
-package com.originit.union.config;
+package com.originit.union.advice;
 
+import com.originit.union.annotation.LockKey;
+import com.originit.union.chat.manager.ChatLock;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,13 +19,25 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Set;
 
+/**
+ * Service的切面
+ * @author xxc、
+ */
 @Aspect
 @Component
+@Slf4j
 public class ServiceAdvice {
 
-    @Autowired
-    Validator validator;
+    private Validator validator;
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
+    /**
+     * 给所有的Service添加参数验证
+     */
     @Around("execution(* com.originit.union.service.*.*(..))")
     public Object validateService (ProceedingJoinPoint point) throws Throwable {
         // 1 获取方法的参数签名
@@ -50,5 +66,28 @@ public class ServiceAdvice {
             }
         }
         return point.proceed();
+    }
+
+    private ChatLock lock;
+
+    @Autowired
+    public void setLock(ChatLock lock) {
+        this.lock = lock;
+    }
+
+    @Around("@annotation(com.originit.union.annotation.LockKey)")
+    public Object redisAutoLock (ProceedingJoinPoint point) throws Throwable {
+        final Method method = ((MethodSignature) point.getSignature()).getMethod();
+        LockKey lockKey = method.getAnnotation(LockKey.class);
+        if (lockKey == null) {
+            lockKey = point.getTarget().getClass().getAnnotation(LockKey.class);
+        }
+        // 如果方法或类上都没有注解或有注解但为不加锁，则直接执行
+        if (lockKey == null || lockKey.noLock()) {
+            return point.proceed();
+        }
+        log.info("auto lock");
+        // 包装上加锁逻辑
+        return lock.commonLock(lockKey.value(), point::proceed);
     }
 }

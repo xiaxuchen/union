@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @TableName("user_tag")
-public class UserTagEntity {
+public class UserTagEntity implements Serializable {
 
     @TableId
     private Long id;

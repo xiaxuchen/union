@@ -2,20 +2,23 @@ package com.originit.union.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * @author xxc、
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @TableName("message")
-public class MessageEntity {
+public class MessageEntity implements Serializable {
 
     public interface TYPE{
         int TEXT = 0;

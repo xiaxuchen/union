@@ -1,43 +1,46 @@
 package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.originit.union.chat.ChatSessionManager;
-import com.originit.union.chat.ChatUserManager;
-import com.originit.union.chat.MessageManager;
+import com.originit.common.page.Pager;
+import com.originit.common.util.SpringUtil;
+import com.originit.union.annotation.LockKey;
 import com.originit.union.chat.data.ChatUser;
-import com.originit.union.chat.data.Message;
+import com.originit.union.chat.manager.MessageManager;
+import com.originit.union.chat.manager.SessionManager;
+import com.originit.union.chat.manager.UserManager;
+import com.originit.union.constant.ChatConstant;
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.UserBindEntity;
+import com.originit.union.entity.vo.ChatMessageVO;
+import com.originit.union.entity.vo.ChatUserVO;
 import com.originit.union.mapper.MessageDao;
-import com.originit.union.mapper.UserDao;
 import com.originit.union.service.MessageService;
+import com.originit.union.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
  * @author xxc、
  */
 @Service
+@LockKey(ChatConstant.USER_LOCK)
 public class MessageServiceImpl extends ServiceImpl<MessageDao,MessageEntity>  implements MessageService {
 
     private MessageManager messageManager;
 
-    private ChatUserManager chatUserManager;
+    private SessionManager sessionManager;
 
-    private ChatSessionManager sessionManager;
-
-    private UserDao userDao;
-
-    @Autowired
-    public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
-    }
+    private UserManager userManager;
 
     @Autowired
     public void setMessageManager(MessageManager messageManager) {
@@ -45,96 +48,152 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao,MessageEntity>  i
     }
 
     @Autowired
-    public void setChatUserManager(ChatUserManager chatUserManager) {
-        this.chatUserManager = chatUserManager;
-    }
-
-    @Autowired
-    public void setSessionManager(ChatSessionManager sessionManager) {
+    public void setSessionManager(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
     }
 
-
-    /**
-     * 通过openId获取用户id
-     * @param openId 用户的openId
-     * @return 用户的id
-     */
-    private Long getUserIdByOpenId (String openId) {
-        return userDao.selectOne(new QueryWrapper<UserBindEntity>().lambda()
-                .select(UserBindEntity::getId).eq(UserBindEntity::getOpenId,openId)).getId();
+    @Autowired
+    public void setUserManager(UserManager userManager) {
+        this.userManager = userManager;
     }
 
     @Override
     public Long sendMessage(MessageEntity messageEntity) {
-        // 发送消息给用户
-        if (!messageEntity.getFromUser()) {
-            messageManager.sendMessageToUser(messageEntity);
-            messageEntity.setState(MessageEntity.STATE.READ);
+        if (messageEntity.getFromUser()) {
+            messageManager.sendMessageForServe(messageEntity.getUserId(),messageEntity);
+        } else {
+            messageManager.sendMessageToUser(messageEntity.getUserId(),
+                    Long.valueOf(messageEntity.getAgentId()),messageEntity);
         }
-        // 将消息数据保存至数据库
-        this.save(messageEntity);
-        messageManager.sendMessage(messageEntity.getUserId(),messageEntity);
         return messageEntity.getId();
     }
 
     @Override
-    public List<ChatUser> getWaitingUsers(int curPage, int pageSize, int messageCount) {
-        // 获取指定页的等待用户列表以及所有的信息
-        return chatUserManager.getWaitingUsers(curPage,pageSize,-1);
+    @Transactional(readOnly = true)
+    public Pager<ChatUserVO> getWaitingUsers(int curPage, int pageSize, int messageCount) {
+        // 获取到等待用户的列表
+        Pager<ChatUser> waiterPager = userManager.getWaitingUsers(curPage, pageSize);
+        // 获取每个用户最后的一条未读信息
+        List<ChatUserVO> vos = waiterPager.getData().stream().map(chatUser -> {
+            String openId = chatUser.getUserInfo().getOpenId();
+            IPage<MessageEntity> iPage = getLastWaitMessage(openId);
+            ChatUserVO vo = to(chatUser);
+            if (!iPage.getRecords().isEmpty()) {
+                MessageEntity message = iPage.getRecords().get(0);
+                vo.setLastMessage(to(message));
+                vo.setTime(DateUtil.timeStampToStr(message.getGmtCreate()
+                        .toEpochSecond(ZoneOffset.UTC)));
+                vo.setNotRead((int) iPage.getTotal());
+            }
+            return vo;
+        }).collect(Collectors.toList());
+        // 转换成pager
+        return new Pager<>(vos,waiterPager.getTotal());
     }
 
     @Override
     public void receiveUser(String openId, Long id) {
-        sessionManager.receiveUser(openId,id);
+        sessionManager.connect(openId,id);
     }
 
     @Override
     public void disConnectUser(String openId, Long id) {
-        sessionManager.disConnectUser(openId,id);
+        sessionManager.disconnect(openId,id,false);
     }
 
     @Override
+    @LockKey(ChatConstant.USER_LOCK)
     public void dispatchToOther(String openId, Long from, Long to) {
-        sessionManager.dispatchToOther(openId,from,to);
+        sessionManager.disconnect(openId,from,false);
+        sessionManager.connect(openId,to);
     }
 
     @Override
     public ChatUser getUser(String openId, int messageCount) {
-        return chatUserManager.getUser(openId,messageCount);
+        return userManager.getUser(openId);
     }
 
     @Override
     public Integer getUserStatus(String openId) {
-        return chatUserManager.getUserStatus(openId);
+        return userManager.getUserState(openId);
+    }
+
+
+    @Override
+    public void readMessage(List<Long> messageIds,Long agentId) {
+        messageManager.messageRead(messageIds,agentId);
     }
 
     @Override
-    public void changeStatus(String openId, Integer status) {
-
+    public List<MessageEntity> getHistoryMessages(String userId, Long agentId, Long messageId) {
+        return messageManager.getHistoryMessages(userId,agentId,messageId);
     }
 
     @Override
-    public Long getWaitingCount() {
-        return (long) chatUserManager.getWaitingCount();
+    public List<MessageEntity> getWaitMessages(String userId, Long agentId, Long messageId) {
+        return messageManager.getWaitMessages(userId,agentId,messageId);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<ChatUser> getUserList(Long userId, int count, int messageCount) {
-        return sessionManager.getUserList(userId,count,messageCount);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void readMessage(List<Long> messageIds, String userId) {
-        messageIds.forEach(id -> {
-            baseMapper.update(null,
-                    new UpdateWrapper<MessageEntity>().lambda()
-                            .set(MessageEntity::getState,MessageEntity.STATE.READ)
-                            .eq(MessageEntity::getId,id));
+    public List<ChatUserVO> getAgentUserVOs(Long agentId) {
+        final List<ChatUserVO> vos = new ArrayList<>();
+        sessionManager.getUserIds (agentId).forEach(id -> {
+            IPage<MessageEntity> iPage = getLastWaitMessage(id);
+            ChatUser user = userManager.getUser(id);
+            ChatUserVO vo = to(user);
+            // 有未读记录
+            if (!iPage.getRecords().isEmpty()) {
+                MessageEntity message = iPage.getRecords().get(0);
+                vo.setLastMessage(to(message));
+                vo.setTime(DateUtil.timeStampToStr(message.getGmtCreate()
+                        .toEpochSecond(ZoneOffset.UTC)));
+                vo.setNotRead((int)iPage.getTotal());
+            }
+            vo.setAgentId(agentId);
+            vos.add(vo);
         });
-        messageManager.readMessages(messageIds,userId);
+        return vos;
     }
 
+    /**
+     * 获取最后一条未读的消息
+     * @param userId 用户id
+     */
+    public IPage<MessageEntity> getLastWaitMessage (String userId) {
+        // 查询该用户经理和用户对话中最近的一条未读记录
+        final IPage<MessageEntity> iPage = baseMapper.selectPage(new Page<>(0, 1),
+                new QueryWrapper<MessageEntity>().lambda()
+                        .eq(MessageEntity::getState, MessageEntity.STATE.WAIT)
+                        .eq(MessageEntity::getUserId, userId)
+                        .orderByDesc(MessageEntity::getGmtCreate));
+        return iPage;
+    }
 
+    private ChatUserVO to(ChatUser user) {
+        UserBindEntity info = user.getUserInfo();
+        return ChatUserVO.builder()
+                .headImg(info.getHeadImg())
+                .id(info.getOpenId())
+                .phone(info.getPhone())
+                .name(info.getName())
+                .build();
+    }
+
+    private ChatMessageVO to (MessageEntity message) {
+        return ChatMessageVO.builder()
+                .isUser(message.getFromUser())
+                .message(message.getContent())
+                .type(message.getType())
+                .userId(message.getUserId())
+                .type(message.getType())
+                .id(message.getId())
+                .time(DateUtil.timeStampToStr(message.getGmtCreate()
+                        .toEpochSecond(ZoneOffset.UTC)))
+                .build();
+    }
+
+    private MessageService getAop () {
+        return SpringUtil.getBean(MessageService.class);
+    }
 }

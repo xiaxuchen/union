@@ -2,15 +2,23 @@ package com.originit.union.chat.data;
 
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.UserBindEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 表示聊天是的用户信息，有附加的聊天状态、对话的会话经理、聊天消息列表等信息
  */
 @Data
-public class ChatUser {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ChatUser implements Serializable {
+
 
     public interface STATE {
         /**
@@ -41,6 +49,5 @@ public class ChatUser {
      * 消息列表
      */
     private List<MessageEntity> messageList;
-
 
 }

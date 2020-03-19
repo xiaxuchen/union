@@ -9,6 +9,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import javax.annotation.Resource;
 
+/**
+ * @author xxc、
+ */
 @Configuration
 public class RedisConfig {
     /**
@@ -24,7 +27,7 @@ public class RedisConfig {
      */
     @Bean
     public RedisTemplate<String, Object> functionDomainRedisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate();
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         initDomainRedisTemplate(redisTemplate, redisConnectionFactory);
         return redisTemplate;
     }

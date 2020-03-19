@@ -32,6 +32,7 @@ public enum ResultCode {
 
     /* 系统错误：40001-49999 */
     SYSTEM_INNER_ERROR(40001, "系统繁忙，请稍后重试"),
+    SYSTEM_LOCK_FAIL(40002, "系统繁忙,请稍后重试"),
 
     /* 数据错误：50001-599999 */
     RESULE_DATA_NONE(50001, "数据未找到"),

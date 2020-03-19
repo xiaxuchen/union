@@ -10,14 +10,13 @@ import com.originit.union.entity.dto.SysUserDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
 import com.originit.union.entity.vo.SysUserVO;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
 /**
- * @Description 系统用户DAO
- * @Author Sans
- * @CreateTime 2019/6/14 15:57
+ * @author xxc、
  */
+@Repository
 public interface SysUserDao extends BaseMapper<SysUserEntity> {
 
     /**

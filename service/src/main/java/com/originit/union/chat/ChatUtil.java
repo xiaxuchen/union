@@ -11,6 +11,13 @@ public class ChatUtil {
      * @param size 列表的总大小
      * @return 列表的开始位置
      */
+    public static long getFromSize (int count,long size) {
+        if (count == -1 || count > size) {
+            return 0;
+        }
+        return size - count;
+    }
+
     public static int getFromSize (int count,int size) {
         if (count == -1 || count > size) {
             return 0;

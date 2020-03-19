@@ -2,15 +2,15 @@ package com.originit.union.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.originit.union.entity.SysMenuEntity;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 
 /**
- * @Description 权限DAO
- * @Author Sans
- * @CreateTime 2019/6/14 15:57
+ * @author xxc、
  */
+@Repository
 public interface SysMenuDao extends BaseMapper<SysMenuEntity> {
 
     /**

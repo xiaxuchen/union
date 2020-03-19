@@ -12,7 +12,6 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Pager<T> {
 
     /**
@@ -24,4 +23,9 @@ public class Pager<T> {
      * 数据总记录数
      */
     private Long total;
+
+    public Pager(List<T> data,Long total) {
+        this.total = total;
+        this.data = data;
+    }
 }

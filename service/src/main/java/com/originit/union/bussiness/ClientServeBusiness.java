@@ -1,6 +1,7 @@
 package com.originit.union.bussiness;
 
 import com.originit.common.exceptions.RemoteAccessException;
+import com.originit.union.entity.MessageEntity;
 import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.KfSender;
@@ -96,9 +97,51 @@ public class ClientServeBusiness {
     }
 
     /**
+     * 发送信息
+     * @param type 信息类型
+     * @param content 信息内容
+     */
+    public void sendMessage (String openId,Integer type,Object content) {
+        switch (type) {
+            case MessageEntity.TYPE.TEXT: {
+                if (content instanceof String) {
+                    sendTextMessage(openId, (String) content);
+                    return;
+                }
+                break;
+            }
+            case MessageEntity.TYPE.IMAGE: {
+                if (content instanceof String) {
+                    sendImageMessage(openId, (String) content);
+                    return;
+                }
+                break;
+            }
+        }
+        throw new IllegalArgumentException("消息类型错误");
+    }
+
+    /**
+     * 发送等待消息
+     * @param openId 用户id
+     */
+    public void sendWaitMessage (String openId) {
+        this.sendTextMessage(openId,"正在排队中，请稍后...");
+        this.sendTextMessage(openId,"输入#2可退出服务");
+    }
+
+    /**
      * 发送评价信息
      */
     public void sendAppraise () {
 
+    }
+
+    /**
+     * 发送退出时的消息
+     * @param openId 用户的openId
+     */
+    public void sendExitMessage(String openId) {
+        this.sendTextMessage(openId,"服务已结束，谢谢您的使用");
     }
 }

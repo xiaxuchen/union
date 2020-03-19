@@ -60,6 +60,7 @@ public class ChatUserManager {
     /**
      * 检查是否存在该用户，不存在则添加到等待列表
      * @param openId 用户的openId
+     * @return 是否开启客服
      */
     public boolean checkUser (String openId, String message) {
         lock.lock();

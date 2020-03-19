@@ -40,43 +40,13 @@ public class MessageController {
     }
 
     /**
-     * 获取最新的服务器端的聊天信息
-     */
-//    @GetMapping("/refreshServe")
-//    public RefreshChatVO refreshServe () {
-//        Long userId = ShiroUtils.getUserInfo().getUserId();
-//        List<ChatUser> userList = messageService.getUserList(userId, -1);
-//        List<ChatMessageVO> messages = userList.stream().flatMap(chatUser -> {
-//            return chatUser.getMessageList().stream().filter(message -> {
-//                return message.getStatus().equals(Message.STATUS.WAIT);
-//            });
-//        }).map(message -> {
-//            return ChatMessageVO.builder()
-//                    .userId(message.getUserOpenId())
-//                    .type(message.getType())
-//                    .message(message.getContent().toString())
-//                    .isUser(message.getFromUser())
-//                    .time(DateUtil.getTime(message.getSendTime().toEpochSecond(ZoneOffset.of("+8"))))
-//                    .build();
-//        }).collect(Collectors.toList());
-//        List<ChatUserVO> users = userList.stream().filter(chatUser -> {
-//            return chatUser.getMessageList().stream().anyMatch(message -> message.getStatus().equals(Message.STATUS.WAIT));
-//        }).map(this::reflectUser).collect(Collectors.toList());
-//        RefreshChatVO refreshChatVO = new RefreshChatVO();
-//        refreshChatVO.setMessageList(messages);
-//        refreshChatVO.setUserList(users);
-//        return refreshChatVO;
-//    }
-
-    /**
      * 获取客户经理的所有用户列表
      * @return 用户列表
      */
     @GetMapping("/chatUserList")
     public List<ChatUserVO> getUserList () {
         Long userId = ShiroUtils.getUserInfo().getUserId();
-        List<ChatUser> userList = messageService.getUserList(userId, MessageService.ALL,MessageService.ALL);
-        return userList.stream().map(this::reflectUser).collect(Collectors.toList());
+        return messageService.getAgentUserVOs(userId);
     }
 
     private ChatUserVO reflectUser (ChatUser chatUser) {
@@ -107,8 +77,24 @@ public class MessageController {
                 .build();
     }
 
-    public List<ChatMessageVO> getMoreMessage () {
+    /**
+     * 获取经理对话的的该用户历史记录
+     * @param userId 用户id
+     * @param lastId 目前加载的最开始的消息的记录
+     * @return
+     */
+    public List<ChatMessageVO> getHistoryMessages (@RequestParam String userId, @RequestParam(required = false) Long lastId){
+        return messageService.getHistoryMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
+                .stream().map(this::to).collect(Collectors.toList());
+    }
 
+    private ChatMessageVO to (MessageEntity message) {
+        return ChatMessageVO.builder()
+                .id(message.getId())
+                .isUser(message.getFromUser())
+                .message(message.getContent())
+                .type(message.getType())
+                .build();
     }
 
     /**
@@ -118,39 +104,14 @@ public class MessageController {
      */
     @GetMapping("/chatMessageList")
     public List<ChatMessageVO> getMessages(@RequestParam String userId,@RequestParam(required = false) Long lastId) {
-        List<MessageEntity> messageList = messageService.getUser(userId, -1).getMessageList();
-        List<ChatMessageVO> vos = messageList.stream()
-                .sorted(Comparator.comparing(MessageEntity::getGmtCreate))
-                .map(message -> ChatMessageVO.builder()
-                .id(message.getId())
-                .isUser(message.getFromUser())
-                .message(message.getContent())
-                .type(message.getType())
-                .build()).collect(Collectors.toList());
-        int start = 0;
-        if (lastId != null) {
-            for (int i = 0; i < vos.size(); i++) {
-                if (vos.get(i).getId().equals(lastId)) {
-                    start = i + 1;
-                }
-            }
-        }
-        for (int i = start; i < messageList.size(); i++) {
-            if (messageList.get(i).getState() == MessageEntity.STATE.WAIT) {
-                start = i;
-                break;
-            }
-        }
-        return vos.subList(start,vos.size());
+        return messageService.getWaitMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
+                .stream().map(this::to).collect(Collectors.toList());
     }
 
 
     @GetMapping("/user/waiting")
     public Pager<ChatUserVO> getWaitingUsers (@RequestParam Integer curPage,@RequestParam(required = false,defaultValue = "10") Integer pageSize) {
-        Pager<ChatUserVO> pager = new Pager<>();
-        pager.setTotal(messageService.getWaitingCount());
-        pager.setData(messageService.getWaitingUsers(curPage,pageSize, 10).stream().map(this::reflectUser).collect(Collectors.toList()));
-        return pager;
+        return messageService.getWaitingUsers(curPage, pageSize, 10);
     }
 
     /**
@@ -158,7 +119,6 @@ public class MessageController {
      */
     @PostMapping("/session")
     public void receiveUser (@RequestBody List<String> userList) {
-
         for (String user : userList) {
             messageService.receiveUser(user,ShiroUtils.getUserInfo().getUserId());
         }
@@ -174,8 +134,8 @@ public class MessageController {
     }
 
     @PutMapping("/list/read")
-    public void readMessage (@RequestParam List<Long> messageIds,@RequestParam String userId) {
-        messageService.readMessage(messageIds,userId);
+    public void readMessage (@RequestParam List<Long> messageIds) {
+        messageService.readMessage(messageIds,ShiroUtils.getUserInfo().getUserId());
     }
 
     /**

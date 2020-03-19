@@ -3,14 +3,14 @@ package com.originit.union.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.originit.union.entity.SysRoleEntity;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
- * @Description 角色DAO
- * @Author Sans
- * @CreateTime 2019/6/14 15:57
+ * @author xxc、
  */
+@Repository
 public interface SysRoleDao extends BaseMapper<SysRoleEntity> {
 
     /**

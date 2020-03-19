@@ -6,12 +6,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.domain.UserInfo;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * @author xxc、
  */
+@Repository
 public interface UserDao extends BaseMapper<UserBindEntity> {
 
     /**

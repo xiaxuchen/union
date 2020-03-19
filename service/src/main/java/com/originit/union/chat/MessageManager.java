@@ -3,6 +3,7 @@ package com.originit.union.chat;
 import com.originit.union.bussiness.ClientServeBusiness;
 import com.originit.union.bussiness.MessageBusiness;
 import com.originit.union.entity.MessageEntity;
+import com.originit.union.service.impl.MessageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -104,7 +105,7 @@ public class MessageManager {
                 return Collections.emptyList();
             }
             int size = messages.size();
-            return messages.subList(ChatUtil.getFromSize(count,size), size);
+            return messages.subList(ChatUtil.getFromSize(count, size), size);
         } finally {
             lock.unlock();
         }
