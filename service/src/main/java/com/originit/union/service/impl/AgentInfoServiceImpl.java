@@ -26,7 +26,7 @@ public class AgentInfoServiceImpl extends ServiceImpl<AgentInfoDao,AgentInfoEnti
     }
 
     @Override
-    public AgentState getAgentStateById(Long userId) {
+    public AgentState getAgentStateByUserId(Long userId) {
         AgentInfoEntity agentInfo = this.getOne(new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, userId));
         return AgentState.builder()
                 .info(agentInfo)
@@ -34,5 +34,14 @@ public class AgentInfoServiceImpl extends ServiceImpl<AgentInfoDao,AgentInfoEnti
                         .select(SysUserEntity::getHeadImg).eq(SysUserEntity::getUserId,userId))
                         .getHeadImg())
                 .build();
+    }
+
+    /**
+     * 通过用户id获取经理的信息
+     * @param userId 用户id
+     * @return
+     */
+    public AgentInfoEntity getByUserId (Long userId) {
+        return this.getOne(new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, userId));
     }
 }

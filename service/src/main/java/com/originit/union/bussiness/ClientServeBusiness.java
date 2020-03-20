@@ -1,6 +1,7 @@
 package com.originit.union.bussiness;
 
 import com.originit.common.exceptions.RemoteAccessException;
+import com.originit.union.constant.WeChatConstant;
 import com.originit.union.entity.MessageEntity;
 import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.api.WxConsts;
@@ -126,8 +127,7 @@ public class ClientServeBusiness {
      * @param openId 用户id
      */
     public void sendWaitMessage (String openId) {
-        this.sendTextMessage(openId,"正在排队中，请稍后...");
-        this.sendTextMessage(openId,"输入#2可退出服务");
+        this.sendTextMessage(openId,"正在排队中，输入 "+ WeChatConstant.CLIENT_SERVE_END +" 可退出服务,请稍候...");
     }
 
     /**

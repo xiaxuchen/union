@@ -20,7 +20,7 @@ public interface SessionManager extends Runnable{
      * @param fromUser 是否用户主动
      * @throws DataConflictException 如果该用户状态不是已接入或已被其他人接入则抛出
      */
-    void disconnect(String userId,Long agentId,boolean fromUser) throws DataConflictException;
+    void disconnect(String userId,Long agentId) throws DataConflictException;
 
     /**
      * 连接客户经理和用户

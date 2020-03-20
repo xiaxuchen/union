@@ -1,8 +1,11 @@
 package com.originit.union.api.controller;
 
+import com.baomidou.mybatisplus.extension.api.R;
+import com.originit.common.exceptions.ParameterInvalidException;
 import com.originit.common.page.Pager;
 import com.originit.union.api.util.SHA256Util;
 import com.originit.union.api.util.ShiroUtils;
+import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.union.entity.dto.SysUserDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
@@ -10,10 +13,13 @@ import com.originit.union.entity.dto.SysUserUpdateDto;
 import com.originit.union.entity.vo.LoginUserVO;
 import com.originit.union.entity.vo.RoleVO;
 import com.originit.union.entity.vo.SysUserVO;
+import com.originit.union.service.AgentInfoService;
 import com.originit.union.service.RedisService;
 import com.originit.union.service.SysRoleService;
 import com.originit.union.service.SysUserService;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.xxc.response.anotation.ResponseResult;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -23,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.Console;
+import javax.swing.text.ParagraphView;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +48,13 @@ public class UserController {
     private SysRoleService sysRoleService;
 
     private RedisService redisService;
+
+    private AgentInfoService agentInfoService;
+
+    @Autowired
+    public void setAgentInfoService(AgentInfoService agentInfoService) {
+        this.agentInfoService = agentInfoService;
+    }
 
     @Autowired
     public void setRedisService(RedisService redisService) {
@@ -77,7 +90,32 @@ public class UserController {
         final String userKey = ShiroUtils.generateUserKey(userInfo.getUserId());
         redisService.set(userKey,ShiroUtils.getSession().getId().toString());
         redisService.expire(userKey,1800);
-        return new LoginUserVO(userInfo.getUserId(),userInfo.getUsername(), userInfo.getHeadImg());
+        return obtainLoginUser(userInfo.getUserId());
+    }
+
+    /**
+     * 获取登录用户信息
+     * @param userId 用户id
+     * @return
+     */
+    private LoginUserVO obtainLoginUser (Long userId) {
+        SysUserEntity userInfo = sysUserService.getById(userId);
+        LoginUserVO loginUserVO = LoginUserVO.builder()
+                .id(userInfo.getUserId())
+                .name(userInfo.getUsername())
+                .headImg(userInfo.getHeadImg())
+                .phone(userInfo.getPhone())
+                .build();
+        AgentInfoEntity info = agentInfoService.getById(userInfo.getUserId());
+        if (info == null) {
+            loginUserVO.setIsAgent(false);
+        } else {
+            loginUserVO.setIsAgent(true);
+            loginUserVO.setDes(info.getDes());
+            loginUserVO.setName(info.getName());
+            loginUserVO.setSex(info.getSex());
+        }
+        return loginUserVO;
     }
 
     /**
@@ -147,8 +185,29 @@ public class UserController {
         return sysRoleService.list().stream().map(sysRoleEntity -> new RoleVO(sysRoleEntity.getRoleId(), sysRoleEntity.getRoleName())).collect(Collectors.toList());
     }
 
+    @GetMapping("/info")
     public LoginUserVO getUserInfo () {
-        SysUserEntity userInfo = ShiroUtils.getUserInfo();
-        return new LoginUserVO(userInfo.getUserId(),userInfo.getUsername(), userInfo.getHeadImg());
+        return obtainLoginUser(ShiroUtils.getUserInfo().getUserId());
     }
+
+    /**
+     * 修改密码
+     * @param originPwd 原密码
+     * @param newPwd 新密码
+     * @return
+     */
+    @PutMapping("/pwd")
+    public Boolean alterPassword (@RequestParam String originPwd,@RequestParam String newPwd){
+        if (originPwd.length() < 8 || originPwd.length() > 32) {
+            throw new ParameterInvalidException("密码应该在8-32位之间");
+        }
+
+        if (newPwd.length() < 8 || newPwd.length() > 32) {
+            throw new ParameterInvalidException("密码应该在8-32位之间");
+        }
+
+        sysUserService.updatePwd(ShiroUtils.getUserInfo().getUserId(),originPwd,newPwd);
+        return true;
+    }
+
 }

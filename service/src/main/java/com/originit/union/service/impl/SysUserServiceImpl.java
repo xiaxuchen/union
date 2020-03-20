@@ -2,8 +2,11 @@ package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.originit.common.exceptions.BusinessException;
+import com.originit.common.exceptions.UserException;
 import com.originit.common.page.Pager;
 import com.originit.common.validator.group.CreateGroup;
 import com.originit.union.entity.AgentInfoEntity;
@@ -134,6 +137,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
         } else {
             // 如果不是经理则删除经理信息，没有就删除不了
             agentInfoDao.delete(qw);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void updatePwd(Long id,String originPwd, String newPwd) {
+        if (originPwd.equals(newPwd)) {
+            throw new IllegalArgumentException("新旧密码不能一样");
+        }
+        if (0 == baseMapper.selectCount(new QueryWrapper<SysUserEntity>().lambda()
+                .eq(SysUserEntity::getPassword,originPwd).eq(SysUserEntity::getUserId,id))) {
+            throw new BusinessException("密码错误");
+        }
+        // 更新该用户的密码
+        if (0 == baseMapper.update(null,new UpdateWrapper<SysUserEntity>().lambda()
+                .set(SysUserEntity::getPassword,newPwd)
+                .eq(SysUserEntity::getUserId,id))) {
+            throw new BusinessException("密码更新失败");
         }
     }
 }

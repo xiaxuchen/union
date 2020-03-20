@@ -6,13 +6,16 @@ import com.originit.common.exceptions.DataNotFoundException;
 import com.originit.common.page.Pager;
 import com.originit.common.util.RedisCacheProvider;
 import com.originit.union.annotation.LockKey;
+import com.originit.union.bussiness.ClientServeBusiness;
 import com.originit.union.chat.ChatUtil;
 import com.originit.union.chat.data.ChatUser;
 import com.originit.union.chat.manager.SessionManager;
 import com.originit.union.chat.manager.UserManager;
 import com.originit.union.chat.manager.function.AgentStateSetter;
 import com.originit.union.constant.ChatConstant;
+import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.UserBindEntity;
+import com.originit.union.mapper.AgentInfoDao;
 import com.originit.union.mapper.UserDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,20 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
     private RedisCacheProvider provider;
 
     private UserDao userDao;
+
+    private ClientServeBusiness clientServeBusiness;
+
+    private AgentInfoDao agentInfoDao;
+
+    @Autowired
+    public void setAgentInfoDao(AgentInfoDao agentInfoDao) {
+        this.agentInfoDao = agentInfoDao;
+    }
+
+    @Autowired
+    public void setClientServeBusiness(ClientServeBusiness clientServeBusiness) {
+        this.clientServeBusiness = clientServeBusiness;
+    }
 
     @Autowired
     public void setProvider(RedisCacheProvider provider) {
@@ -60,7 +77,6 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
                 ChatUser chatUser = ChatUser.builder()
                         .userInfo(userBindEntity).build();
                 if (state == ChatUser.STATE.WAIT) {
-                    // TODO 这里是不是index不确定
                     // 将用户信息插入等待列表，获取到索引
                     Long index = provider.listPush(ChatConstant.USER_WAIT_LIST_KEY,chatUser);
                     // 将索引放入map中，方便通过id查找
@@ -92,7 +108,8 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
                             // 将响应的用户从列表中移除
                             provider.hdel(ChatConstant.USER_RESPOND_MAP_KEY,userId);
                             // 将用户和经理断开连接
-                            disconnect(userId,chatUser.getReceiveAgent(),true);
+                            removeSession(userId,agentId);
+                            clientServeBusiness.sendExitMessage(userId);
                         }
                         break;
                     }
@@ -111,6 +128,7 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
                         chatUser.setReceiveAgent(agentId);
                         // 将索引放入接收的map中
                         provider.hset(ChatConstant.USER_RESPOND_MAP_KEY,userId,chatUser);
+                        sendAgentIntroduce(userId,agentId);
                     }
                     case ChatUser.STATE.NEVER: {
                         // 如果没有就获取到索引
@@ -127,6 +145,19 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
             }
         }
         return true;
+    }
+
+    /**
+     * 发送经理的介绍
+     * @param userId 用户id
+     * @param agentId 经理id
+     */
+    private void sendAgentIntroduce (String userId,Long agentId) {
+        AgentInfoEntity agentInfoEntity = agentInfoDao.selectOne(new QueryWrapper<AgentInfoEntity>().lambda()
+                .select(AgentInfoEntity::getDes, AgentInfoEntity::getName)
+                .eq(AgentInfoEntity::getSysUserId, agentId));
+        clientServeBusiness.sendAgentIntroduce(userId,agentInfoEntity.getName(),agentInfoEntity.getDes(),"");
+        log.info("send agent introduce to connect userId:{} and agentId:{}",userId,agentId);
     }
 
     @Override
@@ -221,18 +252,21 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
 
     @Override
     @LockKey(ChatConstant.USER_LOCK)
-    public void disconnect(String userId, Long agentId,boolean fromUser) throws DataConflictException {
+    public void disconnect(String userId, Long agentId) throws DataConflictException {
+        changeState(userId,ChatUser.STATE.NEVER,agentId);
+    }
+
+    /**
+     * 从session中将用户移除
+     * @param userId
+     * @param agentId
+     */
+    public void removeSession (String userId,Long agentId) {
         String key = ChatConstant.SESSION_LIST_KEY_PREFIX + agentId;
         // 删除经理列表中的指定用户，如果删除成功(代表原本有)了才能进行下一步
-        if (provider.listRemove(key, userId)) {
-            changeState(userId, ChatUser.STATE.NEVER, agentId);
-        } else {
+        if (!provider.listRemove(key, userId)) {
             // 如果没有删除成功，就是没接入
-            throw new DataConflictException("该用于未接入");
-        }
-        // 如果断开连接的请求不是来自于用户的，就去修改状态
-        if (!fromUser) {
-            changeState(userId,ChatUser.STATE.NEVER,agentId);
+            throw new DataConflictException("该用户未接入");
         }
     }
 

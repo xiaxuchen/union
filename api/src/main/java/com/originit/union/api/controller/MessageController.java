@@ -78,11 +78,12 @@ public class MessageController {
     }
 
     /**
-     * 获取经理对话的的该用户历史记录
-     * @param userId 用户id
-     * @param lastId 目前加载的最开始的消息的记录
-     * @return
+     * 获取经理与用户的最近历史消息
+     * @param userId 微信用户的openId
+     * @param lastId 获取的消息在此id的消息前
+     * @return 历史消息列表
      */
+    @GetMapping("/history/list")
     public List<ChatMessageVO> getHistoryMessages (@RequestParam String userId, @RequestParam(required = false) Long lastId){
         return messageService.getHistoryMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
                 .stream().map(this::to).collect(Collectors.toList());
@@ -146,7 +147,7 @@ public class MessageController {
     @PostMapping
     public Long sendMessage (@RequestBody MessageSendDto messageSendDto) {
         log.info("send message...");
-        return messageService.sendMessage( MessageEntity.builder()
+        return messageService.sendMessage(MessageEntity.builder()
                 .userId(messageSendDto.getUserId())
                 .content(messageSendDto.getContent())
                 .type(messageSendDto.getType())
@@ -156,4 +157,5 @@ public class MessageController {
                 .gmtCreate(LocalDateTime.now())
                 .build());
     }
+
 }

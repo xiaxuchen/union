@@ -98,13 +98,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao,MessageEntity>  i
 
     @Override
     public void disConnectUser(String openId, Long id) {
-        sessionManager.disconnect(openId,id,false);
+        sessionManager.disconnect(openId,id);
     }
 
     @Override
     @LockKey(ChatConstant.USER_LOCK)
     public void dispatchToOther(String openId, Long from, Long to) {
-        sessionManager.disconnect(openId,from,false);
+        sessionManager.disconnect(openId,from);
         sessionManager.connect(openId,to);
     }
 

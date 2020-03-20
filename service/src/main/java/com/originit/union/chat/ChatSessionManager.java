@@ -5,7 +5,6 @@ import com.originit.union.bussiness.ClientServeBusiness;
 import com.originit.union.bussiness.MaterialBusiness;
 import com.originit.union.chat.data.AgentState;
 import com.originit.union.chat.data.ChatUser;
-import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.service.AgentInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -98,7 +97,7 @@ public class ChatSessionManager {
     private AgentState getAgentState (Long agentId) {
         AgentState agentState = agentMap.get(agentId);
         if (agentState == null) {
-            agentState = agentInfoService.getAgentStateById(agentId);
+            agentState = agentInfoService.getAgentStateByUserId(agentId);
             agentMap.put(agentId,agentState);
         }
         return agentState;

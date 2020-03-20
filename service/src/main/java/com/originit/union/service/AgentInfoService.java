@@ -11,5 +11,5 @@ public interface AgentInfoService extends IService<AgentInfoEntity> {
      * @param userId 用户id
      * @return 用户信息
      */
-    AgentState getAgentStateById(Long userId);
+    AgentState getAgentStateByUserId(Long userId);
 }

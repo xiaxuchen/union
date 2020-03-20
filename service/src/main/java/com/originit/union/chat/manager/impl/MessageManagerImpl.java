@@ -107,6 +107,7 @@ public class MessageManagerImpl implements MessageManager {
         if (user != null && agentId.equals(user.getReceiveAgent())) {
             // 发送消息
             clientServeBusiness.sendMessage(userId,messageEntity.getType(),messageEntity.getContent());
+            messageEntity.setState(MessageEntity.STATE.READ);
             // 持久化
             messageDao.insert(messageEntity);
             return;
@@ -134,7 +135,6 @@ public class MessageManagerImpl implements MessageManager {
                 {
                     // 将用户直接下线
                     userManager.changeState(userId,ChatUser.STATE.NEVER,null);
-                    clientServeBusiness.sendExitMessage(userId);
                 } else {
                     // 持久化消息
                     messageDao.insert(messageEntity);

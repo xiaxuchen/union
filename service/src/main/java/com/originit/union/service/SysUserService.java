@@ -46,5 +46,12 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @param sysUserEntity 系统用户信息
      */
     void updateSysUser (SysUserUpdateDto sysUserEntity);
+
+    /**
+     * 更新用户密码
+     * @param originPwd 原密码
+     * @param newPwd 新密码
+     */
+    void updatePwd(Long id,String originPwd, String newPwd);
 }
 

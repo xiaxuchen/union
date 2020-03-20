@@ -1,11 +1,11 @@
 package com.originit.union.api.shiro;
 
-import com.xxc.common.utils.RequestContextHolderUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.SessionKey;
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
@@ -16,7 +16,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
-import java.text.MessageFormat;
 
 /**
  * @Description 自定义获取Token
@@ -25,9 +24,19 @@ import java.text.MessageFormat;
  */
 @Slf4j
 public class ShiroSessionManager extends DefaultWebSessionManager {
+
     //定义常量
     public static final String AUTHORIZATION = "Authorization";
     public static final String REFERENCED_SESSION_ID_SOURCE = "Stateless request";
+
+    // 微信端公众的session
+    public static final String WECHAT_COMMON_SESSION_ID = "we-chat-common-session";
+
+    private static final SimpleSession WECHAT_SESSION = new SimpleSession();
+
+    static {
+        WECHAT_SESSION.setId(WECHAT_COMMON_SESSION_ID);
+    }
 
     //重写构造器
     public ShiroSessionManager() {
@@ -42,6 +51,12 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
      */
     @Override
     public Serializable getSessionId(ServletRequest request, ServletResponse response) {
+        // 如果是来自微信的，就不单独创建session
+        if (request.getParameter("signature") != null
+                && request.getParameter("timestamp") != null
+                && request.getParameter("nonce") != null ) {
+            return WECHAT_COMMON_SESSION_ID;
+        }
         String token = WebUtils.toHttp(request).getHeader(AUTHORIZATION);
         //如果请求头中存在token 则从请求头中获取token
         if (!StringUtils.isEmpty(token)) {
@@ -67,6 +82,10 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
         WebSessionKey webSessionKey = (WebSessionKey) sessionKey;
         final ServletRequest servletRequest = webSessionKey.getServletRequest();
         final Serializable sessionId = webSessionKey.getSessionId();
+        // 如果是微信的请求直接返回微信的无效的Session
+        if (WECHAT_COMMON_SESSION_ID.equals(sessionId)) {
+            return WECHAT_SESSION;
+        }
         ServletContext servletContext = null;
         if(sessionId != null && servletRequest != null)
         {
