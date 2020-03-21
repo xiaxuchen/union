@@ -2,6 +2,7 @@ package com.originit.union.bussiness;
 
 import com.alibaba.fastjson.JSONObject;
 import com.originit.common.exceptions.RemoteAccessException;
+import com.originit.common.util.ExceptionUtil;
 import com.originit.union.bussiness.protocol.CardInfo;
 import com.originit.union.constant.WeChatConstant;
 import com.originit.union.entity.UserBindEntity;
@@ -95,7 +96,7 @@ public class UserBusiness {
             }
         }catch (WxErrorException e1) {
             e1.printStackTrace();
-            throw new RemoteAccessException(e1.getError());
+            throw new RemoteAccessException("批量获取用户失败",e1);
         }
     }
 
@@ -113,9 +114,7 @@ public class UserBusiness {
             }
             return openIdList;
         } catch (WxErrorException e) {
-            log.error("获取所有用户openId失败:" + e.getError().getErrmsg());
-            e.printStackTrace();
-            throw new RemoteAccessException(e.getError());
+            throw new RemoteAccessException("获取所有的用户的openId失败",e);
         }
     }
 
@@ -187,14 +186,8 @@ public class UserBusiness {
                 return null;
             }
             return phone;
-        } catch (WxErrorException e) {
-            log.error(e.getError().getErrmsg());
-            e.printStackTrace();
-            throw new RemoteAccessException(e.getError());
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
-            throw new RemoteAccessException("微信请求异常:" + e.getMessage());
+        } catch (WxErrorException  | IOException e) {
+            throw new RemoteAccessException("用户电话获取失败:" ,e);
         }
     }
 
@@ -208,7 +201,7 @@ public class UserBusiness {
         try {
             wxUser = wxService.getUserInfoByOpenId(new WxUserList.WxUser.WxUserGet(openId, WeChatConstant.LANG));
         } catch (WxErrorException e) {
-            e.printStackTrace();
+            log.error(ExceptionUtil.buildErrorMessage(e));
             return null;
         }
         return wxUserToUserBind(wxUser);

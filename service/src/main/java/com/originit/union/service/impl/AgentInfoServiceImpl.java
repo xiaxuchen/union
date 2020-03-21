@@ -36,11 +36,7 @@ public class AgentInfoServiceImpl extends ServiceImpl<AgentInfoDao,AgentInfoEnti
                 .build();
     }
 
-    /**
-     * 通过用户id获取经理的信息
-     * @param userId 用户id
-     * @return
-     */
+    @Override
     public AgentInfoEntity getByUserId (Long userId) {
         return this.getOne(new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, userId));
     }

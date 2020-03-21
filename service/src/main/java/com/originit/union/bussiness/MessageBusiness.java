@@ -79,8 +79,7 @@ public class MessageBusiness {
             SenderResult result = wxService.sendAllPreview(sender);
             return AsyncResult.forValue(result.getMsg_id());
         } catch (WxErrorException e) {
-            e.printStackTrace();
-            return AsyncResult.forExecutionException(new RemoteAccessException(e.getError()));
+            return AsyncResult.forExecutionException(new RemoteAccessException("预览失败，请稍后重试",e));
         }
     }
 
@@ -100,8 +99,7 @@ public class MessageBusiness {
             QrCodeResult result = wxService.createQrCode(code);
             return "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + result.getTicket();
         } catch (WxErrorException e) {
-            e.printStackTrace();
-            throw new RemoteAccessException(e.getError());
+            throw new RemoteAccessException("二维码生成失败",e);
         }
     }
 
@@ -121,8 +119,7 @@ public class MessageBusiness {
             SenderResult result = wxService.sendAllByOpenid(sender);
             return result.getMsg_id();
         } catch (WxErrorException e) {
-            e.printStackTrace();
-            throw new RemoteAccessException(e.getError());
+            throw new RemoteAccessException("推送发送失败",e);
         }
     }
 }

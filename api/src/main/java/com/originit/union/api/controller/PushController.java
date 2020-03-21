@@ -9,12 +9,15 @@ import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.api.wxinterceptor.PreviewQRCodeInterceptor;
 import com.originit.union.bussiness.MaterialBusiness;
 import com.originit.union.bussiness.MessageBusiness;
+import com.originit.union.constant.SystemConstant;
 import com.originit.union.entity.domain.PreviewState;
 import com.originit.union.entity.dto.PushInfoDto;
+import com.originit.union.entity.vo.IndexStatisticVO;
 import com.originit.union.entity.vo.MaterialVO;
 import com.originit.union.entity.vo.TagInfoVO;
 import com.originit.union.entity.vo.UserInfoVO;
 import com.originit.union.service.PushInfoService;
+import com.originit.union.service.RedisService;
 import com.originit.union.service.TagService;
 import com.originit.union.service.UserService;
 import com.originit.union.util.DataUtil;
@@ -60,6 +63,13 @@ public class PushController {
     private RedisCacheProvider redisCacheProvider;
 
     private PushInfoService pushInfoService;
+
+    private RedisService redisService;
+
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
+    }
 
     @Autowired
     public void setPushInfoService(PushInfoService pushInfoService) {
@@ -232,6 +242,19 @@ public class PushController {
         pushInfoService.addPushInfo(pushInfo);
     }
 
+    /**
+     * 获取首页统计数据
+     * @return
+     */
+    @GetMapping("/index")
+    public IndexStatisticVO getIndexStatistic (@RequestParam(required = false) String start,@RequestParam(required = false) String end) {
+        final IndexStatisticVO pushStatistic = pushInfoService.getPushStatistic(start, end);
+        pushStatistic.setAllUserCount(redisService.get(SystemConstant.ALL_USER_COUNT,Integer.class));
+        pushStatistic.setBindUserCount(redisService.get(SystemConstant.USER_BIND_COUNT,Integer.class));
+        pushStatistic.setLastDayUserAddCount(redisService.get(SystemConstant.USER_YESTERDAY_ADDITION,Integer.class));
+        pushStatistic.setTheMonthUserAddCount(redisService.get(SystemConstant.USER_MONTH_ADDITION,Integer.class));
+        return pushStatistic;
+    }
 }
 
 

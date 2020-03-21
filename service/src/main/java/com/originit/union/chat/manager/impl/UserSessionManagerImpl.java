@@ -254,6 +254,7 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
     @LockKey(ChatConstant.USER_LOCK)
     public void disconnect(String userId, Long agentId) throws DataConflictException {
         changeState(userId,ChatUser.STATE.NEVER,agentId);
+        removeSession(userId,agentId);
     }
 
     /**
@@ -264,10 +265,7 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
     public void removeSession (String userId,Long agentId) {
         String key = ChatConstant.SESSION_LIST_KEY_PREFIX + agentId;
         // 删除经理列表中的指定用户，如果删除成功(代表原本有)了才能进行下一步
-        if (!provider.listRemove(key, userId)) {
-            // 如果没有删除成功，就是没接入
-            throw new DataConflictException("该用户未接入");
-        }
+        provider.listRemove(key, userId);
     }
 
     @Override

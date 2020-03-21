@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.originit.union.mapper.PushInfoDao">
+
+    <select id="selectAllPushCount" resultType="long">
+        SELECT SUM(count) FROM push_info
+        <where>
+            <if test="start != null">
+                date_format(gmt_create, '%Y-%m-%d') &gt;  #{start}
+            </if>
+            <if test="end != null">
+                AND date_format(gmt_create, '%Y-%m-%d') &lt; #{end}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAllSentCount" resultType="long">
+        SELECT SUM(send_count) FROM push_info
+        <where>
+            <if test="start != null">
+                DATE_FORMAT(gmt_create, '%Y-%m-%d') &gt;  #{start}
+            </if>
+            <if test="end != null">
+                AND DATE_FORMAT(gmt_create, '%Y-%m-%d') &lt; #{end}
+            </if>
+            AND state = 1
+        </where>
+    </select>
+
+    <resultMap id="ChartMap" type="com.originit.union.entity.vo.ChartDataVO" autoMapping="true" >
+        <id property="date" column="date" />
+    </resultMap>
+
+    <select id="selectChartData" resultMap="ChartMap">
+        SELECT  DATE_FORMAT(gmt_create,'%Y-%m-%d') date,SUM(count) allCount,SUM(send_count) receiveUserCount FROM push_info
+        <where>
+            <if test="start != null">
+                AND date_format(gmt_create, '%Y-%m-%d') &gt;  #{start}
+            </if>
+            <if test="end != null">
+                AND date_format(gmt_create, '%Y-%m-%d') &lt; #{end}
+            </if>
+            AND status = 1
+            AND DATE(gmt_create) in
+            (SELECT DATE(gmt_create) FROM  push_info group by DATE(gmt_create),count,send_count)
+        </where>
+    </select>
+
+
+</mapper>

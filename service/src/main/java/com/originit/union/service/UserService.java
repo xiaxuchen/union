@@ -5,6 +5,8 @@ import com.originit.common.page.Pager;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.dto.SysUserDto;
 import com.originit.union.entity.vo.UserInfoVO;
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 /**
@@ -41,4 +43,9 @@ public interface UserService extends IService<UserBindEntity> {
      * 导入用户信息到系统中
      */
     void importUsers();
+
+    /**
+     * 获取系统中用户总数以及有电话号码的用户的总数 * @return [0]用户总数，[1]用户绑定数
+     */
+    Integer[] getUserStatistic();
 }

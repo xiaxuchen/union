@@ -63,13 +63,30 @@ public class FileUDUtil {
      * @param agent 浏览器的user-agent
      */
     public static void downloadFile(String code, String filename, String agent, HttpServletResponse resp) {
+        String realPath = new String(Base64.getDecoder().decode(code), StandardCharsets.UTF_8);
+        if (filename == null) {
+            filename = realPath.substring(realPath.lastIndexOf("\\") + 1);
+        }
+        downloadFileWithPath("",realPath,filename,agent,resp);
+    }
+
+    /**
+     * 获取对应code的文件
+     * @param code 上传文件生成的code
+     */
+    public static File getFile (String code) {
+        if (code == null) {
+            return null;
+        }
+        String realPath = new String(Base64.getDecoder().decode(code), StandardCharsets.UTF_8);
+        // 获取目录下的资源
+        return new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), realPath);
+    }
+
+    public static void downloadFileWithPath (String relativePath,String realPath, String filename, String agent, HttpServletResponse resp) {
         try {
-            String realPath = new String(Base64.getDecoder().decode(code), StandardCharsets.UTF_8);
-            if (filename == null) {
-                filename = realPath.substring(realPath.lastIndexOf("\\") + 1);
-            }
-            // 获取目录下的资源
-            File file = new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), realPath);
+           // 获取目录下的资源
+            File file = new File(FileUDUtil.class.getClassLoader().getResource(relativePath).getPath(), realPath);
             resp.reset();
 //          // 让浏览器显示下载文件对话框
             resp.setContentType(MediaType.parseMediaType(Files.probeContentType(Paths.get(file.getAbsolutePath()))).getType());
@@ -100,19 +117,6 @@ public class FileUDUtil {
             e.printStackTrace();
             throw new InternalServerException("文件下载异常");
         }
-    }
-
-    /**
-     * 获取对应code的文件
-     * @param code 上传文件生成的code
-     */
-    public static File getFile (String code) {
-        if (code == null) {
-            return null;
-        }
-        String realPath = new String(Base64.getDecoder().decode(code), StandardCharsets.UTF_8);
-        // 获取目录下的资源
-        return new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), realPath);
     }
 
     /**

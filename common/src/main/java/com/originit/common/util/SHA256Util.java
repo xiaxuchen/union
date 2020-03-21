@@ -1,4 +1,4 @@
-package com.originit.union.api.util;
+package com.originit.common.util;
 
 import org.apache.shiro.crypto.hash.SimpleHash;
 

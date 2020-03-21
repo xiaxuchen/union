@@ -2,6 +2,7 @@ package com.originit.common.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -102,8 +103,15 @@ public class DateUtil {
         	age--;
         }
         return age;
-        
 	}
-	
+
+
+	/**
+	 * 现在是否是月初
+	 * @return
+	 */
+	public static boolean isMonth_1st() {
+		return LocalDateTime.now().getDayOfMonth() == 1;
+	}
 
 }

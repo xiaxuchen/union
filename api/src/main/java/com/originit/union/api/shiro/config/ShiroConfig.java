@@ -4,7 +4,7 @@ import com.originit.union.api.shiro.ShiroSessionManager;
 import com.originit.union.api.shiro.filter.ShiroUserFilter;
 import com.originit.union.api.shiro.generator.ShiroSessionIdGenerator;
 import com.originit.union.api.shiro.realm.ShiroRealm;
-import com.originit.union.api.util.SHA256Util;
+import com.originit.common.util.SHA256Util;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;

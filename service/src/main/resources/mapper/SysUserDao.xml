@@ -10,6 +10,7 @@
 
     <resultMap id="SysUserVOMap" type="com.originit.union.entity.vo.SysUserVO" autoMapping="true">
         <id property="userId" column="user_id" />
+        <result property="createTime" column="gmt_create" />
         <association property="agentInfo" javaType="com.originit.union.entity.vo.AgentInfoVO" autoMapping="true">
             <id property="id" column="agentId"/>
         </association>
@@ -21,7 +22,7 @@
 
     <select id="selectByConditions" resultMap="SysUserVOMap">
         SELECT sys_user.*,agent_info.id agentId,
-        agent_info.name,agent_info.sex,agent_info.account,agent_info.des,
+        agent_info.name,agent_info.sex,agent_info.des,
         sys_role.role_id roleId,sys_role.role_name roleName
         FROM sys_user LEFT JOIN agent_info
                 ON sys_user.user_id = agent_info.sys_user_id

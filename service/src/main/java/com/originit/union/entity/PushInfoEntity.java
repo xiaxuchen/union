@@ -21,6 +21,13 @@ import java.time.LocalDateTime;
 @TableName("push_info")
 public class PushInfoEntity implements Serializable {
 
+    public interface STATUS {
+        // 发送中
+        Integer SENDIND = 0;
+        // 发送完成
+        Integer SENT = 1;
+    }
+
     @TableId
     private Long id;
 
@@ -48,6 +55,26 @@ public class PushInfoEntity implements Serializable {
      * 推送内容，可能为media_id
      */
     private String content;
+
+    /**
+     * 发送数
+     */
+    private Integer count;
+
+    /**
+     * 接受数
+     */
+    private Integer sendCount;
+
+    /**
+     * 接受失败数
+     */
+    private Integer errorCount;
+
+    /**
+     * 发送状态
+     */
+    private Integer status;
 
     /**
      * 推送的id，这个是微信公众平台的id

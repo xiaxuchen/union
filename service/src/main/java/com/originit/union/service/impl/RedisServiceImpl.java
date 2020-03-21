@@ -15,7 +15,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void set(String key, Object value) {
-        if (value instanceof String) {
+        if (value instanceof String || value instanceof Integer || value instanceof Long) {
             stringRedisTemplate.opsForValue().set(key, value.toString());
         } else {
             stringRedisTemplate.opsForValue().set(key, JSON.toJSONString(value));
@@ -32,6 +32,13 @@ public class RedisServiceImpl implements RedisService {
         if (type == String.class) {
             return (T) value;
         }
+        if (type == Integer.class) {
+            return (T)((Integer)Integer.parseInt(value));
+        }
+        if (type == Long.class) {
+            return (T)((Long)Long.parseLong(value));
+        }
+
         return JSON.parseObject(value,type);
     }
 

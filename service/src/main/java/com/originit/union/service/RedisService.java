@@ -3,7 +3,7 @@ package com.originit.union.service;
 
 public interface RedisService {
     /**
-     * 存储数据
+     * 存储数据,支持String、Integer、Long以及对象类型
      */
     void set(String key, Object value);
 

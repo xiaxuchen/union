@@ -57,8 +57,4 @@ public class SysUserDto {
      */
     private Integer sex;
 
-    /**
-     * 客服账号
-     */
-    private String account;
 }

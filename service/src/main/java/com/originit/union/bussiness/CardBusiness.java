@@ -57,10 +57,8 @@ public class CardBusiness {
                 }
             }
             return null;
-        } catch (IOException e) {
-            throw new RemoteAccessException("获取token异常:" + e.getMessage());
-        } catch (WxErrorException e) {
-            throw new RemoteAccessException(e.getError());
+        } catch (IOException | WxErrorException e) {
+            throw new RemoteAccessException("获取token异常",e);
         }
     }
 }

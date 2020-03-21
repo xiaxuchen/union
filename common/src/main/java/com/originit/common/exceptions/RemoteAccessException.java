@@ -10,7 +10,11 @@ import com.originit.common.enums.ResultCode;
  */
 public class RemoteAccessException extends BusinessException {
 
+
     private static final long serialVersionUID = -832464574076215195L;
+
+    // 真实的异常
+    private Throwable throwable;
 
     public RemoteAccessException() {
         super();
@@ -36,4 +40,16 @@ public class RemoteAccessException extends BusinessException {
         super(formatMsg, objects);
     }
 
+    public RemoteAccessException(String msg,Throwable throwable) {
+        super(msg);
+        this.throwable = throwable;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+    }
 }

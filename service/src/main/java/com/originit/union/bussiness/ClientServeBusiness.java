@@ -7,6 +7,7 @@ import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.KfSender;
 import com.soecode.wxtools.bean.SenderContent;
+import com.soecode.wxtools.bean.result.WxError;
 import com.soecode.wxtools.exception.WxErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class ClientServeBusiness {
         try {
             wxService.sendMessageByKf(sender);
         } catch (WxErrorException e) {
-            throw new RemoteAccessException(e.getError());
+            throw new RemoteAccessException("消息发送失败",e);
         }
     }
 
@@ -76,7 +77,7 @@ public class ClientServeBusiness {
         try {
             wxService.sendMessageByKf(sender);
         } catch (WxErrorException e) {
-            throw new RemoteAccessException(e.getError());
+            throw new RemoteAccessException("发送图文消息失败",e);
         }
     }
 
@@ -93,7 +94,7 @@ public class ClientServeBusiness {
         try {
             wxService.sendMessageByKf(sender);
         } catch (WxErrorException e) {
-            throw new RemoteAccessException(e.getError());
+            throw new RemoteAccessException("发送图片失败",e);
         }
     }
 

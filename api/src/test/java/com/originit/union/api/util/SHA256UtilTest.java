@@ -1,9 +1,8 @@
 package com.originit.union.api.util;
 
+import com.originit.common.util.SHA256Util;
 import org.apache.shiro.util.ByteSource;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class SHA256UtilTest {
 

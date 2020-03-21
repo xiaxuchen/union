@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.originit.union.mapper.UserAgentDao">
+
+    <resultMap id="UserAgentInfoMap" type="com.originit.union.entity.domain.UserInfo" autoMapping="true">
+        <id property="openId" column="open_id" />
+        <result property="phone" column="phone" />
+        <collection property="tags" javaType="java.util.ArrayList" ofType="com.originit.union.entity.TagEntity">
+            <id property="id" column="tagId" />
+            <result property="name" column="tagName"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectByAgentId" resultMap="UserAgentInfoMap">
+      SELECT user_agent.user_phone phone,user_bind.open_id,
+             user_bind.subscribe_time,user_bind.head_img,
+             user_bind.push_count,user_bind.name,
+             user_bind.sex,tag.id tagId,tag.name tagName FROM user_agent
+      LEFT JOIN user_bind ON user_agent.user_phone = user_bind.phone
+      LEFT JOIN user_tag ON user_bind.id = user_tag.bind_user_id
+      LEFT JOIN tag ON user_tag.tag_id = tag.id
+      WHERE user_agent.agent = #{agentId}
+      ORDER BY user_bind.name
+    </select>
+
+
+</mapper>

@@ -33,6 +33,11 @@ public class MessageEntity implements Serializable {
     @TableId
     private Long id;
 
+    /**
+     * 微信端消息id
+     */
+    private Long messageId;
+
     private String content;
 
     private Integer type;

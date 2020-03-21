@@ -2,6 +2,8 @@ package com.originit.union.api.exhandler;
 
 import com.originit.common.enums.ResultCode;
 import com.originit.common.exceptions.BusinessException;
+import com.originit.common.exceptions.RemoteAccessException;
+import com.originit.common.util.ExceptionUtil;
 import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.entity.SysUserEntity;
 import com.xxc.common.utils.IpUtil;
@@ -28,11 +30,16 @@ public class GlobalExceptionHandler {
         return new PlatformResult<>(false,exception.getCode(), exception.getMessage(), exception.getData());
     }
 
+    @ExceptionHandler(value = RemoteAccessException.class)
+    public PlatformResult remoteAccessExceptionHandler (RemoteAccessException exception) {
+        return new PlatformResult<Object>(false,exception.getCode(), exception.getMessage(), exception.getData());
+    }
+
 
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public PlatformResult unHandledExceptionHandler(Exception exception){
-        log.error("{},the unHandled Exception {} is find, message: {}",getRequesterInfo(),exception.getClass().getName(),exception.getMessage());
+        log.error("{},the unHandled Exception {}",getRequesterInfo(), ExceptionUtil.buildErrorMessage(exception));
         ResultCode paramIsInvalid = ResultCode.SYSTEM_INNER_ERROR;
         return new PlatformResult<>(false, paramIsInvalid.code(),paramIsInvalid.message(),null);
     }
@@ -65,4 +72,5 @@ public class GlobalExceptionHandler {
         }
         return builder.toString();
     }
+
 }

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.common.exceptions.BusinessException;
 import com.originit.common.exceptions.UserException;
 import com.originit.common.page.Pager;
+import com.originit.common.util.SHA256Util;
 import com.originit.common.validator.group.CreateGroup;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
@@ -85,7 +86,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
                     .build());
             // 添加客户经理信息
             agentInfoDao.insert(AgentInfoEntity.builder()
-                    .account(sysUserDto.getAccount())
                     .des(sysUserDto.getDes())
                     .name(sysUserDto.getName())
                     .sex(sysUserDto.getSex())
@@ -110,16 +110,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
                 .phone(sysUserDto.getPhone())
                 .password(sysUserDto.getPassword())
                 .salt(sysUserDto.getSalt())
-                .state(sysUserDto.getIsInValid()? SysUserEntity.FORBID:SysUserEntity.ENABLE)
                 .gmtModified(LocalDateTime.now())
                 .build();
+        if (sysUserDto.getIsInValid() != null) {
+            sysUser .setState(sysUserDto.getIsInValid()? SysUserEntity.FORBID:SysUserEntity.ENABLE);
+        }
+
         // 更新系统用户表
         baseMapper.update(sysUser,new QueryWrapper<SysUserEntity>().lambda().
                 eq(SysUserEntity::getUserId,sysUserDto.getUserId()));
         final LambdaQueryWrapper<AgentInfoEntity> qw = new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, sysUserDto.getUserId());
         if (sysUserDto.getIsAgent()) {
             final AgentInfoEntity agentInfo = AgentInfoEntity.builder()
-                    .account(sysUserDto.getAccount())
                     .des(sysUserDto.getDes())
                     .name(sysUserDto.getName())
                     .sex(sysUserDto.getSex())
@@ -140,19 +142,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updatePwd(Long id,String originPwd, String newPwd) {
         if (originPwd.equals(newPwd)) {
             throw new IllegalArgumentException("新旧密码不能一样");
         }
-        if (0 == baseMapper.selectCount(new QueryWrapper<SysUserEntity>().lambda()
-                .eq(SysUserEntity::getPassword,originPwd).eq(SysUserEntity::getUserId,id))) {
+        final SysUserEntity sysUserEntity = baseMapper.selectOne(new QueryWrapper<SysUserEntity>().lambda()
+                .select(SysUserEntity::getPassword, SysUserEntity::getSalt)
+                .eq(SysUserEntity::getUserId, id));
+
+        if (!sysUserEntity.getPassword().equals(SHA256Util.sha256(originPwd,sysUserEntity.getSalt()))) {
             throw new BusinessException("密码错误");
         }
         // 更新该用户的密码
         if (0 == baseMapper.update(null,new UpdateWrapper<SysUserEntity>().lambda()
-                .set(SysUserEntity::getPassword,newPwd)
+                .set(SysUserEntity::getPassword,SHA256Util.sha256(newPwd,sysUserEntity.getSalt()))
                 .eq(SysUserEntity::getUserId,id))) {
             throw new BusinessException("密码更新失败");
         }

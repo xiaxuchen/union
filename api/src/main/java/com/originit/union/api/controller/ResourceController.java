@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.mchange.lang.ByteUtils;
 import com.originit.common.exceptions.ParameterInvalidException;
 import com.originit.common.util.FileUDUtil;
+import com.originit.union.api.annotation.Anon;
 import com.xxc.response.anotation.OriginResponse;
 import com.xxc.response.anotation.ResponseResult;
 import org.apache.commons.io.FileUtils;
@@ -23,6 +24,7 @@ import java.io.*;
 @RestController
 @ResponseResult
 @RequestMapping("/resource")
+@Anon
 public class ResourceController {
 
     /**
@@ -50,4 +52,15 @@ public class ResourceController {
     public void getFile (@PathVariable String code, HttpServletRequest request, HttpServletResponse resp) throws IOException {
         FileUDUtil.downloadFile(code, null, request.getHeader("User-Agent"),resp);
     }
+
+    /**
+     * 获取电话模板文件
+     * @return 文件
+     */
+    @GetMapping("/template/phone")
+    @OriginResponse
+    public void getPhoneTemplateFile (HttpServletRequest request, HttpServletResponse resp) throws IOException {
+        FileUDUtil.downloadFileWithPath("files","/phone_template.xls", "模板.xls", request.getHeader("User-Agent"),resp);
+    }
+
 }

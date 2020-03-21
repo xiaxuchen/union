@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -123,6 +124,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
             getService().addOrUpdateUsers(users);
             log.info("导入结束");
         }));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Integer[] getUserStatistic() {
+        Integer allCount = baseMapper.selectCount(null);
+        Integer bindCount = baseMapper.selectCount(new QueryWrapper<UserBindEntity>()
+                .lambda().isNotNull(UserBindEntity::getPhone));
+        return new Integer[]{allCount,bindCount};
     }
 
     private UserService getService () {

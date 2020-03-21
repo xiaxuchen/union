@@ -69,8 +69,4 @@ public class SysUserUpdateDto {
      */
     private Integer sex;
 
-    /**
-     * 客服账号
-     */
-    private String account;
 }

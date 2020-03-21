@@ -36,11 +36,6 @@ public class AgentInfoEntity implements Serializable {
     private Integer sex;
 
     /**
-     * 客服账号
-     */
-    private String account;
-
-    /**
      * 简介
      */
     private String des;
