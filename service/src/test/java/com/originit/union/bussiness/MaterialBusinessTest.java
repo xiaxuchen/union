@@ -64,7 +64,7 @@ public class MaterialBusinessTest {
     public void testQRCODe() {
         WxQrcode code = new WxQrcode();
         code.setAction_name("QR_STR_SCENE");
-        code.setAction_info(new WxQrcode.WxQrActionInfo(new WxQrcode.WxQrActionInfo.WxScene("/push/preview?id=" + UUID.randomUUID().toString().replace("-",""))));
+        code.setAction_info(new WxQrcode.WxQrActionInfo(new WxQrcode.WxQrActionInfo.WxScene("/push/preview?wechatMessageId=" + UUID.randomUUID().toString().replace("-",""))));
         code.setExpire_seconds(720);
         try {
             QrCodeResult result = new WechatConfig().iService().createQrCode(code);

@@ -16,10 +16,10 @@ import com.originit.union.entity.vo.IndexStatisticVO;
 import com.originit.union.entity.vo.MaterialVO;
 import com.originit.union.entity.vo.TagInfoVO;
 import com.originit.union.entity.vo.UserInfoVO;
-import com.originit.union.service.PushInfoService;
+import com.originit.union.service.PushService;
 import com.originit.union.service.RedisService;
 import com.originit.union.service.TagService;
-import com.originit.union.service.UserService;
+import com.originit.union.service.WeChatUserService;
 import com.originit.union.util.DataUtil;
 import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.exception.WxErrorException;
@@ -52,7 +52,7 @@ public class PushController {
     private  String openid="o1U3TjoBfIKeo_dyR380-Z4Vw_vU";
     private IService wxService;
 
-    private UserService userService;
+    private WeChatUserService userService;
 
     private TagService tagService;
 
@@ -62,7 +62,7 @@ public class PushController {
 
     private RedisCacheProvider redisCacheProvider;
 
-    private PushInfoService pushInfoService;
+    private PushService pushService;
 
     private RedisService redisService;
 
@@ -72,8 +72,8 @@ public class PushController {
     }
 
     @Autowired
-    public void setPushInfoService(PushInfoService pushInfoService) {
-        this.pushInfoService = pushInfoService;
+    public void setPushService(PushService pushService) {
+        this.pushService = pushService;
     }
 
     @Autowired
@@ -87,7 +87,7 @@ public class PushController {
     }
 
     @Autowired
-    public void setUserService(UserService userService){
+    public void setUserService(WeChatUserService userService){
         this.userService=userService;
     }
 
@@ -173,7 +173,7 @@ public class PushController {
         // 将其放入redis中缓存
         redisCacheProvider.hset(PreviewQRCodeInterceptor.EVENT_KEY,item,
                 new PreviewState(item,false,msgType,content),expireTime);
-        String qrUrl = messageBusiness.generateTempQRCode(PreviewQRCodeInterceptor.EVENT_KEY + "?id=" + item, expireTime);
+        String qrUrl = messageBusiness.generateTempQRCode(PreviewQRCodeInterceptor.EVENT_KEY + "?wechatMessageId=" + item, expireTime);
         return DataUtil.<String,String>mapBuilder()
                 .append("pushItemId",item)
                 .append("url",qrUrl)
@@ -239,7 +239,7 @@ public class PushController {
         Long userId = ShiroUtils.getUserInfo().getUserId();
         pushInfo.setPushId(pushId);
         pushInfo.setPusher(userId);
-        pushInfoService.addPushInfo(pushInfo);
+        pushService.addPushInfo(pushInfo);
     }
 
     /**
@@ -248,7 +248,7 @@ public class PushController {
      */
     @GetMapping("/index")
     public IndexStatisticVO getIndexStatistic (@RequestParam(required = false) String start,@RequestParam(required = false) String end) {
-        final IndexStatisticVO pushStatistic = pushInfoService.getPushStatistic(start, end);
+        final IndexStatisticVO pushStatistic = pushService.getPushStatistic(start, end);
         pushStatistic.setAllUserCount(redisService.get(SystemConstant.ALL_USER_COUNT,Integer.class));
         pushStatistic.setBindUserCount(redisService.get(SystemConstant.USER_BIND_COUNT,Integer.class));
         pushStatistic.setLastDayUserAddCount(redisService.get(SystemConstant.USER_YESTERDAY_ADDITION,Integer.class));

@@ -2,7 +2,7 @@ package com.originit.union.api.quartz;
 
 import com.originit.union.constant.SystemConstant;
 import com.originit.union.service.RedisService;
-import com.originit.union.service.UserService;
+import com.originit.union.service.WeChatUserService;
 import com.originit.union.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @Slf4j
 public class UserImportTimer extends QuartzJobBean {
 
-    private UserService userService;
+    private WeChatUserService userService;
 
     private RedisService redisService;
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public void setUserService(WeChatUserService userService) {
         this.userService = userService;
     }
 

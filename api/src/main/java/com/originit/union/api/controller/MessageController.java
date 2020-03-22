@@ -8,7 +8,7 @@ import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.dto.MessageSendDto;
 import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
-import com.originit.union.service.MessageService;
+import com.originit.union.service.ChatService;
 import com.originit.union.util.DateUtil;
 import com.xxc.response.anotation.ResponseResult;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,10 +31,10 @@ import java.util.stream.Collectors;
 public class MessageController {
 
 
-    private MessageService messageService;
+    private ChatService messageService;
 
     @Autowired
-    public void setMessageService(MessageService messageService) {
+    public void setMessageService(ChatService messageService) {
         this.messageService = messageService;
     }
 
@@ -64,7 +63,7 @@ public class MessageController {
                     .message(message.getContent())
                     .type(message.getType())
                     .build();
-            time = DateUtil.getTime(message.getGmtCreate().toEpochSecond(ZoneOffset.of("+8")));
+            time = DateUtil.toDateTimeStr(message.getGmtCreate().toEpochSecond(ZoneOffset.of("+8")));
         }
         return ChatUserVO.builder()
                 .id(userInfo.getOpenId())
@@ -91,7 +90,7 @@ public class MessageController {
 
     private ChatMessageVO to (MessageEntity message) {
         return ChatMessageVO.builder()
-                .id(message.getId())
+                .id(message.getWechatMessageId())
                 .isUser(message.getFromUser())
                 .message(message.getContent())
                 .type(message.getType())
@@ -131,7 +130,7 @@ public class MessageController {
      */
     @DeleteMapping("/session")
     public void disConnectUser (@RequestParam String openId) {
-        messageService.disConnectUser(openId,ShiroUtils.getUserInfo().getUserId());
+        messageService.disconnectUser(openId,ShiroUtils.getUserInfo().getUserId());
     }
 
     @PutMapping("/list/read")
@@ -148,10 +147,10 @@ public class MessageController {
     public Long sendMessage (@RequestBody MessageSendDto messageSendDto) {
         log.info("send message...");
         return messageService.sendMessage(MessageEntity.builder()
-                .userId(messageSendDto.getUserId())
+                .openId(messageSendDto.getUserId())
                 .content(messageSendDto.getContent())
                 .type(messageSendDto.getType())
-                .agentId(ShiroUtils.getUserInfo().getUserId().toString())
+                .userId(ShiroUtils.getUserInfo().getUserId().toString())
                 .state(MessageEntity.STATE.WAIT)
                 .fromUser(false)
                 .gmtCreate(LocalDateTime.now())

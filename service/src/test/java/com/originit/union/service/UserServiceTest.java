@@ -1,6 +1,5 @@
 package com.originit.union.service;
 
-import com.originit.union.entity.UserBindEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class UserServiceTest {
 
     @Autowired
-    UserService userService;
+    WeChatUserService userService;
 
     @Autowired
     ThreadPoolExecutor executor;

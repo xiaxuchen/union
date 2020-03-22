@@ -1,6 +1,6 @@
 package com.originit.union.api.controller;
 
-import com.originit.union.service.UserService;
+import com.originit.union.service.WeChatUserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,9 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,7 +34,7 @@ public class UserControllerTest {
 
     // 这里是模拟对象
     @Mock
-    private UserService userService;
+    private WeChatUserService userService;
 
     // 这里是将模拟的对象注入到spring中去
     @Autowired

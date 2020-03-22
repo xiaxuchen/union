@@ -6,7 +6,7 @@ import com.originit.common.util.ExceptionUtil;
 import com.originit.union.bussiness.protocol.CardInfo;
 import com.originit.union.constant.WeChatConstant;
 import com.originit.union.entity.UserBindEntity;
-import com.originit.union.entity.mapper.UserMapper;
+import com.originit.union.entity.converter.WeChatUserConverter;
 import com.originit.union.entity.vo.UserInfoVO;
 import com.originit.union.util.DateUtil;
 import com.originit.union.util.WechatUtil;
@@ -84,7 +84,7 @@ public class UserBusiness {
             for (WxUserList.WxUser wxUser : userInfoList) {
                 Integer position = positionMap.get(wxUser.getOpenid());
                 UserInfoVO origin = userInfoVOS.get(position);
-                UserInfoVO userInfoVO = UserMapper.INSTANCE.to(wxUser);
+                UserInfoVO userInfoVO = WeChatUserConverter.INSTANCE.to(wxUser);
                 userInfoVO.setTags(origin.getTags());
                 userInfoVO.setPhone(origin.getPhone());
                 userInfoVO.setId(origin.getId());

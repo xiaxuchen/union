@@ -16,7 +16,8 @@ import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
-import com.originit.union.mapper.MessageDao;
+import com.originit.union.dao.MessageDao;
+import com.originit.union.service.ChatService;
 import com.originit.union.service.MessageService;
 import com.originit.union.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,12 +61,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao,MessageEntity>  i
     @Override
     public Long sendMessage(MessageEntity messageEntity) {
         if (messageEntity.getFromUser()) {
-            messageManager.sendMessageForServe(messageEntity.getUserId(),messageEntity);
+            messageManager.sendMessageForServe(messageEntity.getOpenId(),messageEntity);
         } else {
-            messageManager.sendMessageToUser(messageEntity.getUserId(),
-                    Long.valueOf(messageEntity.getAgentId()),messageEntity);
+            messageManager.sendMessageToUser(messageEntity.getOpenId(),
+                    Long.valueOf(messageEntity.getUserId()),messageEntity);
         }
-        return messageEntity.getId();
+        return messageEntity.getWechatMessageId();
     }
 
     @Override
@@ -98,8 +99,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao,MessageEntity>  i
 
     @Override
     public void disConnectUser(String openId, Long id) {
-        sessionManager.disconnect(openId,id);
+
     }
+
+//    @Override
+//    public void disconnectUser(String openId, Long wechatMessageId) {
+//        sessionManager.disconnect(openId,wechatMessageId);
+//    }
 
     @Override
     @LockKey(ChatConstant.USER_LOCK)
@@ -165,7 +171,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao,MessageEntity>  i
         final IPage<MessageEntity> iPage = baseMapper.selectPage(new Page<>(0, 1),
                 new QueryWrapper<MessageEntity>().lambda()
                         .eq(MessageEntity::getState, MessageEntity.STATE.WAIT)
-                        .eq(MessageEntity::getUserId, userId)
+                        .eq(MessageEntity::getOpenId, userId)
                         .orderByDesc(MessageEntity::getGmtCreate));
         return iPage;
     }
@@ -185,15 +191,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao,MessageEntity>  i
                 .isUser(message.getFromUser())
                 .message(message.getContent())
                 .type(message.getType())
-                .userId(message.getUserId())
+                .userId(message.getOpenId())
                 .type(message.getType())
-                .id(message.getId())
+                .id(message.getWechatMessageId())
                 .time(DateUtil.timeStampToStr(message.getGmtCreate()
                         .toEpochSecond(ZoneOffset.UTC)))
                 .build();
     }
 
-    private MessageService getAop () {
-        return SpringUtil.getBean(MessageService.class);
+    private ChatService getAop () {
+        return SpringUtil.getBean(ChatService.class);
     }
 }

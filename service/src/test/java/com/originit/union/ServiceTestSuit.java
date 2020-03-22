@@ -1,6 +1,6 @@
 package com.originit.union;
 
-import com.originit.union.mapper.UserDaoTest;
+import com.originit.union.dao.UserDaoTest;
 import com.originit.union.service.UserServiceTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

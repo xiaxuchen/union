@@ -2,7 +2,7 @@ package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.union.entity.SysRoleMenuEntity;
-import com.originit.union.mapper.SysRoleMenuDao;
+import com.originit.union.dao.SysRoleMenuDao;
 import com.originit.union.service.SysRoleMenuService;
 import org.springframework.stereotype.Service;
 

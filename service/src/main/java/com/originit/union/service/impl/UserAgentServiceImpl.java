@@ -1,27 +1,21 @@
 package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.common.page.Pager;
 import com.originit.common.util.SpringUtil;
 import com.originit.union.entity.UserAgentEntity;
-import com.originit.union.entity.mapper.TagMapper;
-import com.originit.union.entity.mapper.UserMapper;
+import com.originit.union.entity.converter.WeChatUserConverter;
 import com.originit.union.entity.vo.UserInfoVO;
-import com.originit.union.mapper.UserAgentDao;
+import com.originit.union.dao.UserAgentDao;
 import com.originit.union.service.UserAgentService;
 import com.originit.union.util.PagerUtil;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,22 +67,9 @@ public class UserAgentServiceImpl extends ServiceImpl<UserAgentDao, UserAgentEnt
 
     @Override
     public Pager<UserInfoVO> pagerUserAgent(Long agentId,int curPage, int pageSize) {
-        final Pager<UserInfoVO> userInfoVOPager = PagerUtil.fromIPage(baseMapper.selectByAgentId(PagerUtil.createPage(curPage, pageSize), agentId), userInfo -> {
-            UserInfoVO userInfoVO = new UserInfoVO();
-            userInfoVO.setId(userInfo.getOpenId());
-            userInfoVO.setHeadImg(userInfo.getHeadImg());
-            userInfoVO.setName(userInfo.getName());
-            userInfoVO.setPhone(userInfo.getPhone());
-            if (userInfo.getSubscribeTime() != null) {
-                userInfoVO.setSubscribeTime(userInfo.getSubscribeTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            }
-            userInfoVO.setSex(UserMapper.convertSex(userInfo.getSex()));
-            userInfoVO.setPushCount(userInfo.getPushCount());
-            if (userInfo.getTags() != null && !userInfo.getTags().isEmpty()) {
-                userInfoVO.setTags(TagMapper.INSTANCE.to(userInfo.getTags()));
-            }
-            return userInfoVO;
-        });
+        final Pager<UserInfoVO> userInfoVOPager = PagerUtil
+                .fromIPage(baseMapper.selectByAgentId(PagerUtil
+                        .createPage(curPage, pageSize), agentId), WeChatUserConverter.INSTANCE::to);
         return userInfoVOPager;
     }
 

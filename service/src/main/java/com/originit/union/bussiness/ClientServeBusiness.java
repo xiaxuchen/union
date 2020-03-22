@@ -57,7 +57,7 @@ public class ClientServeBusiness {
         sender.setText(new SenderContent.Text(text));
         sender.setMsgtype(WxConsts.MASS_MSG_TEXT);
         try {
-            wxService.sendMessageByKf(sender);
+            final WxError wxError = wxService.sendMessageByKf(sender);
         } catch (WxErrorException e) {
             throw new RemoteAccessException("消息发送失败",e);
         }

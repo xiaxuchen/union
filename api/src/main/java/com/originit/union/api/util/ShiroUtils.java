@@ -64,7 +64,7 @@ public class ShiroUtils {
      * 删除用户缓存信息
      * @Author Sans
      * @CreateTime 2019/6/17 13:57
-     * @Param  userId  用户名称
+     * @Param  openId  用户名称
      * @Param  isRemoveSession 是否删除Session
      * @Return void
      */
@@ -78,7 +78,7 @@ public class ShiroUtils {
         try {
             session = redisSessionDAO.readSession(sessionId);
         } catch (Exception e) {
-            log.error("session with id {} is not exist",sessionId);
+            log.error("session with wechatMessageId {} is not exist",sessionId);
         }
         if (session == null) {
             return;

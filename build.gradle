@@ -39,7 +39,7 @@ subprojects {
     //指定jdk版本
     sourceCompatibility = 1.8
 
-    //设置group id
+    //设置group wechatMessageId
     group 'com.originit'
 
     //设置版本

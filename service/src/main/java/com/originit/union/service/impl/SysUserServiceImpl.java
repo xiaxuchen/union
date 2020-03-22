@@ -6,20 +6,20 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.common.exceptions.BusinessException;
-import com.originit.common.exceptions.UserException;
 import com.originit.common.page.Pager;
 import com.originit.common.util.SHA256Util;
 import com.originit.common.validator.group.CreateGroup;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.union.entity.SysUserRoleEntity;
-import com.originit.union.entity.dto.SysUserDto;
+import com.originit.union.entity.converter.SysUserConverter;
+import com.originit.union.entity.dto.SysUserCreateDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
 import com.originit.union.entity.dto.SysUserUpdateDto;
 import com.originit.union.entity.vo.SysUserVO;
-import com.originit.union.mapper.AgentInfoDao;
-import com.originit.union.mapper.SysUserDao;
-import com.originit.union.mapper.SysUserRoleDao;
+import com.originit.union.dao.AgentInfoDao;
+import com.originit.union.dao.SysUserDao;
+import com.originit.union.dao.SysUserRoleDao;
 import com.originit.union.service.SysUserService;
 import com.originit.union.util.PagerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,15 +68,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long addSysUser(@Validated(CreateGroup.class) SysUserDto sysUserDto) {
+    public Long addSysUser(@Validated(CreateGroup.class) SysUserCreateDto sysUserDto) {
         // 添加到用户表
-        SysUserEntity sysUser = SysUserEntity.builder()
-                .headImg(sysUserDto.getHeadImg())
-                .username(sysUserDto.getUsername())
-                .phone(sysUserDto.getPhone())
-                .password(sysUserDto.getPassword())
-                .salt(sysUserDto.getSlat())
-                .build();
+        SysUserEntity sysUser = SysUserConverter.INSTANC.to(sysUserDto);
         baseMapper.insert(sysUser);
         if (sysUserDto.getIsAgent()) {
             // 添加客服角色
@@ -85,12 +79,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
                     .userId(sysUser.getUserId())
                     .build());
             // 添加客户经理信息
-            agentInfoDao.insert(AgentInfoEntity.builder()
-                    .des(sysUserDto.getDes())
-                    .name(sysUserDto.getName())
-                    .sex(sysUserDto.getSex())
-                    .sysUserId(sysUser.getUserId())
-                    .build());
+            agentInfoDao.insert(SysUserConverter.INSTANC.toAgentInfoEntity(sysUserDto));
         }
         return sysUser.getUserId();
     }
@@ -104,14 +93,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSysUser(SysUserUpdateDto sysUserDto) {
-        final SysUserEntity sysUser = SysUserEntity.builder()
-                .headImg(sysUserDto.getHeadImg())
-                .username(sysUserDto.getUsername())
-                .phone(sysUserDto.getPhone())
-                .password(sysUserDto.getPassword())
-                .salt(sysUserDto.getSalt())
-                .gmtModified(LocalDateTime.now())
-                .build();
+        final SysUserEntity sysUser = SysUserConverter.INSTANC.to(sysUserDto);
+        sysUser.setGmtModified(LocalDateTime.now());
         if (sysUserDto.getIsInValid() != null) {
             sysUser .setState(sysUserDto.getIsInValid()? SysUserEntity.FORBID:SysUserEntity.ENABLE);
         }
@@ -121,14 +104,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
                 eq(SysUserEntity::getUserId,sysUserDto.getUserId()));
         final LambdaQueryWrapper<AgentInfoEntity> qw = new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, sysUserDto.getUserId());
         if (sysUserDto.getIsAgent()) {
-            final AgentInfoEntity agentInfo = AgentInfoEntity.builder()
-                    .des(sysUserDto.getDes())
-                    .name(sysUserDto.getName())
-                    .sex(sysUserDto.getSex())
-                    .id(sysUserDto.getAgentId())
-                    .sysUserId(sysUserDto.getUserId())
-                    .gmtModified(LocalDateTime.now())
-                    .build();
+            final AgentInfoEntity agentInfo = SysUserConverter.INSTANC.toAgentInfoEntity(sysUserDto);
+            // 将更新时间设为现在
+            agentInfo.setGmtModified(LocalDateTime.now());
             if (agentInfoDao.selectCount(qw) != 0) {
                 // 已存在则更新
                 agentInfoDao.update(agentInfo,qw);

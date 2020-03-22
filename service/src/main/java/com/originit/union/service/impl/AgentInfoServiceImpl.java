@@ -1,13 +1,12 @@
 package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.union.chat.data.AgentState;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
-import com.originit.union.mapper.AgentInfoDao;
-import com.originit.union.mapper.SysUserDao;
+import com.originit.union.dao.AgentInfoDao;
+import com.originit.union.dao.SysUserDao;
 import com.originit.union.service.AgentInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

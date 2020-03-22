@@ -14,7 +14,7 @@ import com.originit.union.chat.manager.UserManager;
 import com.originit.union.constant.ChatConstant;
 import com.originit.union.constant.WeChatConstant;
 import com.originit.union.entity.MessageEntity;
-import com.originit.union.mapper.MessageDao;
+import com.originit.union.dao.MessageDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -72,7 +72,7 @@ public class MessageManagerImpl implements MessageManager {
             lambda.lt(MessageEntity::getGmtCreate,entity.getGmtCreate());
         }
         // 要是这个客户经理的
-        lambda.eq(MessageEntity::getAgentId,agentId);
+        lambda.eq(MessageEntity::getUserId,agentId);
         lambda.orderByDesc(MessageEntity::getGmtCreate);
         // 获取最后10条
         return messageDao.selectPage(new Page<>(0, 10),lambda).getRecords();
@@ -156,8 +156,8 @@ public class MessageManagerImpl implements MessageManager {
         // 循环更新整个列表为改客户经理已读
         messages.forEach(id -> messageDao.update(null,new UpdateWrapper<MessageEntity>().lambda()
                 .set(MessageEntity::getState,MessageEntity.STATE.READ)
-                .set(MessageEntity::getAgentId,agentId)
-                .eq(MessageEntity::getId,id)));
+                .set(MessageEntity::getUserId,agentId)
+                .eq(MessageEntity::getMessageId,id)));
     }
 
     /**

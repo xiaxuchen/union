@@ -31,12 +31,12 @@ public class MessageEntity implements Serializable {
     }
 
     @TableId
-    private Long id;
+    private Long messageId;
 
     /**
      * 微信端消息id
      */
-    private Long messageId;
+    private Long wechatMessageId;
 
     private String content;
 
@@ -45,12 +45,12 @@ public class MessageEntity implements Serializable {
     /**
      * 用户的openId
      */
-    private String userId;
+    private String openId;
 
     /**
      * 客户经理的id
      */
-    private String agentId;
+    private String userId;
 
     /**
      * 是否来自于用户

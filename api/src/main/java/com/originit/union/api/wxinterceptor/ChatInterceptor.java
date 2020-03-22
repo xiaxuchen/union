@@ -54,17 +54,17 @@ public class ChatInterceptor implements WXInterceptor {
                 break;
             }
             default: {
-                log.error("message can't handle with messageId:" + message.getMsgId());
+                log.error("message can't handle with wechatMessageId:" + message.getMsgId());
                 return;
             }
         }
         // 将消息打入消息队列
         producer.sendMessage(MessageEntity.builder()
                 .content(content)
-                .messageId(message.getMsgId())
+                .wechatMessageId(message.getMsgId())
                 .fromUser(true)
                 .type(msgType)
-                .userId(message.getFromUserName())
+                .openId(message.getFromUserName())
                 .state(MessageEntity.STATE.WAIT)
                 .gmtCreate(DateUtil.toLocalDateTime(message.getCreateTime()))
                 .build());

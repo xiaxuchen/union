@@ -19,7 +19,7 @@ public class UserInfoVO {
      * sex : 男
      * name : 嘿
      * pushCount: 1 本月推送次数
-     * id : 100 用户的openId
+     * wechatMessageId : 100 用户的openId
      */
     private String headImg;
     private String subscribeTime;
@@ -29,60 +29,4 @@ public class UserInfoVO {
     private Integer pushCount;
     private String id;
     private List<TagInfoVO> tags;
-
-    public List<TagInfoVO> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<TagInfoVO> tags) {
-        this.tags = tags;
-    }
-
-    public void setHeadImg(String headImg) {
-        this.headImg = headImg;
-    }
-
-    public void setSubscribeTime(String subscribeTime) {
-        this.subscribeTime = subscribeTime;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getHeadImg() {
-        return headImg;
-    }
-
-    public String getSubscribeTime() {
-        return subscribeTime;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getId() {
-        return id;
-    }
 }

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.originit.common.annotation.Interceptor;
 import com.originit.union.constant.WeChatConstant;
 import com.originit.union.entity.PushInfoEntity;
-import com.originit.union.service.PushInfoService;
+import com.originit.union.service.PushService;
 import com.originit.union.util.DateUtil;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxXmlMessage;
@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 @Interceptor
 public class PushResultInterceptor implements WXInterceptor{
 
-    private PushInfoService pushInfoService;
+    private PushService pushService;
 
     @Autowired
-    public void setPushInfoService(PushInfoService pushInfoService) {
-        this.pushInfoService = pushInfoService;
+    public void setPushService(PushService pushService) {
+        this.pushService = pushService;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class PushResultInterceptor implements WXInterceptor{
     public void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         WxXmlMessage message = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
         // 更新推送消息
-        pushInfoService.update(new UpdateWrapper<PushInfoEntity>().lambda()
+        pushService.update(new UpdateWrapper<PushInfoEntity>().lambda()
                 .set(PushInfoEntity::getSendCount,message.getSentCount())
                 .set(PushInfoEntity::getErrorCount,message.getErrorCount())
                 .set(PushInfoEntity::getStatus,PushInfoEntity.STATUS.SENT)

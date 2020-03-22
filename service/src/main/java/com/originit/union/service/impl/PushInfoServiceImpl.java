@@ -2,19 +2,17 @@ package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.originit.common.util.DateUtil;
 import com.originit.common.validator.group.CreateGroup;
-import com.originit.union.constant.SystemConstant;
 import com.originit.union.entity.PushInfoEntity;
 import com.originit.union.entity.PushUserEntity;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.dto.PushInfoDto;
-import com.originit.union.entity.mapper.PushInfoMapper;
+import com.originit.union.entity.converter.PushInfoConverter;
 import com.originit.union.entity.vo.IndexStatisticVO;
-import com.originit.union.mapper.PushInfoDao;
-import com.originit.union.mapper.PushUserDao;
-import com.originit.union.mapper.UserDao;
-import com.originit.union.service.PushInfoService;
+import com.originit.union.dao.PushInfoDao;
+import com.originit.union.dao.PushUserDao;
+import com.originit.union.dao.UserDao;
+import com.originit.union.service.PushService;
 import com.originit.union.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 @Service
-public class PushInfoServiceImpl extends ServiceImpl<PushInfoDao, PushInfoEntity> implements PushInfoService {
+public class PushInfoServiceImpl extends ServiceImpl<PushInfoDao, PushInfoEntity> implements PushService {
     private UserDao userDao;
 
     private PushUserDao pushUserDao;
@@ -56,7 +54,7 @@ public class PushInfoServiceImpl extends ServiceImpl<PushInfoDao, PushInfoEntity
                 .lambda()
                 .select(UserBindEntity::getId)
                 .in(UserBindEntity::getOpenId, pushInfoDto.getUsers()));
-        final PushInfoEntity pushInfo = PushInfoMapper.INSTANCE.dto2Entity(pushInfoDto);
+        final PushInfoEntity pushInfo = PushInfoConverter.INSTANCE.dto2Entity(pushInfoDto);
         // 将状态设置为发送中
         pushInfo.setStatus(PushInfoEntity.STATUS.SENDIND);
         // 设置预期的发送人数

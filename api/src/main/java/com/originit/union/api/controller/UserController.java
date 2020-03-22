@@ -7,7 +7,7 @@ import com.originit.common.util.SHA256Util;
 import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
-import com.originit.union.entity.dto.SysUserDto;
+import com.originit.union.entity.dto.SysUserCreateDto;
 import com.originit.union.entity.dto.SysUserQueryDto;
 import com.originit.union.entity.dto.SysUserUpdateDto;
 import com.originit.union.entity.vo.LoginUserVO;
@@ -16,8 +16,6 @@ import com.originit.union.entity.vo.SysUserVO;
 import com.originit.union.entity.vo.UserInfoVO;
 import com.originit.union.service.*;
 import com.xxc.response.anotation.ResponseResult;
-import com.xxc.response.result.PlatformResult;
-import com.xxc.response.result.Result;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.shiro.SecurityUtils;
@@ -155,9 +153,9 @@ public class UserController {
      * @return 用户id
      */
     @PostMapping
-    public Long addSysUser (@RequestBody SysUserDto sysUserDto) {
+    public Long addSysUser (@RequestBody SysUserCreateDto sysUserDto) {
         String salt = ByteSource.Util.bytes(sysUserDto.getUsername()).toString();
-        sysUserDto.setSlat(salt);
+        sysUserDto.setSalt(salt);
         sysUserDto.setPassword(SHA256Util.sha256(sysUserDto.getPassword(),salt));
         return sysUserService.addSysUser(sysUserDto);
     }

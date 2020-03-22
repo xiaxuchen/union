@@ -15,8 +15,8 @@ import com.originit.union.chat.manager.function.AgentStateSetter;
 import com.originit.union.constant.ChatConstant;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.UserBindEntity;
-import com.originit.union.mapper.AgentInfoDao;
-import com.originit.union.mapper.UserDao;
+import com.originit.union.dao.AgentInfoDao;
+import com.originit.union.dao.UserDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -157,7 +157,7 @@ public class UserSessionManagerImpl implements UserManager, SessionManager {
                 .select(AgentInfoEntity::getDes, AgentInfoEntity::getName)
                 .eq(AgentInfoEntity::getSysUserId, agentId));
         clientServeBusiness.sendAgentIntroduce(userId,agentInfoEntity.getName(),agentInfoEntity.getDes(),"");
-        log.info("send agent introduce to connect userId:{} and agentId:{}",userId,agentId);
+        log.info("send agent introduce to connect openId:{} and userId:{}",userId,agentId);
     }
 
     @Override

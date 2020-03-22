@@ -1,13 +1,10 @@
 package com.originit.union.chat;
 
 import com.originit.common.exceptions.DataConflictException;
-import com.originit.common.exceptions.InternalServerException;
-import com.originit.common.exceptions.PermissionForbiddenException;
-import com.originit.union.bussiness.ClientServeBusiness;
 import com.originit.union.chat.data.ChatUser;
 import com.originit.union.constant.WeChatConstant;
 import com.originit.union.entity.UserBindEntity;
-import com.originit.union.service.UserService;
+import com.originit.union.service.WeChatUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +28,7 @@ public class ChatUserManager {
 
     private ReentrantLock lock = new ReentrantLock();
 
-    private UserService userService;
+    private WeChatUserService userService;
 
     private MessageManager messageManager;
 
@@ -43,7 +40,7 @@ public class ChatUserManager {
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public void setUserService(WeChatUserService userService) {
         this.userService = userService;
     }
 

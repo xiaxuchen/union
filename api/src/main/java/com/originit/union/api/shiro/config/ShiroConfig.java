@@ -162,7 +162,7 @@ public class ShiroConfig {
         redisCacheManager.setRedisManager(redisManager());
         redisCacheManager.setKeyPrefix(CACHE_KEY);
         // 配置缓存的话要求放在session里面的实体类必须有个id标识
-        redisCacheManager.setPrincipalIdFieldName("userId");
+        redisCacheManager.setPrincipalIdFieldName("openId");
         return redisCacheManager;
     }
 

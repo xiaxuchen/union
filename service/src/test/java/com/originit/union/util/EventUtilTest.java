@@ -8,6 +8,6 @@ public class EventUtilTest {
 
     @Test
     public void getEventKeyParams() {
-        System.out.println(EventUtil.getEventKeyParams("/push/preview?id=123").get("id"));
+        System.out.println(EventUtil.getEventKeyParams("/push/preview?wechatMessageId=123").get("id"));
     }
 }

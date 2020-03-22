@@ -1,9 +1,7 @@
 package com.originit.union.chat;
 
 import com.originit.union.bussiness.ClientServeBusiness;
-import com.originit.union.bussiness.MessageBusiness;
 import com.originit.union.entity.MessageEntity;
-import com.originit.union.service.impl.MessageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -80,7 +78,7 @@ public class MessageManager {
     public void sendMessageToUser(MessageEntity message) {
         switch (message.getType()) {
             case MessageEntity.TYPE.TEXT: {
-                clientServeBusiness.sendTextMessage(message.getUserId(),message.getContent());
+                clientServeBusiness.sendTextMessage(message.getOpenId(),message.getContent());
                 break;
             }
             case MessageEntity.TYPE.IMAGE: {
@@ -119,7 +117,7 @@ public class MessageManager {
     public void readMessages(List<Long> messageIds, String userId) {
         List<MessageEntity> messageEntities = userMessages.get(userId);
         messageEntities.forEach(messageEntity -> {
-            if (messageIds.stream().anyMatch((id) -> id.equals(messageEntity.getId()))) {
+            if (messageIds.stream().anyMatch((id) -> id.equals(messageEntity.getWechatMessageId()))) {
                 messageEntity.setState(MessageEntity.STATE.READ);
             }
         });

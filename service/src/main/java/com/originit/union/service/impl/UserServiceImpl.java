@@ -5,28 +5,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.common.page.Pager;
 import com.originit.common.util.SpringUtil;
-import com.originit.common.validator.group.CreateGroup;
 import com.originit.union.bussiness.UserBusiness;
 import com.originit.union.entity.UserBindEntity;
-import com.originit.union.entity.dto.SysUserDto;
-import com.originit.union.entity.mapper.TagMapper;
-import com.originit.union.entity.mapper.UserMapper;
+import com.originit.union.entity.converter.WeChatUserConverter;
 import com.originit.union.entity.vo.UserInfoVO;
-import com.originit.union.mapper.UserDao;
-import com.originit.union.service.UserService;
+import com.originit.union.dao.UserDao;
+import com.originit.union.service.WeChatUserService;
 import com.originit.union.util.PagerUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -35,7 +28,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Service
 @Slf4j
-public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implements WeChatUserService {
 
     private UserBusiness userBusiness;
 
@@ -101,20 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
     @Override
     public Pager<UserInfoVO> getUserInfoList(List<String> phone, List<Integer> tagList, int curPage, int pageSize) {
         // 获取用户openId、标签并转换
-        return PagerUtil.fromIPage(baseMapper.selectUserByPhonesAndTags(new Page<>(curPage, pageSize), phone, tagList), userInfo -> {
-            UserInfoVO userInfoVO = new UserInfoVO();
-            userInfoVO.setId(userInfo.getOpenId());
-            userInfoVO.setHeadImg(userInfo.getHeadImg());
-            userInfoVO.setName(userInfo.getName());
-            userInfoVO.setPhone(userInfo.getPhone());
-            if (userInfo.getSubscribeTime() != null) {
-                userInfoVO.setSubscribeTime(userInfo.getSubscribeTime().format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            }
-            userInfoVO.setSex(UserMapper.convertSex(userInfo.getSex()));
-            userInfoVO.setPushCount(userInfo.getPushCount());
-            userInfoVO.setTags(TagMapper.INSTANCE.to(userInfo.getTags()));
-            return userInfoVO;
-        });
+        return PagerUtil.fromIPage(baseMapper.selectUserByPhonesAndTags(new Page<>(curPage, pageSize), phone, tagList), WeChatUserConverter.INSTANCE::to);
     }
 
     @Override
@@ -135,7 +115,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
         return new Integer[]{allCount,bindCount};
     }
 
-    private UserService getService () {
+    private WeChatUserService getService () {
         return SpringUtil.getBean(this.getClass());
     }
 }

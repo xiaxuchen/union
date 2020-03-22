@@ -9,7 +9,7 @@ public class TagInfoVO {
 
     /**
      * name : vip用户
-     * id : 1
+     * wechatMessageId : 1
      */
     private String name;
     private Integer id;

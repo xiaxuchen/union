@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
  * name : 嘿
  * lastMessage : 你好啊
  * notRead : 10
- * id : 100
- * agentId: 3
+ * wechatMessageId : 100
+ * userId: 3
  * @author xxc、
  */
 @Data
