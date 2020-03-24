@@ -20,6 +20,7 @@ public interface SysUserConverter {
      * @return 用户实体
      */
     @Mappings({
+            @Mapping(source = "userId",target="userId"),
             @Mapping(source = "headImg",target="headImg"),
             @Mapping(source = "username",target="username"),
             @Mapping(source = "phone",target="phone"),
@@ -50,8 +51,7 @@ public interface SysUserConverter {
     @Mappings({
             @Mapping(source = "des",target="des"),
             @Mapping(source = "name",target="name"),
-            @Mapping(source = "sex",target="sex"),
-            @Mapping(source = "openId",target="sysUserId")
+            @Mapping(source = "sex",target="sex")
     })
     AgentInfoEntity toAgentInfoEntity(SysUserCreateDto sysUserDto);
 
@@ -64,8 +64,8 @@ public interface SysUserConverter {
             @Mapping(source = "des",target="des"),
             @Mapping(source = "name",target="name"),
             @Mapping(source = "sex",target="sex"),
-            @Mapping(source = "userId",target="id"),
-            @Mapping(source = "openId",target="sysUserId")
+            @Mapping(source = "agentId",target="id"),
+            @Mapping(source = "userId",target="sysUserId")
     })
     AgentInfoEntity toAgentInfoEntity(SysUserUpdateDto sysUserDto);
 

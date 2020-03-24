@@ -3,5 +3,10 @@
 
 <mapper namespace="com.originit.union.dao.ChatUserDao">
 
-
+    <select id="selectWaitingUsers" resultType="com.originit.union.entity.UserBindEntity">
+        SELECT user_bind.open_id,user_bind.name,user_bind.phone,user_bind.head_img
+        FROM chat_user JOIN user_bind ON chat_user.open_id=user_bind.open_id
+        WHERE chat_user.state = 0
+        ORDER BY chat_user.chat_user_id DESC
+    </select>
 </mapper>

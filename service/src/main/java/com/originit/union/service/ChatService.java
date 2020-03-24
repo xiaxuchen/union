@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * 聊天服务
+ * @author xxc、
  */
 public interface ChatService {
     /**
@@ -64,22 +65,6 @@ public interface ChatService {
      * @param to 转接的客户经理
      */
     void dispatchToOther(String openId, Long from, Long to);
-
-    /**
-     * 获取用户信息
-     * @param openId 用户id
-     * @param messageCount 用户消息数
-     * @return 用户信息
-     */
-    ChatUser getUser(String openId, int messageCount);
-
-
-    /**
-     * 获取当前用户的状态
-     * @param openId 用户id
-     * @return 用户的状态
-     */
-    Integer getUserStatus(String openId);
 
     /**
      * 将消息状态设置为已读

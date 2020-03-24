@@ -2,6 +2,7 @@ package com.originit.union.entity.converter;
 
 import com.originit.union.entity.ChatUserEntity;
 import com.originit.union.entity.MessageEntity;
+import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
 import com.originit.union.util.DateUtil;
@@ -14,7 +15,7 @@ import org.mapstruct.factory.Mappers;
  * 聊天相关的转换类
  * @author xxc、
  */
-@Mapper
+@Mapper(imports = {DateUtil.class})
 public interface ChatConverter {
 
     ChatConverter INSTANCE = Mappers.getMapper(ChatConverter.class);
@@ -26,10 +27,12 @@ public interface ChatConverter {
      * @return
      */
     @Mappings({
-            @Mapping(source = "openId",target = "id"),
-            @Mapping(source = "userId",target = "agentId")
+            @Mapping(source = "user.openId",target = "id"),
+            @Mapping(source = "user.headImg",target = "headImg"),
+            @Mapping(source = "user.phone",target = "phone"),
+            @Mapping(source = "user.name",target = "name")
     })
-    ChatUserVO convertWaitingUser (ChatUserEntity user,Integer notRead);
+    ChatUserVO convertWaitingUser (UserBindEntity user, Integer notRead);
 
     /**
      * 将消息转换为显示对象

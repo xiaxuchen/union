@@ -78,8 +78,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
                     .roleId(2L)
                     .userId(sysUser.getUserId())
                     .build());
+            final AgentInfoEntity agentInfo = SysUserConverter.INSTANC.toAgentInfoEntity(sysUserDto);
+            agentInfo.setSysUserId(sysUser.getUserId());
             // 添加客户经理信息
-            agentInfoDao.insert(SysUserConverter.INSTANC.toAgentInfoEntity(sysUserDto));
+            agentInfoDao.insert(agentInfo);
         }
         return sysUser.getUserId();
     }

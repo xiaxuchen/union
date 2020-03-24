@@ -12,6 +12,7 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisSessionDAO;
+import org.springframework.http.server.ServletServerHttpRequest;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -106,4 +107,20 @@ public class ShiroUtils {
         return "union_user_id:" + userId;
     }
 
+
+    /**
+     * 返回token对应的用户信息
+     * @param token 用户token
+     * @return 用户信息
+     */
+    public static SysUserEntity getUserInfo (String token) {
+       try {
+           return ((SysUserEntity)((SimplePrincipalCollection)redisSessionDAO.readSession
+                   (token)
+                   .getAttribute("org.apache.shiro.subject.support.DefaultSubjectContext_PRINCIPALS_SESSION_KEY"))
+                   .getPrimaryPrincipal());
+       } catch (Exception e) {
+           return null;
+       }
+    }
 }

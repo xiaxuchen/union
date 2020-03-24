@@ -32,4 +32,13 @@ public interface ChatConstant {
      */
     String AGENT_MAP_KEY = "chat-agent-map";
 
+    /**
+     * 等待用户的数量更新
+     */
+    String WS_WAIT_COUNT_UPDATE = "/chatUser/waiting/count";
+
+    /**
+     * 用户被接受了
+     */
+    String WS_USER_RECEIVED = "/chatUser/user/received";
 }

@@ -3,6 +3,7 @@ package com.originit.union.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CommonConfig {
 
     @Bean
+    @Primary
     public ThreadPoolExecutor asyncServiceExecutor() {
         log.info("start asyncServiceExecutor");
         int poolSize = Runtime.getRuntime().availableProcessors() * 2;

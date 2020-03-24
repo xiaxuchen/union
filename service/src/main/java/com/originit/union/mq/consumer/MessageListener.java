@@ -23,17 +23,17 @@ import java.io.IOException;
 @Slf4j
 public class MessageListener {
 
-    private ChatService messageService;
+    private ChatService chatService;
 
     @Autowired
-    public void setMessageService(ChatService messageService) {
-        this.messageService = messageService;
+    public void setChatService(ChatService chatService) {
+        this.chatService = chatService;
     }
 
     @RabbitHandler
     public void handle(MessageEntity messageEntity, Channel channel, Message message) throws IOException {
         log.info("process orderId:{},curListener:{}",messageEntity,this);
-        messageService.sendMessage(messageEntity);
+        chatService.sendMessageForServe(messageEntity);
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }
 }

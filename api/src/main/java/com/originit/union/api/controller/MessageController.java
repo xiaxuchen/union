@@ -8,6 +8,7 @@ import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.dto.MessageSendDto;
 import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
+import com.originit.union.exception.chat.ChatException;
 import com.originit.union.service.ChatService;
 import com.originit.union.util.DateUtil;
 import com.xxc.response.anotation.ResponseResult;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,11 +33,11 @@ import java.util.stream.Collectors;
 public class MessageController {
 
 
-    private ChatService messageService;
+    private ChatService chatService;
 
     @Autowired
-    public void setMessageService(ChatService messageService) {
-        this.messageService = messageService;
+    public void setChatService(ChatService chatService) {
+        this.chatService = chatService;
     }
 
     /**
@@ -45,7 +47,7 @@ public class MessageController {
     @GetMapping("/chatUserList")
     public List<ChatUserVO> getUserList () {
         Long userId = ShiroUtils.getUserInfo().getUserId();
-        return messageService.getAgentUserVOs(userId);
+        return chatService.getAgentUserVOs(userId);
     }
 
     private ChatUserVO reflectUser (ChatUser chatUser) {
@@ -84,7 +86,7 @@ public class MessageController {
      */
     @GetMapping("/history/list")
     public List<ChatMessageVO> getHistoryMessages (@RequestParam String userId, @RequestParam(required = false) Long lastId){
-        return messageService.getHistoryMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
+        return chatService.getHistoryMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
                 .stream().map(this::to).collect(Collectors.toList());
     }
 
@@ -104,24 +106,32 @@ public class MessageController {
      */
     @GetMapping("/chatMessageList")
     public List<ChatMessageVO> getMessages(@RequestParam String userId,@RequestParam(required = false) Long lastId) {
-        return messageService.getWaitMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
+        return chatService.getWaitMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
                 .stream().map(this::to).collect(Collectors.toList());
     }
 
 
     @GetMapping("/user/waiting")
     public Pager<ChatUserVO> getWaitingUsers (@RequestParam Integer curPage,@RequestParam(required = false,defaultValue = "10") Integer pageSize) {
-        return messageService.getWaitingUsers(curPage, pageSize, 10);
+        return chatService.getWaitingUsers(curPage, pageSize);
     }
 
     /**
-     * 接入该用户
+     * 接入用户
+     * @param userList 需要接入的用户
+     * @return 接入失败的列表
      */
     @PostMapping("/session")
-    public void receiveUser (@RequestBody List<String> userList) {
+    public List<String> receiveUser (@RequestBody List<String> userList) {
+        List<String> notReceiveUser = new ArrayList<>();
         for (String user : userList) {
-            messageService.receiveUser(user,ShiroUtils.getUserInfo().getUserId());
+            try {
+                chatService.receiveUser(user,ShiroUtils.getUserInfo().getUserId());
+            } catch (Exception e) {
+                notReceiveUser.add(user);
+            }
         }
+        return notReceiveUser;
     }
 
     /**
@@ -130,12 +140,12 @@ public class MessageController {
      */
     @DeleteMapping("/session")
     public void disConnectUser (@RequestParam String openId) {
-        messageService.disconnectUser(openId,ShiroUtils.getUserInfo().getUserId());
+        chatService.disconnectUser(openId,ShiroUtils.getUserInfo().getUserId());
     }
 
     @PutMapping("/list/read")
     public void readMessage (@RequestParam List<Long> messageIds) {
-        messageService.readMessage(messageIds,ShiroUtils.getUserInfo().getUserId());
+        chatService.readMessage(messageIds,ShiroUtils.getUserInfo().getUserId());
     }
 
     /**
@@ -146,11 +156,11 @@ public class MessageController {
     @PostMapping
     public Long sendMessage (@RequestBody MessageSendDto messageSendDto) {
         log.info("send message...");
-        return messageService.sendMessage(MessageEntity.builder()
+        return chatService.sendMessageToUser(MessageEntity.builder()
                 .openId(messageSendDto.getUserId())
                 .content(messageSendDto.getContent())
                 .type(messageSendDto.getType())
-                .userId(ShiroUtils.getUserInfo().getUserId().toString())
+                .userId(ShiroUtils.getUserInfo().getUserId())
                 .state(MessageEntity.STATE.WAIT)
                 .fromUser(false)
                 .gmtCreate(LocalDateTime.now())

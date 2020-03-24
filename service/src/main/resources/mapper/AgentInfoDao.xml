@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.originit.union.dao.AgentInfoDao">
+
+    <select id="selectAgentInfo" resultType="com.originit.union.entity.vo.AgentIntroduceVO">
+        SELECT agent_info.name,agent_info.des,sys_user.head_img FROM agent_info JOIN sys_user ON agent_info.sys_user_id = sys_user.user_id
+        WHERE agent_info.sys_user_id=#{userId}
+    </select>
+</mapper>

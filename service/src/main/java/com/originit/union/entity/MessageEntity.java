@@ -50,7 +50,7 @@ public class MessageEntity implements Serializable {
     /**
      * 客户经理的id
      */
-    private String userId;
+    private Long userId;
 
     /**
      * 是否来自于用户

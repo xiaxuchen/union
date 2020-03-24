@@ -49,7 +49,7 @@ public class ChatUserEntity implements Serializable {
     /**
      * 用户当前状态
      */
-    private String state;
+    private Integer state;
 
     /**
     * 创建时间

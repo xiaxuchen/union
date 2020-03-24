@@ -7,6 +7,7 @@ import com.originit.union.api.shiro.realm.ShiroRealm;
 import com.originit.common.util.SHA256Util;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -82,6 +83,8 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/core/**","anon");
         filterChainDefinitionMap.put("/test/**","anon");
         filterChainDefinitionMap.put("/resource/file/**","anon");
+        // 聊天的websocket忽略
+        filterChainDefinitionMap.put("/chat/**","anon");
         filterChainDefinitionMap.put("/**", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;
