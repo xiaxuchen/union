@@ -41,4 +41,19 @@ public interface ChatConstant {
      * 用户被接受了
      */
     String WS_USER_RECEIVED = "/chatUser/user/received";
+
+    /**
+     * 用户结束了聊天
+     */
+    String WS_EXIT_CHAT = "/chatUser/user/exit";
+
+    /**
+     * 用户有新消息
+     */
+    String WS_NEW_MESSAGE = "/chatUser/message";
+
+    /**
+     * 用户的消息数量更新
+     */
+    String WS_MESSAGE_COUNT_UPDATE = "/chatUser/message/count";
 }

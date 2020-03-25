@@ -14,7 +14,9 @@ import com.originit.union.constant.WeChatConstant;
 import com.originit.union.dao.*;
 import com.originit.union.entity.*;
 import com.originit.union.entity.converter.ChatConverter;
+import com.originit.union.entity.dto.GetChatUserDto;
 import com.originit.union.entity.vo.AgentIntroduceVO;
+import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
 import com.originit.union.exception.chat.ChatException;
 import com.originit.union.exception.chat.ChatUserAlreadyReceiveException;
@@ -31,10 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +54,10 @@ public class ChatServiceImpl implements ChatService {
     private SqlSessionFactory sqlSessionFactory;
 
     private ClientServeBusiness clientServeBusiness;
+
+    private UserDao userDao;
+
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -131,16 +134,29 @@ public class ChatServiceImpl implements ChatService {
             return null;
         }
         Integer state = chatUser.getState();
+        // 查询是否有聊天关系
+        final ChatUserAgentEntity chatRelation = chatUserAgentDao.selectOne(new QueryWrapper<ChatUserAgentEntity>().lambda()
+                .select(ChatUserAgentEntity::getUserId, ChatUserAgentEntity::getChatUserAgentId).eq(ChatUserAgentEntity::getOpenId, messageEntity.getOpenId()));
         // 如果已经在排队中了，且输入了退出排队指令，则退出排队，同时断开连接
         if (WeChatConstant.CLIENT_SERVE_END.equals(messageEntity.getContent())) {
             // 删除用户排队
             chatUserDao.delete(new QueryWrapper<ChatUserEntity>().lambda()
                     .eq(ChatUserEntity::getOpenId,messageEntity.getOpenId()));
-            // 删除与之相关的聊天关系
-            chatUserAgentDao.delete(new QueryWrapper<ChatUserAgentEntity>().lambda()
-                    .eq(ChatUserAgentEntity::getOpenId,messageEntity.getOpenId()));
+            // 如果有就删除
+            if (chatRelation != null) {
+                chatUserAgentDao.deleteById(chatRelation.getChatUserAgentId());
+            }
             // 发送通知给微信用户，服务断开
             clientServeBusiness.sendExitMessage(messageEntity.getOpenId());
+
+            // 如果是接受状态，就要通知他的客户经理该用户已退出聊天
+            if (state == ChatUserEntity.STATE.RECEIVE) {
+                messagingTemplate.convertAndSendToUser(String.valueOf(chatRelation.getUserId()),ChatConstant
+                        .WS_EXIT_CHAT,DataUtil.mapBuilder()
+                        .append("openId",messageEntity.getOpenId())
+                        .append("time",System.currentTimeMillis())
+                        .build());
+            }
             // 如果是等待状态，则通知经理等待用户的数量减少了
             if (state == ChatUserEntity.STATE.WAIT) {
                 messagingTemplate.convertAndSend(ChatConstant
@@ -151,14 +167,19 @@ public class ChatServiceImpl implements ChatService {
             }
             return null;
         }
+        // 将消息设置为该用户经理的
+        if (chatRelation != null) {
+            messageEntity.setUserId(chatRelation.getUserId());
+        }
         // 2.2 持久化消息
         messageDao.insert(messageEntity);
-        // 2.3 TODO 获取状态的时候同时获取所属的经理,通知客户经理有新的消息
         if (state == ChatUserEntity.STATE.RECEIVE) {
-//            ChatServer.sendNewMessage(ChatConverter.INSTANCE.to(messageEntity),
-//                    chatUserAgentDao.selectOne(new QueryWrapper<ChatUserAgentEntity>()
-//                            .lambda().select(ChatUserAgentEntity::getUserId).eq(ChatUserAgentEntity::getOpenId,messageEntity.getOpenId()))
-//                            .getUserId());
+            messagingTemplate.convertAndSendToUser(String.valueOf(chatRelation.getUserId()),
+                    ChatConstant.WS_NEW_MESSAGE,DataUtil.mapBuilder()
+                            .append("message", ChatConverter.INSTANCE.to(messageEntity))
+                            .append("time",System.currentTimeMillis())
+                            .append("count",getWaitMessageCount(messageEntity.getOpenId(),chatRelation.getUserId()))
+                            .build());
         }
         return messageEntity.getMessageId();
     }
@@ -177,9 +198,9 @@ public class ChatServiceImpl implements ChatService {
     public Pager<ChatUserVO> getWaitingUsers(int curPage, int pageSize) {
         // TODO 这里进行了多次查询，后期希望能成为一次
         // 1. 分页查询所有的用户的，时间逆序，后面来的在前面
-        final IPage<UserBindEntity> chatUserPage = chatUserDao.selectWaitingUsers(new Page<>(curPage, pageSize));
+        final IPage<UserBindEntity> chatUserPage = chatUserDao.selectWaitingUsers(new Page<>(curPage, pageSize),null);
         // 将用户信息转换为vo，同时获取用户的最后信息
-        final List<ChatUserVO> records = convertChatUserVOWithLastMessage(chatUserPage.getRecords());
+        final List<ChatUserVO> records = convertChatUserVOWithLastMessage(chatUserPage.getRecords(),null);
         return new Pager<>(records,chatUserPage.getTotal());
     }
 
@@ -212,6 +233,23 @@ public class ChatServiceImpl implements ChatService {
                 .append("openId",openId)
                 .append("time",System.currentTimeMillis())
                 .build());
+        // 通知当前经理该用户接收成功
+        messagingTemplate.convertAndSendToUser(String.valueOf(id),ChatConstant.WS_USER_RECEIVED,
+                DataUtil.mapBuilder()
+                        .append("user",getReceivedUserInfo(openId))
+                        .build());
+    }
+
+    /**
+     * 获取经理接受了的用户的信息
+     * @param openId 用户的openId
+     * @return
+     */
+    private ChatUserVO getReceivedUserInfo(String openId) {
+        final UserBindEntity user = userDao.selectOne(new QueryWrapper<UserBindEntity>().lambda()
+                .select(UserBindEntity::getName, UserBindEntity::getHeadImg).eq(UserBindEntity::getOpenId, openId));
+        user.setOpenId(openId);
+        return convertChatUserVOWithLastMessage(Arrays.asList(user),null).get(0);
     }
 
     @Override
@@ -272,7 +310,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void readMessage(List<Long> messageIds, Long agentId) {
+    public void readMessage(List<Long> messageIds,String openId, Long agentId) {
         try(SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH, false)) {
             final MessageDao batchMessageDao = sqlSession.getMapper(MessageDao.class);
             for (Long messageId : messageIds) {
@@ -286,10 +324,29 @@ public class ChatServiceImpl implements ChatService {
             sqlSession.flushStatements();
             sqlSession.commit();
         }
+        messagingTemplate.convertAndSendToUser(String.valueOf(agentId),ChatConstant.WS_MESSAGE_COUNT_UPDATE,
+                DataUtil.mapBuilder()
+                        .append("time",System.currentTimeMillis())
+                        .append("count",getWaitMessageCount(openId,agentId))
+                        .append("openId",openId)
+                        .build());
+    }
+
+    /**
+     * 获取待读消息的数量
+     * @param openId 微信用户的id
+     * @param userId 经理的id
+     * @return 消息的数量
+     */
+    public Integer getWaitMessageCount (String openId,Long userId) {
+        return messageDao.selectCount(new QueryWrapper<MessageEntity>()
+                .lambda().eq(MessageEntity::getOpenId,openId).eq(MessageEntity::getUserId,userId)
+                .eq(MessageEntity::getState,MessageEntity.STATE.WAIT)
+        );
     }
 
     @Override
-    public List<MessageEntity> getHistoryMessages(String userId,Long agentId, Long messageId) {
+    public List<ChatMessageVO> getHistoryMessages(String userId, Long agentId, Long messageId) {
         MessageEntity entity = null;
         if (messageId != null) {
             entity = messageDao.selectById(messageId);
@@ -302,57 +359,60 @@ public class ChatServiceImpl implements ChatService {
         if (messageId != null) {
             lambda.lt(MessageEntity::getGmtCreate,entity.getGmtCreate());
         }
-        // 要是这个客户经理的
+        // 要是这个用户和这个客户经理的
         lambda.eq(MessageEntity::getUserId,agentId);
+        lambda.eq(MessageEntity::getOpenId,userId);
+
         lambda.orderByDesc(MessageEntity::getGmtCreate);
         // 获取最后10条
-        return messageDao.selectPage(new Page<>(0, 10),lambda).getRecords();
+        return messageDao.selectPage(new Page<>(0, 10),lambda)
+                .getRecords().stream().map(ChatConverter.INSTANCE::to)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public List<MessageEntity> getWaitMessages(String userId,Long agentId, Long messageId) {
-        MessageEntity entity = null;
-        if (messageId != null) {
-            entity = messageDao.selectById(messageId);
-            if (entity == null) {
-                throw new DataConflictException("不存在此消息");
-            }
-        }
-        LambdaQueryWrapper<MessageEntity> lambda = new QueryWrapper<MessageEntity>().lambda();
-        // 如果当前指定最后的消息，则设置
-        if (messageId != null) {
-            lambda.gt(MessageEntity::getGmtCreate,entity.getGmtCreate());
-        }
-        lambda.eq(MessageEntity::getState,MessageEntity.STATE.WAIT);
-        // 顺序获取
-        lambda.orderByAsc(MessageEntity::getGmtCreate);
-        // 获取最后10条
-        return messageDao.selectPage(new Page<>(0, 10),lambda).getRecords();
-    }
     @Override
     @Transactional(readOnly = true)
     public List<ChatUserVO> getAgentUserVOs(Long agentId) {
         // 1. 分页查询所有的用户的，时间逆序，后面来的在前面
         final List<UserBindEntity> users = chatUserAgentDao.selectAgentUsers(agentId);
         // 2. 将用户信息转换为VO同时获取最后一条消息
-        return convertChatUserVOWithLastMessage(users);
+        return convertChatUserVOWithLastMessage(users,agentId);
+    }
+
+    @Override
+    public Pager<ChatUserVO> searchWaitingUser(GetChatUserDto dto, int pageSize) {
+        // 1. 分页查询所有的用户的，时间逆序，后面来的在前面
+        int curPage = 1;
+        if (dto != null && dto.getCurPage() != null) {
+            curPage = dto.getCurPage();
+        }
+        final IPage<UserBindEntity> chatUserPage = chatUserDao.selectWaitingUsers(new Page<>(curPage, pageSize),dto);
+        // 将用户信息转换为vo，同时获取用户的最后信息
+        final List<ChatUserVO> records = convertChatUserVOWithLastMessage(chatUserPage.getRecords(),null);
+        return new Pager<>(records,chatUserPage.getTotal());
     }
 
     /**
-     * 抽取的转换用户且获取用户最后一条消息的方法
+     * 抽取的转换用户且获取用户最后一条消息的方法，有经理就是和经理的最后一条，没有就是等待的最后一条
      * @param users 用户信息
+     * @param userId 经理的系统id，如果有经理就查与这个经理的对话的最后一条
      * @return 用户显示对象（包括最后一条信息）
      */
-    private List<ChatUserVO> convertChatUserVOWithLastMessage (List<UserBindEntity> users) {
+    private List<ChatUserVO> convertChatUserVOWithLastMessage (List<UserBindEntity> users,Long userId) {
         if (users == null || users.isEmpty()) {
             return Collections.emptyList();
         }
         final List<ChatUserVO> records = users.stream().map(chatUserEntity -> {
-            // 查找该用户最新的一条消息
-            final IPage<MessageEntity> messagePage = messageDao.selectPage(new Page<>(1, 1), new QueryWrapper<MessageEntity>().lambda()
+            final LambdaQueryWrapper<MessageEntity> queryWrapper = new QueryWrapper<MessageEntity>().lambda()
                     .eq(MessageEntity::getOpenId, chatUserEntity.getOpenId())
-                    .eq(MessageEntity::getState, MessageEntity.STATE.WAIT)
-                    .orderByDesc(MessageEntity::getGmtCreate));
+                    .orderByDesc(MessageEntity::getGmtCreate);
+            if (userId != null) {
+                queryWrapper.eq(MessageEntity::getUserId,userId);
+            } else {
+                queryWrapper.eq(MessageEntity::getState, MessageEntity.STATE.WAIT);
+            }
+            // 查找该用户最新的一条消息
+            final IPage<MessageEntity> messagePage = messageDao.selectPage(new Page<>(1, 1), queryWrapper);
             final ChatUserVO chatUserVO = ChatConverter.INSTANCE.convertWaitingUser(chatUserEntity, (int) messagePage.getTotal());
             // 如果查询到了未读消息，则填入其中
             if (!messagePage.getRecords().isEmpty()) {
@@ -402,5 +462,10 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     public void setMessageDao(MessageDao messageDao) {
         this.messageDao = messageDao;
+    }
+
+    @Autowired
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
     }
 }

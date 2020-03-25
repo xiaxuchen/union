@@ -2,6 +2,7 @@ package com.originit.union.mq.consumer;
 
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.service.ChatService;
+import com.originit.union.util.DateUtil;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -32,7 +33,7 @@ public class MessageListener {
 
     @RabbitHandler
     public void handle(MessageEntity messageEntity, Channel channel, Message message) throws IOException {
-        log.info("process orderId:{},curListener:{}",messageEntity,this);
+        log.info("receive chat message,spend {} ms",System.currentTimeMillis() - DateUtil.toTimeMillions(messageEntity.getGmtCreate()));
         chatService.sendMessageForServe(messageEntity);
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }

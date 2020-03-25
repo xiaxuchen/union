@@ -6,7 +6,26 @@
     <select id="selectWaitingUsers" resultType="com.originit.union.entity.UserBindEntity">
         SELECT user_bind.open_id,user_bind.name,user_bind.phone,user_bind.head_img
         FROM chat_user JOIN user_bind ON chat_user.open_id=user_bind.open_id
-        WHERE chat_user.state = 0
+        LEFT JOIN user_tag on user_bind.id = user_tag.bind_user_id
+        LEFT JOIN user_agent on user_agent.user_phone = user_bind.phone
+        <where>
+            <!--等待-->
+            chat_user.state = 0
+            <if test="query != null">
+              <!--TODO 使用了like,可能需要优化-->
+              <if test="query.searchKey != null and query.searchKey != ''">
+                  AND (user_bind.name like '%${query.searchKey}%'
+                  OR user_bind.phone like '%${query.searchKey}%')
+              </if>
+              <!--查询的是属于该经理的用户，所属关系有user_agent表示-->
+              <if test="query.agentId != null">
+                  AND user_agent.agent = #{query.agentId}
+              </if>
+              <if test="query.tagId != null and query.tagId != -1">
+                  AND user_tag.tag_id = #{query.tagId}
+              </if>
+            </if>
+        </where>
         ORDER BY chat_user.chat_user_id DESC
     </select>
 </mapper>

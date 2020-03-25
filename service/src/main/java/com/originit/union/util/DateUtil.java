@@ -120,6 +120,29 @@ public class DateUtil {
     }
 
     /**
+     * 将时间转化为最近的时间格式(例如6分钟前)显示
+     * @param localDateTime
+     * @return 显示的字符
+     */
+    public static String convertTimeToFormat(LocalDateTime localDateTime) {
+        long timeStamp = toTimeMillions(localDateTime);
+        long curTime = System.currentTimeMillis() / (long) 1000;
+        long time = curTime - timeStamp;
+
+        if (time < 60 && time >= 0) {
+            return "刚刚";
+        } else if (time >= 60 && time < 3600) {
+            return time / 60 + "分钟前";
+        } else if (time >= 3600 && time < 3600 * 24) {
+            return time / 3600 + "小时前";
+        } else if (time >= 3600 * 24 && time < 3600 * 24 * 30) {
+            return toDateTimeStr(localDateTime);
+        } else {
+            return "刚刚";
+        }
+    }
+
+    /**
      * 将一个时间戳转换成提示性时间字符串，(多少分钟)
      *
      * @param timeStamp
@@ -153,6 +176,18 @@ public class DateUtil {
             return null;
         }
         return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    /**
+     * 将LocalDateTime转化为毫秒
+     * @param localDateTime 时间
+     * @return 毫秒数
+     */
+    public static long toTimeMillions (LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return 0;
+        }
+        return localDateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
     }
 
 }

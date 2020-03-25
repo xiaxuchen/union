@@ -1,7 +1,6 @@
 package com.originit.common.util;
 
 import com.originit.common.exceptions.InternalServerException;
-import io.netty.handler.codec.base64.Base64Encoder;
 import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;

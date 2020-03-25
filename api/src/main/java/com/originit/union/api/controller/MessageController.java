@@ -86,8 +86,7 @@ public class MessageController {
      */
     @GetMapping("/history/list")
     public List<ChatMessageVO> getHistoryMessages (@RequestParam String userId, @RequestParam(required = false) Long lastId){
-        return chatService.getHistoryMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
-                .stream().map(this::to).collect(Collectors.toList());
+        return chatService.getHistoryMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId);
     }
 
     private ChatMessageVO to (MessageEntity message) {
@@ -99,16 +98,16 @@ public class MessageController {
                 .build();
     }
 
-    /**
-     * 获取聊天用户的未读消息
-     * @param userId 用户的id
-     * @return 用户的所有未读消息
-     */
-    @GetMapping("/chatMessageList")
-    public List<ChatMessageVO> getMessages(@RequestParam String userId,@RequestParam(required = false) Long lastId) {
-        return chatService.getWaitMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
-                .stream().map(this::to).collect(Collectors.toList());
-    }
+//    /**
+//     * 获取聊天用户的未读消息
+//     * @param userId 用户的id
+//     * @return 用户的所有未读消息
+//     */
+//    @GetMapping("/chatMessageList")
+//    public List<ChatMessageVO> getMessages(@RequestParam String userId,@RequestParam(required = false) Long lastId) {
+//        return chatService.getWaitMessages(userId,ShiroUtils.getUserInfo().getUserId(),lastId)
+//                .stream().map(this::to).collect(Collectors.toList());
+//    }
 
 
     @GetMapping("/user/waiting")
@@ -144,8 +143,8 @@ public class MessageController {
     }
 
     @PutMapping("/list/read")
-    public void readMessage (@RequestParam List<Long> messageIds) {
-        chatService.readMessage(messageIds,ShiroUtils.getUserInfo().getUserId());
+    public void readMessage (@RequestParam List<Long> messageIds,@RequestParam String openId) {
+        chatService.readMessage(messageIds,openId,ShiroUtils.getUserInfo().getUserId());
     }
 
     /**

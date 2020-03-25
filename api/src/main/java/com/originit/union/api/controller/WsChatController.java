@@ -35,12 +35,11 @@ public class WsChatController {
     @SendToUser("/waitUser/users")
     public Pager<ChatUserVO> getWaitingUsers (@Payload GetChatUserDto dto) {
         log.info("get waiting user now，{}",dto.toString());
-        return chatService.getWaitingUsers(dto.getCurPage(),20);
+        return chatService.searchWaitingUser(dto,20);
     }
 
     /**
      * 获取刷新页面后初始的等待用户
-     * @param principal 用户信息
      * @return 等待的用户
      */
     @SubscribeMapping("/waiting/users")
@@ -48,4 +47,13 @@ public class WsChatController {
         return chatService.getWaitingUsers(1, 20);
     }
 
+    /**
+     * 获取当前经理对话的用户的信息
+     * @return 对话的用户
+     */
+    @SubscribeMapping("/chatting/users")
+    public List<ChatUserVO> getInitChatUsers (Principal principal) {
+        log.info("获取初始的聊天用户信息");
+        return chatService.getAgentUserVOs(Long.valueOf(principal.getName()));
+    }
 }
