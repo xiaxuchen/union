@@ -22,7 +22,7 @@ public class UserInfoVO {
      * wechatMessageId : 100 用户的openId
      */
     private String headImg;
-    private String subscribeTime;
+    private Long subscribeTime;
     private String phone;
     private String sex;
     private String name;

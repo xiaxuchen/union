@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.originit.union.dao.TagDao">
+
+    <select id="selectAllWithCount" resultType="com.originit.union.entity.vo.TagInfoVO">
+        SELECT tag.id,tag.name,count(bind_user_id) count FROM tag
+          LEFT JOIN user_tag u on tag.id = u.tag_id
+        GROUP BY tag.id
+    </select>
+
+</mapper>

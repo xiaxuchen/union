@@ -1,7 +1,6 @@
 package com.originit.union.service;
 
 import com.originit.common.page.Pager;
-import com.originit.union.chat.data.ChatUser;
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.dto.GetChatUserDto;
 import com.originit.union.entity.vo.ChatMessageVO;

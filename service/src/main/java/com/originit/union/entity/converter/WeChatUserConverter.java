@@ -34,7 +34,7 @@ public interface WeChatUserConverter {
             @Mapping(source = "name",target = "name"),
             @Mapping(source = "phone",target = "phone"),
             @Mapping(source = "pushCount",target = "pushCount"),
-            @Mapping(target = "subscribeTime",expression = "java(DateUtil.toDateTimeStr(user.getSubscribeTime()))"),
+            @Mapping(target = "subscribeTime",expression = "java(DateUtil.toTimeMillions(user.getSubscribeTime()))"),
             @Mapping(target = "tags",expression = "java(TagConverter.INSTANCE.to(user.getTags()))")
     })
     UserInfoVO to (UserInfo user);

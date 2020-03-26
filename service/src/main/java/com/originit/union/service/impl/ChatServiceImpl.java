@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.originit.common.exceptions.DataConflictException;
 import com.originit.common.page.Pager;
 import com.originit.union.bussiness.ClientServeBusiness;
-import com.originit.union.chat.data.ChatUser;
 import com.originit.union.constant.ChatConstant;
 import com.originit.union.constant.WeChatConstant;
 import com.originit.union.dao.*;
@@ -70,7 +69,7 @@ public class ChatServiceImpl implements ChatService {
         }
         // 1. 查找发送的用户
         final int findUserCount = chatUserDao.selectCount(new QueryWrapper<ChatUserEntity>()
-                .lambda().eq(ChatUserEntity::getState,ChatUser.STATE.RECEIVED)
+                .lambda().eq(ChatUserEntity::getState,ChatUserEntity.STATE.RECEIVE)
                 .eq(ChatUserEntity::getOpenId, message.getOpenId()));
         if (findUserCount == 0) {
             throw new ChatUserOfflineException();
@@ -293,7 +292,7 @@ public class ChatServiceImpl implements ChatService {
                     .userId(to)
                     .openId(openId)
                     .build());
-        } else if (state == ChatUser.STATE.RECEIVED) {
+        } else if (state == ChatUserEntity.STATE.RECEIVE) {
             // 1.3 如果用户是已接受，则只需要将原关系中的经理修改为当前经理
             int count = chatUserAgentDao.update(null,
                     new UpdateWrapper<ChatUserAgentEntity>()
@@ -405,11 +404,10 @@ public class ChatServiceImpl implements ChatService {
         final List<ChatUserVO> records = users.stream().map(chatUserEntity -> {
             final LambdaQueryWrapper<MessageEntity> queryWrapper = new QueryWrapper<MessageEntity>().lambda()
                     .eq(MessageEntity::getOpenId, chatUserEntity.getOpenId())
-                    .orderByDesc(MessageEntity::getGmtCreate);
+                    .orderByDesc(MessageEntity::getGmtCreate)
+                    .eq(MessageEntity::getState, MessageEntity.STATE.WAIT);
             if (userId != null) {
                 queryWrapper.eq(MessageEntity::getUserId,userId);
-            } else {
-                queryWrapper.eq(MessageEntity::getState, MessageEntity.STATE.WAIT);
             }
             // 查找该用户最新的一条消息
             final IPage<MessageEntity> messagePage = messageDao.selectPage(new Page<>(1, 1), queryWrapper);

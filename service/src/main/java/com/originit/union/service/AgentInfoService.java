@@ -2,7 +2,6 @@ package com.originit.union.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.originit.union.chat.data.AgentState;
 import com.originit.union.entity.AgentInfoEntity;
 
 public interface AgentInfoService extends IService<AgentInfoEntity> {
@@ -11,7 +10,7 @@ public interface AgentInfoService extends IService<AgentInfoEntity> {
      * @param userId 用户id
      * @return 用户信息
      */
-    AgentState getAgentStateByUserId(Long userId);
+//    AgentState getAgentStateByUserId(Long userId);
 
     /**
      * 通过系统用户id获取经理信息

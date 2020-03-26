@@ -16,5 +16,5 @@ public interface UserAgentDao extends BaseMapper<UserAgentEntity> {
      * @param agentId 所属的用户经理
      * @return
      */
-    Page<UserInfo> selectByAgentId(Page<?> page, @Param("userId") Long agentId);
+    Page<UserInfo> selectByAgentId(Page<?> page, @Param("agentId") Long agentId);
 }

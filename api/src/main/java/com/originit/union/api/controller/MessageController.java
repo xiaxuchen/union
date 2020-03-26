@@ -1,7 +1,6 @@
 package com.originit.union.api.controller;
 
 import com.originit.common.page.Pager;
-import com.originit.union.chat.data.ChatUser;
 import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.UserBindEntity;
@@ -48,34 +47,6 @@ public class MessageController {
     public List<ChatUserVO> getUserList () {
         Long userId = ShiroUtils.getUserInfo().getUserId();
         return chatService.getAgentUserVOs(userId);
-    }
-
-    private ChatUserVO reflectUser (ChatUser chatUser) {
-        UserBindEntity userInfo = chatUser.getUserInfo();
-        List<MessageEntity> messageList = chatUser.getMessageList();
-        Long notRead = 0L;
-        // 这里先暂时只支持文本消息
-        ChatMessageVO lastMessage = null;
-        String time = "";
-        if (messageList != null && !messageList.isEmpty()) {
-            MessageEntity message = messageList.get(messageList.size() - 1);
-            notRead = messageList.stream().filter(m -> m.getState().equals(MessageEntity.STATE.WAIT)).count();
-            lastMessage = ChatMessageVO.builder()
-                    .isUser(message.getFromUser())
-                    .message(message.getContent())
-                    .type(message.getType())
-                    .build();
-            time = DateUtil.toDateTimeStr(message.getGmtCreate().toEpochSecond(ZoneOffset.of("+8")));
-        }
-        return ChatUserVO.builder()
-                .id(userInfo.getOpenId())
-                .name(userInfo.getName())
-                .phone(userInfo.getPhone())
-                .headImg(userInfo.getHeadImg())
-                .notRead(notRead.intValue())
-                .lastMessage(lastMessage)
-                .time(time)
-                .build();
     }
 
     /**

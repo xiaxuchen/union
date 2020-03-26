@@ -89,7 +89,8 @@ public class UserBusiness {
                 userInfoVO.setPhone(origin.getPhone());
                 userInfoVO.setId(origin.getId());
                 if (wxUser.getSubscribe_time() != null) {
-                    userInfoVO.setSubscribeTime(DateUtil.timeStampToStr(Long.parseLong(wxUser.getSubscribe_time())));
+                    // TODO 微信传递过来的是秒
+                    userInfoVO.setSubscribeTime(Long.parseLong(wxUser.getSubscribe_time()) * 1000);
                 }
                 // 更新填充后的实体
                 userInfoVOS.set(position,userInfoVO);

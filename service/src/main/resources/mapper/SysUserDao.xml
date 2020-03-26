@@ -8,7 +8,7 @@
         <id property="userId" column="user_id"/>
     </resultMap>
 
-    <resultMap id="SysUserVOMap" type="com.originit.union.entity.vo.SysUserVO" autoMapping="true">
+    <resultMap id="SysUserVOMap" type="com.originit.union.entity.domain.SysUserInfo" autoMapping="true">
         <id property="userId" column="user_id" />
         <result property="createTime" column="gmt_create" />
         <association property="agentInfo" javaType="com.originit.union.entity.vo.AgentInfoVO" autoMapping="true">

@@ -1,4 +1,4 @@
-package com.originit.union.chat;
+package com.originit.union.util;
 
 import java.util.Collections;
 import java.util.List;

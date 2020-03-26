@@ -2,14 +2,17 @@ package com.originit.union.entity.converter;
 
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
+import com.originit.union.entity.domain.SysUserInfo;
 import com.originit.union.entity.dto.SysUserCreateDto;
 import com.originit.union.entity.dto.SysUserUpdateDto;
+import com.originit.union.entity.vo.SysUserVO;
+import com.originit.union.util.DateUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(imports = {DateUtil.class})
 public interface SysUserConverter {
 
     SysUserConverter INSTANC = Mappers.getMapper(SysUserConverter.class);
@@ -68,5 +71,13 @@ public interface SysUserConverter {
             @Mapping(source = "userId",target="sysUserId")
     })
     AgentInfoEntity toAgentInfoEntity(SysUserUpdateDto sysUserDto);
+
+    /**
+     * 转换创建时间为时间戳
+     */
+    @Mappings({
+            @Mapping(expression = "java(DateUtil.toTimeMillions(info.getCreateTime()))",target="createTime")}
+            )
+    SysUserVO to (SysUserInfo info);
 
 }

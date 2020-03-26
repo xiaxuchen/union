@@ -88,7 +88,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 
     @Override
     public Pager<SysUserVO> search(SysUserQueryDto queryDto) {
-        IPage<SysUserVO> sysUserVOIPage = baseMapper.selectByConditions(PagerUtil.createPage(queryDto.getCurPage(), queryDto.getPageSize()), queryDto);
+        IPage<SysUserVO> sysUserVOIPage = baseMapper.selectByConditions(PagerUtil
+                .createPage(queryDto.getCurPage(), queryDto.getPageSize()), queryDto)
+                .convert(SysUserConverter.INSTANC::to);
         return PagerUtil.fromIPage(sysUserVOIPage);
     }
 

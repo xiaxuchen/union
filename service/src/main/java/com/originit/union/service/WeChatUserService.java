@@ -28,13 +28,13 @@ public interface WeChatUserService extends IService<UserBindEntity> {
 
     /**
      * 获取用户列表信息
-     * @param phone 用户的电话
+     * @param searchKey 搜索的关键字
      * @param tagList 标签列表
      * @param curPage 当前页
      * @param pageSize 每页大小
      * @return 分页的用户信息列表
      */
-    Pager<UserInfoVO> getUserInfoList(List<String> phone, List<Integer> tagList, int curPage, int pageSize);
+    Pager<UserInfoVO> getUserInfoList(String searchKey, List<Integer> tagList, int curPage, int pageSize);
 
     /**
      * 导入用户信息到系统中
@@ -45,4 +45,11 @@ public interface WeChatUserService extends IService<UserBindEntity> {
      * 获取系统中用户总数以及有电话号码的用户的总数 * @return [0]用户总数，[1]用户绑定数
      */
     Integer[] getUserStatistic();
+
+    /**
+     * 根据电话号码获取用户信息
+     * @param phones 电话
+     * @return 用户信息
+     */
+    List<UserInfoVO> getUserInfoByPhones(List<String> phones);
 }

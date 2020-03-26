@@ -1,20 +1,18 @@
-package com.originit.union.entity.vo;
+package com.originit.union.entity.domain;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import lombok.AllArgsConstructor;
+import com.originit.union.entity.vo.AgentInfoVO;
+import com.originit.union.entity.vo.RoleVO;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 用户信息vo
+ * 用户信息
  * @author xxc、
  */
 @Data
-public class SysUserVO {
+public class SysUserInfo {
     /**
      * 用户ID
      */
@@ -52,6 +50,6 @@ public class SysUserVO {
     /**
      * 创建时间
      */
-    private Long createTime;
+    private LocalDateTime createTime;
 
 }

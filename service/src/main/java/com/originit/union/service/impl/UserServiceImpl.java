@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * @author xxc、
@@ -92,9 +93,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
     }
 
     @Override
-    public Pager<UserInfoVO> getUserInfoList(List<String> phone, List<Integer> tagList, int curPage, int pageSize) {
+    public Pager<UserInfoVO> getUserInfoList(String searchKey, List<Integer> tagList, int curPage, int pageSize) {
         // 获取用户openId、标签并转换
-        return PagerUtil.fromIPage(baseMapper.selectUserByPhonesAndTags(new Page<>(curPage, pageSize), phone, tagList), WeChatUserConverter.INSTANCE::to);
+        return PagerUtil.fromIPage(baseMapper.searchUsers(new Page<>(curPage, pageSize), searchKey, tagList), WeChatUserConverter.INSTANCE::to);
     }
 
     @Override
@@ -113,6 +114,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
         Integer bindCount = baseMapper.selectCount(new QueryWrapper<UserBindEntity>()
                 .lambda().isNotNull(UserBindEntity::getPhone));
         return new Integer[]{allCount,bindCount};
+    }
+
+    @Override
+    public List<UserInfoVO> getUserInfoByPhones(List<String> phones) {
+        if (phones == null || phones.isEmpty()) {
+            throw new IllegalArgumentException("电话列表不能为空");
+        }
+        return baseMapper.selectUserByPhones(phones)
+                .stream().map(WeChatUserConverter.INSTANCE::to).collect(Collectors.toList());
     }
 
     private WeChatUserService getService () {

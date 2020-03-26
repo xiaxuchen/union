@@ -108,14 +108,14 @@ public class PushController {
 
     /**
      * 查找用户信息并返回
-     * @param phone 用户输入的电话号码列表，以空格分隔
+     * @param searchKey 搜索的关键字
      * @param tagList 用户标签列表
      * @param curPage  当前页
      * @param pageSize  一页显示几条数据
      * @return  用户信息列表
      */
     @GetMapping("/userList")
-    public Pager<UserInfoVO> searchUserList(@RequestParam(required = false,defaultValue = "") String phone,
+    public Pager<UserInfoVO> searchUserList(@RequestParam(required = false,defaultValue = "") String searchKey,
                                             @RequestParam(required = false) List<Integer> tagList,
                                             @RequestParam(required = false,defaultValue = "1") int curPage,
                                             @RequestParam(required = false,defaultValue = "10") int pageSize) {
@@ -123,12 +123,7 @@ public class PushController {
         if(tagList != null && tagList.stream().anyMatch(id -> id == 0)) {
             tagList.clear();
         }
-        List<String> phones = null;
-        if (!phone.trim().isEmpty()) {
-            phones = Arrays.asList(phone.split(" "));
-        }
-
-        return userService.getUserInfoList(phones,
+        return userService.getUserInfoList(searchKey,
                 tagList, curPage, pageSize);
     }
 
@@ -225,8 +220,7 @@ public class PushController {
             }
             return list;
         });
-        return userService.getUserInfoList(phones,
-                null, 0, phones.size()).getData();
+        return userService.getUserInfoByPhones(phones);
     }
 
     /**

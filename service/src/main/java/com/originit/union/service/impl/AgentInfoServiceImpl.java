@@ -2,7 +2,6 @@ package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.originit.union.chat.data.AgentState;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.union.dao.AgentInfoDao;
@@ -24,16 +23,16 @@ public class AgentInfoServiceImpl extends ServiceImpl<AgentInfoDao,AgentInfoEnti
         this.sysUserDao = sysUserDao;
     }
 
-    @Override
-    public AgentState getAgentStateByUserId(Long userId) {
-        AgentInfoEntity agentInfo = this.getOne(new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, userId));
-        return AgentState.builder()
-                .info(agentInfo)
-                .headImg(sysUserDao.selectOne(new QueryWrapper<SysUserEntity>().lambda()
-                        .select(SysUserEntity::getHeadImg).eq(SysUserEntity::getUserId,userId))
-                        .getHeadImg())
-                .build();
-    }
+//    @Override
+//    public AgentState getAgentStateByUserId(Long userId) {
+//        AgentInfoEntity agentInfo = this.getOne(new QueryWrapper<AgentInfoEntity>().lambda().eq(AgentInfoEntity::getSysUserId, userId));
+//        return AgentState.builder()
+//                .info(agentInfo)
+//                .headImg(sysUserDao.selectOne(new QueryWrapper<SysUserEntity>().lambda()
+//                        .select(SysUserEntity::getHeadImg).eq(SysUserEntity::getUserId,userId))
+//                        .getHeadImg())
+//                .build();
+//    }
 
     @Override
     public AgentInfoEntity getByUserId (Long userId) {

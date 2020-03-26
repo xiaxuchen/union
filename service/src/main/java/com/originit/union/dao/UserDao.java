@@ -30,6 +30,13 @@ public interface UserDao extends BaseMapper<UserBindEntity> {
      * @param tagList 标签列表
      * @return 用户信息分页
      */
-    IPage<UserInfo> selectUserByPhonesAndTags(Page<?> page, @Param("phoneList") List<String> phoneList,
-                                              @Param("tagList") List<Integer> tagList);
+    IPage<UserInfo> searchUsers(Page<?> page, @Param("searchKey") String searchKey,
+                                @Param("tagList") List<Integer> tagList);
+
+    /**
+     * 根据用户的电话获取用户信息
+     * @param phones 用户的电话
+     * @return 用户的信息
+     */
+    List<UserInfo> selectUserByPhones(@Param("phone") List<String> phones);
 }

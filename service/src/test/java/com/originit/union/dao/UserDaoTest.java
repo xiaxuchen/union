@@ -32,6 +32,6 @@ public class UserDaoTest {
 
     @Test
     public void selectUserByPhonesAndTags() {
-        System.out.println(userDao.selectUserByPhonesAndTags(new Page<>(1, 2), Arrays.asList(), Arrays.asList(1)).getTotal());
+        System.out.println(userDao.searchUsers(new Page<>(1, 2), Arrays.asList(), Arrays.asList(1)).getTotal());
     }
 }

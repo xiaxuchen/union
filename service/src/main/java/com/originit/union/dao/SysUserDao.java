@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.originit.union.entity.SysUserEntity;
+import com.originit.union.entity.domain.SysUserInfo;
 import com.originit.union.entity.dto.SysUserQueryDto;
 import com.originit.union.entity.vo.SysUserVO;
 import org.apache.ibatis.annotations.Param;
@@ -22,5 +23,5 @@ public interface SysUserDao extends BaseMapper<SysUserEntity> {
      * @param condition 条件
      * @return 系统用户列表
      */
-    IPage<SysUserVO> selectByConditions(Page<?> page, @Param("condition") SysUserQueryDto condition);
+    IPage<SysUserInfo> selectByConditions(Page<?> page, @Param("condition") SysUserQueryDto condition);
 }
