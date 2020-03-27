@@ -76,7 +76,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 用户的前缀为/user
         registry.setUserDestinationPrefix("/user");
         // 开启客户经理、聊天记录的消息代理
-        registry.enableSimpleBroker("/chatUser","/waitUser","/user");
+        registry.enableSimpleBroker("/chatUser","/receivableUser","/waitUser","/user");
     }
 
 }

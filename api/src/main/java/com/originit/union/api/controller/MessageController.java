@@ -1,9 +1,12 @@
 package com.originit.union.api.controller;
 
 import com.originit.common.page.Pager;
+import com.originit.common.util.ExceptionUtil;
 import com.originit.union.api.util.ShiroUtils;
+import com.originit.union.entity.AgentStateEntity;
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.UserBindEntity;
+import com.originit.union.entity.dto.AgentStateDto;
 import com.originit.union.entity.dto.MessageSendDto;
 import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
@@ -98,6 +101,25 @@ public class MessageController {
             try {
                 chatService.receiveUser(user,ShiroUtils.getUserInfo().getUserId());
             } catch (Exception e) {
+                log.error(ExceptionUtil.buildErrorMessage(e));
+                notReceiveUser.add(user);
+            }
+        }
+        return notReceiveUser;
+    }
+
+    /**
+     * 反向接入用户
+     * @param userList 接入的用户列表
+     * @return
+     */
+    @PostMapping("/session/receivable")
+    public List<String> receiveNotWaitUser (@RequestBody List<String> userList) {
+        List<String> notReceiveUser = new ArrayList<>();
+        for (String user : userList) {
+            try {
+                chatService.receiveNotWaitUser(user,ShiroUtils.getUserInfo().getUserId());
+            } catch (Exception e) {
                 notReceiveUser.add(user);
             }
         }
@@ -135,6 +157,25 @@ public class MessageController {
                 .fromUser(false)
                 .gmtCreate(LocalDateTime.now())
                 .build());
+    }
+
+    /**
+     * 配置客户经理
+     * @param dto 设置当前经理的状态
+     */
+    @PutMapping("/agent")
+    public void configAgent(@RequestBody AgentStateDto dto) {
+        chatService.configAgent(dto);
+    }
+
+    /**
+     * 获取经理的设置
+     * @param userId 用户id
+     * @return
+     */
+    @GetMapping("/agent")
+    public AgentStateEntity getAgentConfig (@RequestParam Long userId) {
+        return chatService.getAgentState(userId);
     }
 
 }

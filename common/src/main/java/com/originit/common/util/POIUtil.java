@@ -149,6 +149,9 @@ public class POIUtil {
      * @return
      */
     public static String getCellValue(Cell cell){
+        if (cell == null) {
+            return null;
+        }
         String value = "";
         //格式化number String字符
         DecimalFormat df = new DecimalFormat("0");

@@ -8,6 +8,7 @@ import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxXmlMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +38,7 @@ public class ChatInterceptor implements WXInterceptor {
     }
 
     @Override
+    @Async
     public void handle(HttpServletRequest request, HttpServletResponse response) {
         WxXmlMessage message = getMessage(request);
         // 添加图片类型的消息处理

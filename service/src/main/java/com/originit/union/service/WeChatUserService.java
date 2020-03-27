@@ -5,6 +5,7 @@ import com.originit.common.page.Pager;
 import com.originit.union.entity.UserBindEntity;
 import com.originit.union.entity.vo.UserInfoVO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 /**
  * 访问用户相关表的Service
@@ -52,4 +53,17 @@ public interface WeChatUserService extends IService<UserBindEntity> {
      * @return 用户信息
      */
     List<UserInfoVO> getUserInfoByPhones(List<String> phones);
+
+    /**
+     * 更新用户上次交互的时间
+     * @param openId 用户的openId
+     * @param localDateTime 上次使用的时间
+     */
+    void updateLastUseTime (String openId, LocalDateTime localDateTime);
+
+    /**
+     * 导入用户
+     * @param openId 用户的openId
+     */
+    void importUser(String openId);
 }

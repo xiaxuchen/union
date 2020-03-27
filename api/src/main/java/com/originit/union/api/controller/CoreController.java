@@ -116,10 +116,10 @@ public class CoreController {
         }
     }
 
-//    private void autoLogin(String openId,HttpSession session) {
+//    private void autoLogin(String id,HttpSession session) {
 //        if (session.getAttribute("user") == null)
 //        {
-//            session.setAttribute("user",userBindMapper.selectOneByOpenId(openId));
+//            session.setAttribute("user",userBindMapper.selectOneByOpenId(id));
 //        }
 //    }
 
@@ -145,8 +145,8 @@ public class CoreController {
 //    public String bind(String code,HttpSession session) throws WxErrorException {
 //        WxOAuth2AccessTokenResult oAuth2AccessTokenResult = iService.oauth2ToGetAccessToken(code);
 //        final String openid = oAuth2AccessTokenResult.getOpenid();
-//        if(session.getAttribute("openId") == null) {
-//            session.setAttribute("openId", openid);
+//        if(session.getAttribute("id") == null) {
+//            session.setAttribute("id", openid);
 //            //自动登录,由于网页授权和微信平台的请求不是同一源(session不是同一个)故重复登录
 //            autoLogin(openid,session);
 //        }

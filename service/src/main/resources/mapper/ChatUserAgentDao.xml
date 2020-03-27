@@ -4,7 +4,7 @@
 <mapper namespace="com.originit.union.dao.ChatUserAgentDao">
 
     <select id="selectAgentUsers" resultType="com.originit.union.entity.UserBindEntity">
-        SELECT user_bind.open_id,user_bind.name,user_bind.phone,user_bind.head_img
+        SELECT user_bind.open_id openId,user_bind.name,user_bind.phone,user_bind.head_img
         FROM chat_user_agent JOIN user_bind ON chat_user_agent.open_id=user_bind.open_id
         WHERE chat_user_agent.user_id = #{userId}
         ORDER BY chat_user_agent.chat_user_agent_id DESC

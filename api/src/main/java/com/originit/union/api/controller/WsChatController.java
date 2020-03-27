@@ -39,6 +39,18 @@ public class WsChatController {
     }
 
     /**
+     * 搜索可接入的用户
+     * @param dto 搜索用的dto
+     * @return
+     */
+    @MessageMapping("/receivableUser/users")
+    @SendToUser("/receivableUser/users")
+    public Pager<ChatUserVO> getReceviableUser (@Payload GetChatUserDto dto) {
+        log.info("get waiting user now，{}",dto.toString());
+        return chatService.searchReceivableUsers(dto,20);
+    }
+
+    /**
      * 获取刷新页面后初始的等待用户
      * @return 等待的用户
      */
@@ -56,4 +68,5 @@ public class WsChatController {
         log.info("获取初始的聊天用户信息");
         return chatService.getAgentUserVOs(Long.valueOf(principal.getName()));
     }
+
 }

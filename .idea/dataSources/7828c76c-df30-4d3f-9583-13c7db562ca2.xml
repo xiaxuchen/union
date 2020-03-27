@@ -1190,7 +1190,7 @@
     <column id="281" parent="229" name="content">
       <Position>3</Position>
       <Comment>消息内容</Comment>
-      <DataType>varchar(512)|0s</DataType>
+      <DataType>varchar(2048)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
@@ -1631,8 +1631,9 @@
     </column>
     <column id="353" parent="235" name="deleted">
       <Position>8</Position>
-      <Comment>是否删除</Comment>
+      <Comment>是否删除，0为未删除，1为已删除</Comment>
       <DataType>tinyint(1)|0s</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="354" parent="235" name="gmt_modified">
@@ -1773,8 +1774,8 @@
     </column>
     <column id="378" parent="238" name="agent">
       <Position>3</Position>
-      <Comment>经理的标识</Comment>
-      <DataType>char(32)|0s</DataType>
+      <Comment>经理的id</Comment>
+      <DataType>bigint(20) unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>

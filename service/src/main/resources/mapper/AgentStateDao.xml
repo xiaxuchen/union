@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.originit.union.dao.AgentStateDao">
+
+    <select id="selectSuitAgentId" resultType="long">
+        SELECT agent_state.user_id id FROM agent_state
+        <!-- 连表找到当前经理所属的用户 -->
+        JOIN user_agent ON agent_state.user_id=user_agent.agent
+        <!--经理在线-->
+        WHERE agent_state.state = 1
+        <!--开启了自动接入-->
+        AND agent_state.auto_receive_enable = 1
+        <!--经理的开始接入人数大于当前已接入-->
+        AND agent_state.auto_receive_from &gt;
+          <!--查找当前用户已接待人数-->
+            (select count(*) from chat_user_agent WHERE chat_user_agent.user_id = agent_state.user_id)
+        AND user_agent.user_phone = #{phone}
+    </select>
+</mapper>

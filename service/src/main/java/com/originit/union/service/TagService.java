@@ -2,10 +2,15 @@ package com.originit.union.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.originit.union.entity.TagEntity;
+import com.originit.union.entity.dto.TagUserAddDto;
 import com.originit.union.entity.vo.TagInfoVO;
 
 import java.util.List;
 
+/**
+ * 标签管理服务
+ * @author xxc、
+ */
 public interface TagService extends IService<TagEntity> {
 
     /**
@@ -39,4 +44,17 @@ public interface TagService extends IService<TagEntity> {
      * @param tagName 标签名称
      */
     void updateTag(Long tagId, String tagName);
+
+    /**
+     * 添加用户的标签
+     * @param userInfo 用户信息
+     * @param tagId 用户标签
+     */
+    void addTagOfUser(List<TagUserAddDto> userInfo, Long tagId);
+
+    /**
+     * 删除用户的标签
+     * @param userTagId 用户标签关系的id
+     */
+    void deleteTagOfUser(Long userTagId);
 }

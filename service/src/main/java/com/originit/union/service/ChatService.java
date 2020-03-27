@@ -1,7 +1,9 @@
 package com.originit.union.service;
 
 import com.originit.common.page.Pager;
+import com.originit.union.entity.AgentStateEntity;
 import com.originit.union.entity.MessageEntity;
+import com.originit.union.entity.dto.AgentStateDto;
 import com.originit.union.entity.dto.GetChatUserDto;
 import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
@@ -100,4 +102,39 @@ public interface ChatService {
      * @return 聊天用户的显示对象
      */
     Pager<ChatUserVO> searchWaitingUser(GetChatUserDto dto, int pageSize);
+
+    /**
+     * 配置经理的状态信息
+     * @param dto 经理的状态
+     */
+    void configAgent(AgentStateDto dto);
+
+    /**
+     * 清楚等待超时的用户
+     * @param timeOut 超时时间
+     */
+    void clearWaitTimeout(Long timeOut);
+
+    /**
+     * TODO 在经理离线的时候去发一个消息，5分钟后没有连接就设置离开
+     * 获取经理的状态信息
+     * @param userId 用户id
+     * @return
+     */
+    AgentStateEntity getAgentState(Long userId);
+
+    /**
+     * 搜索可接入的用户
+     * @param dto 搜索dto
+     * @param pageSize 每页大小
+     * @return
+     */
+    Pager<ChatUserVO> searchReceivableUsers(GetChatUserDto dto, int pageSize);
+
+    /**
+     * 接受不在等待的用户
+     * @param openId 用户id
+     * @param userId 客户经理id
+     */
+    void receiveNotWaitUser(String openId, Long userId);
 }

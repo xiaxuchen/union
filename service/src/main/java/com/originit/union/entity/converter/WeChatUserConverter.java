@@ -29,13 +29,13 @@ public interface WeChatUserConverter {
 
     @Mappings({
             @Mapping(target = "sex",expression = "java(WeChatUserConverter.convertSex(user.getSex()))"),
-            @Mapping(source = "openId",target = "id"),
+            @Mapping(source = "id",target = "id"),
             @Mapping(source = "headImg",target = "headImg"),
             @Mapping(source = "name",target = "name"),
             @Mapping(source = "phone",target = "phone"),
             @Mapping(source = "pushCount",target = "pushCount"),
             @Mapping(target = "subscribeTime",expression = "java(DateUtil.toTimeMillions(user.getSubscribeTime()))"),
-            @Mapping(target = "tags",expression = "java(TagConverter.INSTANCE.to(user.getTags()))")
+            @Mapping(source = "tags",target = "tags")
     })
     UserInfoVO to (UserInfo user);
 

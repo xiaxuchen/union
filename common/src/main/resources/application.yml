@@ -81,7 +81,7 @@ spring:
   redis:
     host: 47.105.61.4
     port: 6379
-    timeout: 6000
+    timeout: 10000
     password: xxcisbest
     jedis:
       pool:
@@ -133,3 +133,9 @@ mybatis-plus:
     call-setters-on-nulls: true
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+system:
+  # 聊天
+  chat:
+    # 用户等待的超时时间,单位秒
+    wait-time-out: 900

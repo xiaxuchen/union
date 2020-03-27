@@ -1,9 +1,12 @@
 package com.originit.union.api.controller;
 
+import com.originit.common.config.RedisConfig;
 import com.originit.common.exceptions.ParameterInvalidException;
 import com.originit.common.page.Pager;
 import com.originit.common.util.POIUtil;
+import com.originit.common.util.RedisCacheProvider;
 import com.originit.common.util.SHA256Util;
+import com.originit.union.api.shiro.config.ShiroConfig;
 import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
@@ -48,7 +51,7 @@ public class UserController {
 
     private SysRoleService sysRoleService;
 
-    private RedisService redisService;
+    private RedisCacheProvider redisCacheProvider;
 
     private AgentInfoService agentInfoService;
 
@@ -64,11 +67,11 @@ public class UserController {
         this.agentInfoService = agentInfoService;
     }
 
-    @Autowired
-    public void setRedisService(RedisService redisService) {
-        this.redisService = redisService;
-    }
 
+    @Autowired
+    public void setRedisCacheProvider(RedisCacheProvider redisCacheProvider) {
+        this.redisCacheProvider = redisCacheProvider;
+    }
 
     @Autowired
     public void setSysUserService(SysUserService sysUserService) {
@@ -96,9 +99,7 @@ public class UserController {
         SysUserEntity userInfo = ShiroUtils.getUserInfo();
         // 更新用户和session的关系
         final String userKey = ShiroUtils.generateUserKey(userInfo.getUserId());
-        redisService.set(userKey,ShiroUtils.getSession().getId().toString());
-        // TODO 这里的同步是有问题的，因为访问session的时候时间会刷新
-        redisService.expire(userKey,1800);
+        redisCacheProvider.set(userKey,ShiroUtils.getSession().getId(), ShiroConfig.EXPIRE);
         return obtainLoginUser(userInfo.getUserId());
     }
 

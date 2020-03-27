@@ -168,7 +168,7 @@ public class PushController {
         // 将其放入redis中缓存
         redisCacheProvider.hset(PreviewQRCodeInterceptor.EVENT_KEY,item,
                 new PreviewState(item,false,msgType,content),expireTime);
-        String qrUrl = messageBusiness.generateTempQRCode(PreviewQRCodeInterceptor.EVENT_KEY + "?wechatMessageId=" + item, expireTime);
+        String qrUrl = messageBusiness.generateTempQRCode(PreviewQRCodeInterceptor.EVENT_KEY + "?id=" + item, expireTime);
         return DataUtil.<String,String>mapBuilder()
                 .append("pushItemId",item)
                 .append("url",qrUrl)

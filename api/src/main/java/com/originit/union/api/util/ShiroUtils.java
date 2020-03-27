@@ -65,7 +65,7 @@ public class ShiroUtils {
      * 删除用户缓存信息
      * @Author Sans
      * @CreateTime 2019/6/17 13:57
-     * @Param  openId  用户名称
+     * @Param  id  用户名称
      * @Param  isRemoveSession 是否删除Session
      * @Return void
      */
@@ -123,4 +123,20 @@ public class ShiroUtils {
            return null;
        }
     }
+
+    /**
+     * 通过session获取用户信息
+     * @param session
+     * @return
+     */
+    public static SysUserEntity getUserInfo (Session session) {
+        try {
+            return ((SysUserEntity)((SimplePrincipalCollection)session
+                    .getAttribute("org.apache.shiro.subject.support.DefaultSubjectContext_PRINCIPALS_SESSION_KEY"))
+                    .getPrimaryPrincipal());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

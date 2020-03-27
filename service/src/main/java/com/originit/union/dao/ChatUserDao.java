@@ -12,6 +12,9 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
 @Repository
 public interface ChatUserDao extends BaseMapper<ChatUserEntity> {
     /**
@@ -20,4 +23,11 @@ public interface ChatUserDao extends BaseMapper<ChatUserEntity> {
      * @return 分页的用户信息
      */
     IPage<UserBindEntity> selectWaitingUsers(Page<ChatUserEntity> page,@Param("query") GetChatUserDto query);
+
+    /**
+     * 查找超时的用户id
+     * @param timeout 超时时间
+     * @return 属性的键值对
+     */
+    List<Map<String,Object>> selectTimeoutUserId(Long timeout);
 }

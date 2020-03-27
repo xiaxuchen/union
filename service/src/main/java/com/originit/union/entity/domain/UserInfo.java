@@ -3,6 +3,7 @@ package com.originit.union.entity.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.originit.union.entity.TagEntity;
 import com.originit.union.entity.UserBindEntity;
+import com.originit.union.entity.vo.TagInfoVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -74,5 +75,5 @@ public class UserInfo {
     /**
      * 用户的标签
      */
-    private List<TagEntity> tags;
+    private List<TagInfoVO> tags;
 }

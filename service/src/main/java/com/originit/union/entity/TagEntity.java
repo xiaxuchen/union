@@ -23,11 +23,6 @@ public class TagEntity implements Serializable {
     private String name;
 
     /**
-     * 微信的标签的id
-     */
-    private Integer wechatTagId;
-
-    /**
      * 创建时间
      */
     private LocalDateTime gmtCreate;

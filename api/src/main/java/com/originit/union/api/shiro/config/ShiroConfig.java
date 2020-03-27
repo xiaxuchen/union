@@ -1,10 +1,12 @@
 package com.originit.union.api.shiro.config;
 
+import com.originit.common.util.RedisCacheProvider;
 import com.originit.union.api.shiro.ShiroSessionManager;
 import com.originit.union.api.shiro.filter.ShiroUserFilter;
 import com.originit.union.api.shiro.generator.ShiroSessionIdGenerator;
 import com.originit.union.api.shiro.realm.ShiroRealm;
 import com.originit.common.util.SHA256Util;
+import com.originit.union.api.util.ShiroUtils;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.Session;
@@ -15,11 +17,17 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
+import org.crazycake.shiro.exception.SerializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.servlet.Filter;
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,7 +42,8 @@ public class ShiroConfig {
 
     private final String CACHE_KEY = "shiro:cache:";
     private final String SESSION_KEY = "shiro:session:";
-    private final int EXPIRE = 1800;
+    // session存在8个小时
+    public static final int EXPIRE = 8 * 60 *  1000;
 
     /**
      * redis配置
@@ -96,10 +105,10 @@ public class ShiroConfig {
      * @CreateTime 2019/6/12 10:34
      */
     @Bean
-    public SecurityManager securityManager() {
+    public SecurityManager securityManager(SessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         // 自定义Ssession管理
-        securityManager.setSessionManager(sessionManager());
+        securityManager.setSessionManager(sessionManager);
         // 自定义Cache实现
         securityManager.setCacheManager(cacheManager());
         // 自定义Realm验证
@@ -143,7 +152,6 @@ public class ShiroConfig {
      */
     @Bean
     public RedisManager redisManager() {
-        // 出现了问题，jar包中的方法找不到 java.lang.NoSuchMethodError scanResult.getStringCursor
         RedisManager redisManager = new RedisManager();
         redisManager.setHost(host);
         redisManager.setPort(port);
@@ -165,7 +173,7 @@ public class ShiroConfig {
         redisCacheManager.setRedisManager(redisManager());
         redisCacheManager.setKeyPrefix(CACHE_KEY);
         // 配置缓存的话要求放在session里面的实体类必须有个id标识
-        redisCacheManager.setPrincipalIdFieldName("openId");
+        redisCacheManager.setPrincipalIdFieldName("id");
         return redisCacheManager;
     }
 
@@ -179,6 +187,7 @@ public class ShiroConfig {
         return new ShiroSessionIdGenerator();
     }
 
+
     /**
      * 配置RedisSessionDAO
      * @Attention 使用的是shiro-redis开源插件
@@ -186,7 +195,7 @@ public class ShiroConfig {
      * @CreateTime 2019/6/12 13:44
      */
     @Bean
-    public RedisSessionDAO redisSessionDAO() {
+    public RedisSessionDAO redisSessionDAO(RedisCacheProvider redisCacheProvider) {
         RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
         redisSessionDAO.setRedisManager(redisManager());
         redisSessionDAO.setSessionIdGenerator(sessionIdGenerator());
@@ -201,9 +210,12 @@ public class ShiroConfig {
      * @CreateTime 2019/6/12 14:25
      */
     @Bean
-    public SessionManager sessionManager() {
+    public SessionManager sessionManager(RedisSessionDAO redisSessionDAO) {
         ShiroSessionManager shiroSessionManager = new ShiroSessionManager();
-        shiroSessionManager.setSessionDAO(redisSessionDAO());
+        shiroSessionManager.setSessionDAO(redisSessionDAO);
+        shiroSessionManager.setSessionValidationSchedulerEnabled(true);
+        shiroSessionManager.setGlobalSessionTimeout(timeout);
+        shiroSessionManager.setDeleteInvalidSessions(true);
         return shiroSessionManager;
     }
 }

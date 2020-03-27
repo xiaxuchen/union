@@ -215,7 +215,7 @@ public class ChatServer {
                 .type(WebSocketMessage.TYPE.EVENT)
                 .eventName(RECEIVED_USER)
                 .content(DataUtil
-                        .mapBuilder().append("openId",openId)
+                        .mapBuilder().append("id",openId)
                         .append("count",count)
                         .append("time",System.currentTimeMillis()).build())
                 .build());

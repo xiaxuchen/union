@@ -9,6 +9,7 @@ import com.originit.union.util.EventUtil;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxXmlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
@@ -49,6 +50,7 @@ public class PreviewQRCodeInterceptor implements WXInterceptor {
     }
 
     @Override
+    @Async
     public void handle(HttpServletRequest request, HttpServletResponse response) {
         WxXmlMessage wxXmlMessage = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
         String eventKey = wxXmlMessage.getEventKey();

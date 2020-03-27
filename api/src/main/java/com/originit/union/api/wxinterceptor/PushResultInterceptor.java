@@ -9,6 +9,7 @@ import com.originit.union.util.DateUtil;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxXmlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ public class PushResultInterceptor implements WXInterceptor{
     }
 
     @Override
+    @Async
     public void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         WxXmlMessage message = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
         // 更新推送消息

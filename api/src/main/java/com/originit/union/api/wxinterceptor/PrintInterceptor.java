@@ -3,6 +3,7 @@ package com.originit.union.api.wxinterceptor;
 import com.originit.common.annotation.Interceptor;
 import com.originit.union.constant.WeChatConstant;
 import com.soecode.wxtools.bean.WxXmlMessage;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

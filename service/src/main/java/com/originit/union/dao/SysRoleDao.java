@@ -17,9 +17,9 @@ public interface SysRoleDao extends BaseMapper<SysRoleEntity> {
      * 通过用户ID查询角色集合
      * @Author Sans
      * @CreateTime 2019/6/18 18:01
-     * @Param  openId 用户ID
+     * @Param  id 用户ID
      * @Return List<SysRoleEntity> 角色名集合
      */
-    List<SysRoleEntity> selectSysRoleByUserId(@Param("openId") Long userId);
+    List<SysRoleEntity> selectSysRoleByUserId(@Param("id") Long userId);
 
 }

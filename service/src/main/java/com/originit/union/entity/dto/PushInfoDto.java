@@ -25,7 +25,7 @@ public class PushInfoDto {
     /**
      * 推送的信息，type为1表示文本消息，为2表示图文消息，content对应为文本内容和微信公众平台的media_id
      */
-    @EnumValue(intValues = {1,2},groups = CreateGroup.class,message = "推送类型只能为指定值")
+    @EnumValue(intValues = {0,1},groups = CreateGroup.class,message = "推送类型只能为指定值")
     private  Integer  type;
 
     @NotBlank(groups = {CreateGroup.class},message = "推送的内容不能为空")

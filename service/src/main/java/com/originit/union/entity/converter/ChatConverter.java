@@ -1,8 +1,10 @@
 package com.originit.union.entity.converter;
 
+import com.originit.union.entity.AgentStateEntity;
 import com.originit.union.entity.ChatUserEntity;
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.entity.UserBindEntity;
+import com.originit.union.entity.dto.AgentStateDto;
 import com.originit.union.entity.vo.ChatMessageVO;
 import com.originit.union.entity.vo.ChatUserVO;
 import com.originit.union.util.DateUtil;
@@ -47,4 +49,6 @@ public interface ChatConverter {
             @Mapping(target = "time",expression = "java(DateUtil.toDateTimeStr(message.getGmtCreate()))")
     })
     ChatMessageVO to (MessageEntity message);
+
+    AgentStateEntity to(AgentStateDto dto);
 }

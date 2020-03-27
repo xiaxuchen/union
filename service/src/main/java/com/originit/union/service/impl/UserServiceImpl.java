@@ -1,6 +1,7 @@
 package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.originit.common.page.Pager;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -123,6 +125,20 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
         }
         return baseMapper.selectUserByPhones(phones)
                 .stream().map(WeChatUserConverter.INSTANCE::to).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateLastUseTime(String openId, LocalDateTime localDateTime) {
+        // 更新用户的上次使用时间
+        baseMapper.update(null,new UpdateWrapper<UserBindEntity>().
+                lambda().set(UserBindEntity::getGmtLastUse,localDateTime)
+                .eq(UserBindEntity::getOpenId,openId));
+    }
+
+    @Override
+    public void importUser(String openId) {
+        final UserBindEntity user = userBusiness.getUserByOpenId(openId);
+        baseMapper.insert(user);
     }
 
     private WeChatUserService getService () {

@@ -63,10 +63,10 @@ public class UserServiceTest {
 //
 //    @Test
 //    public void updateUserBind() {
-//        final List<String> openId = clear();
-//        userService.addUserIfNotExist(openId);
-//        userService.updateUserBind(openId.stream().map(s -> UserBindDto.builder().openid(s).phone(s).build()).collect(Collectors.toList()));
-//        openId.forEach(s -> Assert.assertEquals(userService.getOne(new QueryWrapper<UserBindEntity>().lambda().eq(UserBindEntity::getOpenId,s)).getPhone(),s));
+//        final List<String> id = clear();
+//        userService.addUserIfNotExist(id);
+//        userService.updateUserBind(id.stream().map(s -> UserBindDto.builder().openid(s).phone(s).build()).collect(Collectors.toList()));
+//        id.forEach(s -> Assert.assertEquals(userService.getOne(new QueryWrapper<UserBindEntity>().lambda().eq(UserBindEntity::getId,s)).getPhone(),s));
 //        clear();
 //    }
 //

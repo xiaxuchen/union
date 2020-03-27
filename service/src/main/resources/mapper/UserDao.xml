@@ -6,9 +6,10 @@
     <resultMap id="UserInfoMap" type="com.originit.union.entity.domain.UserInfo" autoMapping="true">
         <id property="openId" column="open_id" />
         <result property="phone" column="phone" />
-        <collection property="tags" javaType="java.util.ArrayList" ofType="com.originit.union.entity.TagEntity">
+        <collection property="tags" javaType="java.util.ArrayList" ofType="com.originit.union.entity.vo.TagInfoVO">
             <id property="id" column="tagId" />
             <result property="name" column="tagName"/>
+            <result property="userTagId" column="userTagId" />
         </collection>
     </resultMap>
 
@@ -19,21 +20,24 @@
     </insert>
 
     <select id="searchUsers" resultMap="UserInfoMap">
-        SELECT user_bind.open_id,user_bind.phone,
+        SELECT user_bind.id,user_bind.open_id,user_bind.phone,
         user_bind.subscribe_time,user_bind.head_img,
         user_bind.push_count,user_bind.name,
-        user_bind.sex,tag.id tagId,tag.name tagName
+        user_bind.sex,tag.id tagId,tag.name tagName,
+        user_tag.id userTagId
         FROM user_bind
         LEFT JOIN user_tag ON user_bind.id = user_tag.bind_user_id
         LEFT JOIN tag ON user_tag.tag_id = tag.id
         <where>
             <if test="tagList != null and tagList.size() > 0">
+                EXISTS(SELECT user_tag.id FROM user_tag WHERE user_tag.bind_user_id=user_bind.id
                 AND user_tag.tag_id in
                 <foreach collection="tagList" item="tag" open="(" close=")" separator=",">
                     #{tag}
                 </foreach>
+                )
             </if>
-            <if test="searchKey != null || searchKey != ''">
+            <if test="searchKey != null and searchKey != ''">
                 AND (user_bind.name LIKE '%${searchKey}%'
                 OR user_bind.phone LIKE '%${searchKey}%')
             </if>
@@ -41,10 +45,11 @@
     </select>
 
     <select id="selectUserByPhones" resultMap="UserInfoMap">
-        SELECT user_bind.open_id,user_bind.phone,
+        SELECT user_bind.id,user_bind.open_id,user_bind.phone,
         user_bind.subscribe_time,user_bind.head_img,
         user_bind.push_count,user_bind.name,
-        user_bind.sex,tag.id tagId,tag.name tagName
+        user_bind.sex,tag.id tagId,tag.name tagName,
+        user_tag.id userTagId
         FROM user_bind
         LEFT JOIN user_tag ON user_bind.id = user_tag.bind_user_id
         LEFT JOIN tag ON user_tag.tag_id = tag.id
@@ -58,4 +63,48 @@
         </where>
     </select>
 
+
+    <select id="selectReceivableUsers" resultType="com.originit.union.entity.UserBindEntity" >
+        SELECT user_bind.open_id,user_bind.name,user_bind.phone,user_bind.head_img
+        FROM user_bind
+        LEFT JOIN user_tag on user_bind.id = user_tag.bind_user_id
+        LEFT JOIN user_agent on user_agent.user_phone = user_bind.phone
+        LEFT JOIN chat_user ON user_bind.open_id = chat_user.open_id
+        <where>
+            <!--该用户没有被其他经理接受-->
+            chat_user.chat_user_id is null
+            AND user_bind.gmt_last_use is not null
+            <!-- 上次使用是在两天内 -->
+            AND DATE_ADD(user_bind.gmt_last_use,INTERVAL 2 DAY) &gt; NOW()
+            <if test="query != null">
+                <!--TODO 使用了like,可能需要优化-->
+                <if test="query.searchKey != null and query.searchKey != ''">
+                    AND (user_bind.name like '%${query.searchKey}%'
+                    OR user_bind.phone like '%${query.searchKey}%')
+                </if>
+                <!--查询的是属于该经理的用户，所属关系有user_agent表示-->
+                <if test="query.agentId != null">
+                    AND user_agent.agent = #{query.agentId}
+                </if>
+                <if test="query.tagId != null and query.tagId != -1">
+                    AND user_tag.tag_id = #{query.tagId}
+                </if>
+            </if>
+        </where>
+        ORDER BY user_bind.gmt_last_use DESC
+    </select>
+
+    <select id="selectCanReceive" resultType="boolean">
+      SELECT COUNT(*) FROM user_bind LEFT JOIN chat_user_agent
+                                   ON user_bind.open_id=chat_user_agent.open_id
+        <where>
+            <!-- 查找指定用户 -->
+            user_bind.open_id = #{openId}
+            <!-- 该用户没有被接受 -->
+            AND chat_user_agent.chat_user_agent_id is null
+            AND user_bind.gmt_last_use is not null
+            <!-- 上次使用是在两天内 -->
+            AND DATE_ADD(user_bind.gmt_last_use,INTERVAL 2 DAY) &gt; NOW()
+        </where>
+    </select>
 </mapper>

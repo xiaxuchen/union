@@ -28,4 +28,14 @@
         </where>
         ORDER BY chat_user.chat_user_id DESC
     </select>
+
+    <select id="selectTimeoutUserId" resultType="map">
+        SELECT chat_user.open_id openId,chat_user.chat_user_id chatUserId from chat_user
+          LEFT JOIN chat_user_agent
+                ON chat_user.open_id = chat_user_agent.open_id
+        <!-- 没人接入的同时超时 -->
+        WHERE chat_user_agent_id is null
+        AND chat_user.state = 0
+          AND DATE_ADD(chat_user.gmt_create,INTERVAL #{timeout} SECOND) &lt; now()
+    </select>
 </mapper>
