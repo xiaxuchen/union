@@ -12,15 +12,21 @@ import java.io.PrintWriter;
 
 @Interceptor
 public class PrintInterceptor implements WXInterceptor {
+
+    @Override
+    public int order() {
+        return Integer.MAX_VALUE;
+    }
+
     @Override
     public int intercept(HttpServletRequest request, HttpServletResponse response) {
         return SHARED_OTHER;
     }
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WxXmlMessage wxXmlMessage = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
+    public void handle(HttpServletRequest request, HttpServletResponse response,WxXmlMessage wxXmlMessage) throws IOException, InterruptedException {
         System.out.println(wxXmlMessage);
+        Thread.sleep(100);
         Object prevent = request.getAttribute(WeChatConstant.PREVENT_DEFAULT_OUT);
         if (prevent == null) {
             PrintWriter writer = response.getWriter();

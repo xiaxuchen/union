@@ -28,6 +28,11 @@ public class PushResultInterceptor implements WXInterceptor{
     }
 
     @Override
+    public int order() {
+        return -1;
+    }
+
+    @Override
     public int intercept(HttpServletRequest request, HttpServletResponse response) throws Exception {
         WxXmlMessage message = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
         if (message.getMsgType().equals(WxConsts.XML_MSG_EVENT) && message.getEvent().equals(WxConsts.EVT_MASS_SEND_JOB_FINISH)) {
@@ -38,8 +43,7 @@ public class PushResultInterceptor implements WXInterceptor{
 
     @Override
     @Async
-    public void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        WxXmlMessage message = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
+    public void handle(HttpServletRequest request, HttpServletResponse response,WxXmlMessage message) throws Exception {
         // 更新推送消息
         pushService.update(new UpdateWrapper<PushInfoEntity>().lambda()
                 .set(PushInfoEntity::getSendCount,message.getSentCount())
@@ -48,4 +52,5 @@ public class PushResultInterceptor implements WXInterceptor{
                 .set(PushInfoEntity::getGmtModified, DateUtil.toLocalDateTime(message.getCreateTime()))
                 .eq(PushInfoEntity::getPushId,message.getMsgId()));
     }
+
 }

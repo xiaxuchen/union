@@ -40,6 +40,23 @@ public interface WeChatUserConverter {
     UserInfoVO to (UserInfo user);
 
     /**
+     * 将openId返回，而不是userId
+     * @param user
+     * @return
+     */
+    @Mappings({
+            @Mapping(target = "sex",expression = "java(WeChatUserConverter.convertSex(user.getSex()))"),
+            @Mapping(source = "openId",target = "id"),
+            @Mapping(source = "headImg",target = "headImg"),
+            @Mapping(source = "name",target = "name"),
+            @Mapping(source = "phone",target = "phone"),
+            @Mapping(source = "pushCount",target = "pushCount"),
+            @Mapping(target = "subscribeTime",expression = "java(DateUtil.toTimeMillions(user.getSubscribeTime()))"),
+            @Mapping(source = "tags",target = "tags")
+    })
+    UserInfoVO toPushUser (UserInfo user);
+
+    /**
      * 转换性别
      * @param sex
      * @return

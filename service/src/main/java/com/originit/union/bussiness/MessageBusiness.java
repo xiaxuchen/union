@@ -1,6 +1,7 @@
 package com.originit.union.bussiness;
 
 import com.originit.common.exceptions.RemoteAccessException;
+import com.originit.union.bussiness.protocol.WxOpenIdSender;
 import com.originit.union.entity.dto.PushInfoDto;
 import com.soecode.wxtools.api.IService;
 import com.soecode.wxtools.api.WxConsts;
@@ -11,13 +12,18 @@ import com.soecode.wxtools.bean.WxQrcode;
 import com.soecode.wxtools.bean.result.QrCodeResult;
 import com.soecode.wxtools.bean.result.SenderResult;
 import com.soecode.wxtools.exception.WxErrorException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.io.IOException;
+import java.util.UUID;
+
 @Component
+@Slf4j
 public class MessageBusiness {
 
     private IService wxService;
@@ -109,16 +115,25 @@ public class MessageBusiness {
      * @return 推送的id
      */
     public Long pushMessage (PushInfoDto pushInfo) {
+        log.info("push start {}",pushInfo);
         String msgType = getMsgType(pushInfo.getType());
-        WxOpenidSender sender = new WxOpenidSender();
+        WxOpenIdSender sender = new WxOpenIdSender();
         sender.setTouser(pushInfo.getUsers());
         sender.setMsgtype(msgType);
+        sender.setClientmsgid(UUID.randomUUID().toString().replace("-",""));
+        try {
+            log.error(sender.toJson());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         prepareSender(msgType,pushInfo.getContent(),sender);
         //群发文本内容
         try {
             SenderResult result = wxService.sendAllByOpenid(sender);
+            log.info("推送成功：{}",result.getMsg_id());
             return result.getMsg_id();
         } catch (WxErrorException e) {
+            log.info("推送失败");
             throw new RemoteAccessException("推送发送失败",e);
         }
     }

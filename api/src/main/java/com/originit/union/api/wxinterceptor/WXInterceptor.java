@@ -1,7 +1,9 @@
 package com.originit.union.api.wxinterceptor;
 
+import com.originit.common.util.SpringUtil;
 import com.originit.union.constant.WeChatConstant;
 import com.soecode.wxtools.bean.WxXmlMessage;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.scheduling.annotation.Async;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +17,7 @@ public interface WXInterceptor {
      */
     int FORRBIDE_OTHER = -1;
     /**
-     * 和其他共享
+     * 和其他共享，值越大越在后面执行
      */
     int SHARED_OTHER = 1;
     /**
@@ -23,6 +25,13 @@ public interface WXInterceptor {
      */
     int NOT_INTEREST = 0;
 
+    /**
+     * 执行顺序，越小越靠前
+     * @return
+     */
+    default int order () {
+        return 0;
+    }
     /**
      * 是否对请求进行拦截
      * @param request 请求
@@ -32,9 +41,9 @@ public interface WXInterceptor {
     int intercept(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /**
-     * 处理请求
+     * 处理请求,如果要使用异步同时又要使用request、response需要异常小心，因为可能这两个对象的使用没有结束对象就关闭了
      */
-    void handle(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    void handle(HttpServletRequest request, HttpServletResponse response, WxXmlMessage message) throws Exception;
 
     /**
      * 获取消息
@@ -44,4 +53,6 @@ public interface WXInterceptor {
     default WxXmlMessage getMessage(HttpServletRequest request) {
         return (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
     }
+
+
 }

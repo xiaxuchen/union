@@ -51,8 +51,7 @@ public class PreviewQRCodeInterceptor implements WXInterceptor {
 
     @Override
     @Async
-    public void handle(HttpServletRequest request, HttpServletResponse response) {
-        WxXmlMessage wxXmlMessage = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
+    public void handle(HttpServletRequest request, HttpServletResponse response,WxXmlMessage wxXmlMessage) {
         String eventKey = wxXmlMessage.getEventKey();
         String id = EventUtil.getEventKeyParams(eventKey).get("id");
         final PreviewState previewState = (PreviewState) redisCacheProvider.hget(EVENT_KEY, id);

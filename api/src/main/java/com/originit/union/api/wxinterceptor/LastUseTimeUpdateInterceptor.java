@@ -42,8 +42,7 @@ public class LastUseTimeUpdateInterceptor implements WXInterceptor {
 
     @Override
     @Async
-    public void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        WxXmlMessage message = (WxXmlMessage) request.getAttribute(WeChatConstant.ATTR_WEB_XML_MESSAGE);
+    public void handle(HttpServletRequest request, HttpServletResponse response,WxXmlMessage message) throws Exception {
         if (WxConsts.EVT_SUBSCRIBE.equals(message.getEvent())) {
             // 如果是订阅消息,就先导入用户
             weChatUserService.importUser(message.getFromUserName());

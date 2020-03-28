@@ -39,8 +39,7 @@ public class ChatInterceptor implements WXInterceptor {
 
     @Override
     @Async
-    public void handle(HttpServletRequest request, HttpServletResponse response) {
-        WxXmlMessage message = getMessage(request);
+    public void handle(HttpServletRequest request, HttpServletResponse response, WxXmlMessage message) {
         // 添加图片类型的消息处理
         Integer msgType;
         String content;

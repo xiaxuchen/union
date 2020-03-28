@@ -8,10 +8,15 @@ import com.originit.common.enums.ResultCode;
 public class ChatUserOfflineException extends ChatException {
 
     public ChatUserOfflineException() {
-        super(ResultCode.CHAT_USER_IS_OFFLINE);
+        super();
     }
 
     public ChatUserOfflineException(String message) {
         super(message);
+    }
+
+    @Override
+    public ResultCode defaultResultCode() {
+        return ResultCode.CHAT_USER_IS_OFFLINE;
     }
 }

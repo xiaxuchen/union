@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
@@ -57,10 +58,17 @@ public class MvcConfig implements WebMvcConfigurer {
         converters.add(converter);
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+    }
+
     @Bean
     public ConfigurableServletWebServerFactory webServerFactory () {
         final TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory();
         HashSet<ErrorPage> set = new HashSet<>();
+        ErrorPage error401Page=new ErrorPage(HttpStatus.UNAUTHORIZED,"/index.html");
+        set.add(error401Page);
         set.add(new ErrorPage(HttpStatus.NOT_FOUND,"/index.html"));
         tomcatServletWebServerFactory.setErrorPages(set);
         return tomcatServletWebServerFactory;

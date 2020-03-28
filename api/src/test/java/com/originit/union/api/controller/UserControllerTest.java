@@ -33,7 +33,7 @@ public class UserControllerTest {
     private MockHttpSession session;
 
     // 这里是模拟对象
-    @Mock
+    @Autowired
     private WeChatUserService userService;
 
     // 这里是将模拟的对象注入到spring中去
@@ -63,4 +63,13 @@ public class UserControllerTest {
     }
 
 
+    @Test
+    public void test1() {
+        userService.importUsers();
+        try {
+            Thread.sleep(100000000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

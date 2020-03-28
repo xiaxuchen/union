@@ -27,7 +27,6 @@ public class WeChatUserConverterTest {
                 .subscribeTime(LocalDateTime.now())
                 .phone("17779911413")
                 .sex(null)
-                .tags(tagEntities)
                 .headImg("jasjdjas")
                 .pushCount(100)
                 .build();

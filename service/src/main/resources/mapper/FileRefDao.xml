@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.originit.union.dao.FileRefDao">
+
+    <select id="getTimeoutList" resultType="com.originit.union.entity.FileRefEntity">
+        SELECT code,id FROM file_ref WHERE count=0
+        <!--超时-->
+        AND DATE_ADD(gmt_create,INTERVAL expire SECOND) &lt; NOW()
+    </select>
+
+    <update id="increCount">
+        UPDATE file_ref SET count = count + 1 WHERE code=#{code}
+    </update>
+
+    <update id="decreCount">
+        UPDATE file_ref SET count = count - 1 WHERE code=#{code}
+    </update>
+
+</mapper>

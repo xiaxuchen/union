@@ -1,5 +1,10 @@
 package com.originit.union.api.shiro;
 
+import com.originit.common.util.RedisCacheProvider;
+import com.originit.common.util.SpringUtil;
+import com.originit.union.api.shiro.config.ShiroConfig;
+import com.originit.union.api.util.ShiroUtils;
+import com.originit.union.entity.SysUserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.session.Session;
@@ -10,6 +15,8 @@ import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.apache.shiro.web.util.WebUtils;
+import org.crazycake.shiro.RedisSessionDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -34,8 +41,19 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
 
     private static final SimpleSession WECHAT_SESSION = new SimpleSession();
 
-    static {
+    private RedisCacheProvider provider;
+
+    @Autowired
+    public void setProvider(RedisCacheProvider provider) {
+        this.provider = provider;
+    }
+
+    public ShiroSessionManager (RedisSessionDAO redisSessionDAO) {
+        this();
+        setSessionDAO(redisSessionDAO);
         WECHAT_SESSION.setId(WECHAT_COMMON_SESSION_ID);
+        redisSessionDAO.update(WECHAT_SESSION);
+        log.info("保存微信端的公共session");
     }
 
     //重写构造器
@@ -103,6 +121,15 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
             if(session != null) {
                 servletContext.setAttribute(session.getId().toString(),session);
             }
+        }
+        if (session == null) {
+            return null;
+        }
+        final SysUserEntity userInfo = ShiroUtils.getUserInfo(session);
+        if (userInfo != null) {
+            final String userKey = ShiroUtils.generateUserKey(userInfo.getUserId());
+            provider.expire(userKey, ShiroConfig.EXPIRE);
+            log.info("刷新用户的session键(用户快速查找用户的session)");
         }
         return session;
     }

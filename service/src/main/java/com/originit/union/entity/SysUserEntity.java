@@ -62,12 +62,6 @@ public class SysUserEntity implements Serializable {
 	private Integer state;
 
 	/**
-	 * 是否已删除
-	 */
-	@TableLogic
-	private Integer deleted;
-
-	/**
 	 * 创建时间
 	 */
 	private LocalDateTime gmtCreate;

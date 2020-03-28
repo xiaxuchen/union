@@ -1,5 +1,6 @@
 package com.originit.union.api.runner;
 
+import com.originit.union.api.quartz.ClearFileTimer;
 import com.originit.union.api.quartz.ClearWaitTimeoutTimer;
 import com.originit.union.api.quartz.UserImportTimer;
 import lombok.Data;
@@ -34,8 +35,9 @@ public class TimerRunner implements ApplicationRunner {
     }
     @Override
     public void run(ApplicationArguments args) throws Exception {
-       startImportTime();
+       startImportTimer();
        startClearWaitTimeoutTimer();
+       startClearFileTimer();
     }
 
     private void startClearWaitTimeoutTimer () throws SchedulerException {
@@ -57,7 +59,7 @@ public class TimerRunner implements ApplicationRunner {
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    private void startImportTime () throws SchedulerException {
+    private void startImportTimer() throws SchedulerException {
         log.info("start import user task");
         //任务名称
         String name = UUID.randomUUID().toString();
@@ -66,8 +68,23 @@ public class TimerRunner implements ApplicationRunner {
         //创建任务
         JobDetail jobDetail = JobBuilder.newJob(UserImportTimer.class).withIdentity(name,group).build();
         //创建任务触发器,指定每天凌晨一点执行任务
-        Trigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger2","group2")
+        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(name,group)
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 ? * *")).build();
+        //将触发器与任务绑定到调度器内
+        scheduler.scheduleJob(jobDetail, trigger);
+    }
+
+    private void startClearFileTimer () throws SchedulerException {
+        log.info("start clear file task");
+        //任务名称
+        String name = UUID.randomUUID().toString();
+        //任务所属分组
+        String group = ClearFileTimer.class.getName();
+        //创建任务
+        JobDetail jobDetail = JobBuilder.newJob(ClearFileTimer.class).withIdentity(name,group).build();
+        //创建任务触发器,指定每天凌晨两点执行任务
+        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(name,group)
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 2 ? * *")).build();
         //将触发器与任务绑定到调度器内
         scheduler.scheduleJob(jobDetail, trigger);
     }

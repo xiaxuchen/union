@@ -2,6 +2,7 @@ package com.originit.union.api.controller;
 
 import com.originit.common.config.RedisConfig;
 import com.originit.common.exceptions.ParameterInvalidException;
+import com.originit.common.exceptions.UserNotLoginException;
 import com.originit.common.page.Pager;
 import com.originit.common.util.POIUtil;
 import com.originit.common.util.RedisCacheProvider;
@@ -17,7 +18,9 @@ import com.originit.union.entity.vo.LoginUserVO;
 import com.originit.union.entity.vo.RoleVO;
 import com.originit.union.entity.vo.SysUserVO;
 import com.originit.union.entity.vo.UserInfoVO;
+import com.originit.union.exception.file.FileException;
 import com.originit.union.service.*;
+import com.originit.union.util.ExcelParseUtil;
 import com.xxc.response.anotation.ResponseResult;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -32,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -178,8 +182,10 @@ public class UserController {
 
     @PutMapping
     public void updateSysUser (@RequestBody SysUserUpdateDto sysUserDto) {
-        String salt = ByteSource.Util.bytes(sysUserDto.getUsername()).toString();
+        // 如果需要修改密码，则设置加密的盐
         if (sysUserDto.getPassword() != null) {
+            // 设置用户名为加密的盐
+            String salt = ByteSource.Util.bytes(sysUserDto.getUsername()).toString();
             sysUserDto.setSalt(salt);
             sysUserDto.setPassword(SHA256Util.sha256(sysUserDto.getPassword(),salt));
         }
@@ -224,21 +230,19 @@ public class UserController {
      * 导入经理和用户的绑定关系
      * @param file excel文件
      * @param mode 模式，0为覆盖写，1为正常写，如果已经在其他经理下，就提示
+     * @return 返回覆盖或忽略的用户openId
      */
     @PostMapping("/belong")
-    public List<String> importBindUser (MultipartFile file,@RequestParam Long agentId, @RequestParam(required = false) Integer mode) throws IOException {
-        List<String> phones = POIUtil.customQuery(file.getInputStream(),file.getOriginalFilename(), workbook -> {
-            List<String> list = new ArrayList<>();
-            Sheet sheet = workbook.getSheetAt(0);
-            // 从第二行开始
-            for (int row = 1; row <= sheet.getLastRowNum(); row++) {
-                Row rowObj = sheet.getRow(row);
-                for (int col = 0; col < 1; col++) {
-                    list.add(POIUtil.getCellValue(rowObj.getCell(col)));
-                }
-            }
-            return list;
-        });
+    public List<String> importBindUser (MultipartFile file,@RequestParam Long agentId, @RequestParam(required = false) Integer mode) {
+        final InputStream inputStream;
+        try {
+            inputStream = file.getInputStream();
+        } catch (IOException e) {
+            throw new FileException("上传的文件异常");
+        }
+        // 1. 解析电话号码
+        List<String> phones = ExcelParseUtil.parsePhoneTemplate(inputStream,file.getOriginalFilename());
+        // 2. 根据不同的模式去选择是覆盖写还是忽略写
         if (mode != null && mode.equals(0)) {
             return userAgentService.addRelationClearOld(agentId,phones);
         } else  {

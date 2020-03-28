@@ -3,6 +3,8 @@ package com.originit.common.util;
 import com.originit.common.exceptions.InternalServerException;
 import lombok.val;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,9 @@ import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -149,9 +153,9 @@ public class FileUDUtil {
      * 上传文件
      * @param inputStream 文件的输入流
      * @param filename 文件名
-     * @return 文件的路径
+     * @return 文件的编码
      */
-    public static String uploadFile(InputStream inputStream,String filename) {
+    public static String saveFile(InputStream inputStream, String filename) {
         try {
             String path = getPath(filename);
             mkdirIfNotExist(path);
@@ -174,5 +178,27 @@ public class FileUDUtil {
         if (!file.exists()) {
             file.mkdirs();
         }
+    }
+
+    public static Logger logger = LoggerFactory.getLogger(FileUDUtil.class);
+    /**
+     * 获取文件的系统url
+     * @param code 编码code
+     * @return
+     */
+    public static String getSystemURL (String code) {
+        if (code == null) {
+            return null;
+        }
+        try {
+            final String hostAddress = InetAddress.getLocalHost().getHostAddress();
+            String url = "http://" + hostAddress + "/union" + "/resource/file/" + code;
+            logger.warn("the ip is {}",url);
+            return url;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            logger.error("the ip is null,error {}",ExceptionUtil.buildErrorMessage(e));
+        }
+        return null;
     }
 }

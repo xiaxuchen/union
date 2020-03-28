@@ -12,10 +12,6 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisSessionDAO;
-import org.springframework.http.server.ServletServerHttpRequest;
-
-import java.util.Collection;
-import java.util.Objects;
 
 /**
  * @Description Shiro工具类

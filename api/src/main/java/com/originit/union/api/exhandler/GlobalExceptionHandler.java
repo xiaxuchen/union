@@ -32,6 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = RemoteAccessException.class)
     public PlatformResult remoteAccessExceptionHandler (RemoteAccessException exception) {
+        log.warn("{},Exception {} find, message is {}, code is ",getRequesterInfo(),exception.getClass().getName(),exception.getMessage(),exception.getCode());
         return new PlatformResult<Object>(false,exception.getCode(), exception.getMessage(), exception.getData());
     }
 

@@ -1,18 +1,13 @@
 package com.originit.union.api.controller;
 
-import com.google.common.primitives.Bytes;
-import com.mchange.lang.ByteUtils;
 import com.originit.common.exceptions.DataNotFoundException;
 import com.originit.common.exceptions.ParameterInvalidException;
 import com.originit.common.util.FileUDUtil;
 import com.originit.union.api.annotation.Anon;
+import com.originit.union.service.FileService;
 import com.xxc.response.anotation.OriginResponse;
 import com.xxc.response.anotation.ResponseResult;
-import org.apache.commons.io.FileUtils;
-import org.apache.coyote.http2.ByteUtil;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +28,13 @@ public class ResourceController {
 
     private static final Map<String,String> templateMap;
 
+    private FileService fileService;
+
+    @Autowired
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
+    }
+
     static {
         templateMap = new HashMap<>();
         templateMap.put("phone", "/phone_template.xls");
@@ -40,14 +42,14 @@ public class ResourceController {
     }
 
     /**
-     * 上传图片返回图片的key和url
+     * 上传图片返回图片编码
      * @param file 图片文件
-     * @return 图片的信息
+     * @return 图片的编码
      */
     @PostMapping("/file")
     public String uploadFile (MultipartFile file) {
         try {
-            return FileUDUtil.uploadFile(file.getInputStream(), file.getOriginalFilename());
+            return fileService.saveFile(file.getInputStream(), file.getOriginalFilename());
         } catch (IOException e) {
             e.printStackTrace();
             throw new ParameterInvalidException("文件上传异常");

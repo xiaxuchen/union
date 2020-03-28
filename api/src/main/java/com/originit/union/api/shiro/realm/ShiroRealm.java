@@ -106,7 +106,7 @@ public class ShiroRealm extends AuthorizingRealm {
         if (user == null) {
             throw new UserException(ResultCode.USER_NOT_EXIST);
         }
-        //判断账号是否被冻结
+        // TODO 测试 判断账号是否被冻结
         if (user.getState()==null || SysUserEntity.FORBID == user.getState()){
             throw new UserException(ResultCode.USER_ACCOUNT_FORBIDDEN);
         }

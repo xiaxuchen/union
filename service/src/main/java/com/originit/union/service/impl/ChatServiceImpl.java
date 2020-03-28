@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.originit.common.exceptions.DataConflictException;
 import com.originit.common.exceptions.DataNotFoundException;
 import com.originit.common.page.Pager;
+import com.originit.common.util.FileUDUtil;
 import com.originit.common.util.SpringUtil;
 import com.originit.union.bussiness.ClientServeBusiness;
+import com.originit.union.bussiness.UserBusiness;
 import com.originit.union.constant.ChatConstant;
 import com.originit.union.constant.WeChatConstant;
 import com.originit.union.dao.*;
@@ -61,7 +63,6 @@ public class ChatServiceImpl implements ChatService {
     private ClientServeBusiness clientServeBusiness;
 
     private UserDao userDao;
-
 
 
     @Override
@@ -231,7 +232,7 @@ public class ChatServiceImpl implements ChatService {
                 .build());
         // 3. 发送接入通知给聊天用户
         AgentIntroduceVO agentInfo = agentInfoDao.selectAgentInfo (id);
-        clientServeBusiness.sendAgentIntroduce(openId,agentInfo.getName(),agentInfo.getDes(),agentInfo.getHeadImg());
+        clientServeBusiness.sendAgentIntroduce(openId,agentInfo.getName(),agentInfo.getDes(), FileUDUtil.getSystemURL(agentInfo.getHeadImg()));
         // 4. 通知所有的经理该用户已被接受，同时更新当前的数量
         messagingTemplate.convertAndSend(ChatConstant.WS_USER_RECEIVED,DataUtil.mapBuilder()
                 .append("count",getWaitingUserCount())
@@ -430,6 +431,8 @@ public class ChatServiceImpl implements ChatService {
         messageDao.delete(new QueryWrapper<MessageEntity>().lambda().eq(MessageEntity::getState,MessageEntity.STATE.WAIT).in(MessageEntity::getOpenId,openIds));
         // 在聊天列表中删除这些超时的用户
         chatUserDao.deleteBatchIds(chatUserIds);
+        // 发送清除的消息给用户
+        clientServeBusiness.sendClearMessage(openIds);
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.originit.common.exceptions.BusinessException;
 public class ChatException extends BusinessException {
 
     public ChatException() {
-        super(ResultCode.CHAT_ERROR);
+        super();
     }
 
     public ChatException(String message) {
@@ -26,5 +26,10 @@ public class ChatException extends BusinessException {
 
     public ChatException(ResultCode resultCode) {
         super(resultCode);
+    }
+
+    @Override
+    public ResultCode defaultResultCode() {
+        return ResultCode.CHAT_ERROR;
     }
 }

@@ -97,7 +97,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
     @Override
     public Pager<UserInfoVO> getUserInfoList(String searchKey, List<Integer> tagList, int curPage, int pageSize) {
         // 获取用户openId、标签并转换
-        return PagerUtil.fromIPage(baseMapper.searchUsers(new Page<>(curPage, pageSize), searchKey, tagList), WeChatUserConverter.INSTANCE::to);
+        return PagerUtil.fromIPage(baseMapper.searchUsers(new Page<>(curPage, pageSize), searchKey, tagList), WeChatUserConverter.INSTANCE::toPushUser);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserBindEntity> implem
             throw new IllegalArgumentException("电话列表不能为空");
         }
         return baseMapper.selectUserByPhones(phones)
-                .stream().map(WeChatUserConverter.INSTANCE::to).collect(Collectors.toList());
+                .stream().map(WeChatUserConverter.INSTANCE::toPushUser).collect(Collectors.toList());
     }
 
     @Override

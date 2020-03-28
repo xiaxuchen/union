@@ -23,19 +23,30 @@ public class BusinessException extends RuntimeException {
 
     protected Object data;
 
-    public BusinessException() {
-        BusinessExceptionEnum exceptionEnum = BusinessExceptionEnum.getByEClass(this.getClass());
-        if (exceptionEnum != null) {
-            resultCode = exceptionEnum.getResultCode();
-            code = exceptionEnum.getResultCode().code();
-            message = exceptionEnum.getResultCode().message();
-        }
+    protected Throwable throwable;
 
+    public BusinessException() {
+        final ResultCode resultCode = defaultResultCode();
+        if (resultCode != null) {
+            this.resultCode = resultCode;
+            code = resultCode.code();
+            message = resultCode.message();
+        }
     }
 
     public BusinessException(String message) {
         this();
         this.message = message;
+    }
+
+    public BusinessException(Throwable cause) {
+        this();
+        this.throwable = cause;
+    }
+
+    public BusinessException(Throwable cause,String message) {
+        this(message);
+        this.throwable = cause;
     }
 
     public BusinessException(String format, Object... objects) {
@@ -54,4 +65,15 @@ public class BusinessException extends RuntimeException {
         this.message = resultCode.message();
     }
 
+    /**
+     * 获取默认的resultCode
+     * @return
+     */
+    public ResultCode defaultResultCode () {
+        BusinessExceptionEnum exceptionEnum = BusinessExceptionEnum.getByEClass(this.getClass());
+        if (exceptionEnum != null) {
+            return exceptionEnum.getResultCode();
+        }
+        return null;
+    }
 }

@@ -43,7 +43,7 @@ public class ShiroConfig {
     private final String CACHE_KEY = "shiro:cache:";
     private final String SESSION_KEY = "shiro:session:";
     // session存在8个小时
-    public static final int EXPIRE = 8 * 60 *  1000;
+    public static final int EXPIRE = 1800;
 
     /**
      * redis配置
@@ -75,9 +75,9 @@ public class ShiroConfig {
      * @CreateTime 2019/6/12 8:42
      */
     @Bean
-    public ShiroFilterFactoryBean shiroFilterFactory(SecurityManager securityManager){
+    public ShiroFilterFactoryBean shiroFilterFactory(){
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-        shiroFilterFactoryBean.setSecurityManager(securityManager);
+        shiroFilterFactoryBean.setSecurityManager(securityManager());
         Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
         // 注意这里不要用Bean的方式，否则会报错
         filters.put("authc", new ShiroUserFilter());
@@ -90,7 +90,6 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/sysuser/login", "anon");
         filterChainDefinitionMap.put("/sysuser/permit","anon");
         filterChainDefinitionMap.put("/core/**","anon");
-        filterChainDefinitionMap.put("/test/**","anon");
         filterChainDefinitionMap.put("/resource/file/**","anon");
         // 聊天的websocket忽略
         filterChainDefinitionMap.put("/chat/**","anon");
@@ -105,10 +104,10 @@ public class ShiroConfig {
      * @CreateTime 2019/6/12 10:34
      */
     @Bean
-    public SecurityManager securityManager(SessionManager sessionManager) {
+    public SecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         // 自定义Ssession管理
-        securityManager.setSessionManager(sessionManager);
+        securityManager.setSessionManager(sessionManager());
         // 自定义Cache实现
         securityManager.setCacheManager(cacheManager());
         // 自定义Realm验证
@@ -195,7 +194,7 @@ public class ShiroConfig {
      * @CreateTime 2019/6/12 13:44
      */
     @Bean
-    public RedisSessionDAO redisSessionDAO(RedisCacheProvider redisCacheProvider) {
+    public RedisSessionDAO redisSessionDAO() {
         RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
         redisSessionDAO.setRedisManager(redisManager());
         redisSessionDAO.setSessionIdGenerator(sessionIdGenerator());
@@ -210,11 +209,10 @@ public class ShiroConfig {
      * @CreateTime 2019/6/12 14:25
      */
     @Bean
-    public SessionManager sessionManager(RedisSessionDAO redisSessionDAO) {
-        ShiroSessionManager shiroSessionManager = new ShiroSessionManager();
-        shiroSessionManager.setSessionDAO(redisSessionDAO);
+    public ShiroSessionManager sessionManager() {
+        ShiroSessionManager shiroSessionManager = new ShiroSessionManager(redisSessionDAO());
         shiroSessionManager.setSessionValidationSchedulerEnabled(true);
-        shiroSessionManager.setGlobalSessionTimeout(timeout);
+        shiroSessionManager.setGlobalSessionTimeout(EXPIRE * 1000);
         shiroSessionManager.setDeleteInvalidSessions(true);
         return shiroSessionManager;
     }

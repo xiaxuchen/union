@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author xxc、
@@ -144,5 +145,15 @@ public class ClientServeBusiness {
      */
     public void sendExitMessage(String openId) {
         this.sendTextMessage(openId,"服务已结束，谢谢您的使用");
+    }
+
+    /**
+     * 发送清除的消息
+     * @param openIds
+     */
+    public void sendClearMessage(List<String> openIds) {
+        for (String openId : openIds) {
+            this.sendTextMessage(openId, "客服正忙，请稍后重试");
+        }
     }
 }

@@ -14,12 +14,14 @@ import com.originit.union.dao.PushUserDao;
 import com.originit.union.dao.UserDao;
 import com.originit.union.service.PushService;
 import com.originit.union.service.RedisService;
+import com.originit.union.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -68,6 +70,12 @@ public class PushInfoServiceImpl extends ServiceImpl<PushInfoDao, PushInfoEntity
     @Override
     @Transactional(readOnly = true)
     public IndexStatisticVO getPushStatistic(String start, String end) {
+        // 如果没有指定日期。就获取前十天的
+        if (start == null && end == null) {
+            final LocalDateTime now = LocalDateTime.now();
+            end = DateUtil.toDateStr(now);
+            start = DateUtil.toDateStr(now.minusDays(10));
+        }
         return IndexStatisticVO.builder()
                 .chartData(baseMapper.selectChartData(start,end))
                 .build();

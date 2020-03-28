@@ -5,7 +5,7 @@ import com.originit.common.enums.ResultCode;
 public class ChatUserAlreadyReceiveException extends ChatException {
 
     public ChatUserAlreadyReceiveException() {
-        super(ResultCode.CHAT_USER_IS_ALREADY_RECEIVED);
+        super();
     }
 
     public ChatUserAlreadyReceiveException(String message) {
@@ -22,5 +22,10 @@ public class ChatUserAlreadyReceiveException extends ChatException {
 
     public ChatUserAlreadyReceiveException(ResultCode resultCode) {
         super(resultCode);
+    }
+
+    @Override
+    public ResultCode defaultResultCode() {
+        return ResultCode.CHAT_USER_IS_ALREADY_RECEIVED;
     }
 }

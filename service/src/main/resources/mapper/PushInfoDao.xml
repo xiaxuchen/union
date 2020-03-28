@@ -7,10 +7,10 @@
         SELECT SUM(count) FROM push_info
         <where>
             <if test="start != null">
-                date_format(gmt_create, '%Y-%m-%d') &gt;  #{start}
+                gmt_create &gt;  STR_TO_DATE(#{start}, '%Y-%m-%d')
             </if>
             <if test="end != null">
-                AND date_format(gmt_create, '%Y-%m-%d') &lt; #{end}
+                AND date_format(gmt_create, '%Y-%m-%d') &lt; STR_TO_DATE(#{end}, '%Y-%m-%d')
             </if>
         </where>
     </select>
@@ -19,10 +19,10 @@
         SELECT SUM(send_count) FROM push_info
         <where>
             <if test="start != null">
-                DATE_FORMAT(gmt_create, '%Y-%m-%d') &gt;  #{start}
+                gmt_create &gt;  STR_TO_DATE(#{start}, '%Y-%m-%d')
             </if>
             <if test="end != null">
-                AND DATE_FORMAT(gmt_create, '%Y-%m-%d') &lt; #{end}
+                gmt_create &lt; STR_TO_DATE(#{end}, '%Y-%m-%d')
             </if>
             AND state = 1
         </where>
@@ -36,14 +36,13 @@
         SELECT  DATE_FORMAT(gmt_create,'%Y-%m-%d') date,SUM(count) allCount,SUM(send_count) receiveUserCount FROM push_info
         <where>
             <if test="start != null">
-                AND date_format(gmt_create, '%Y-%m-%d') &gt;  #{start}
+                AND gmt_create &gt;  STR_TO_DATE(#{start}, '%Y-%m-%d')
             </if>
             <if test="end != null">
-                AND date_format(gmt_create, '%Y-%m-%d') &lt; #{end}
+                AND gmt_create &lt; STR_TO_DATE(#{end}, '%Y-%m-%d')
             </if>
             AND status = 1
-            AND DATE(gmt_create) in
-            (SELECT DATE(gmt_create) FROM  push_info group by DATE(gmt_create),count,send_count)
+            group by DATE(gmt_create)
         </where>
     </select>
 

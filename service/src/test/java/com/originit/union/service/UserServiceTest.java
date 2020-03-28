@@ -91,7 +91,6 @@ public class UserServiceTest {
 
     @Test
     public void getUserInfoList() {
-        System.out.println(userService.getUserInfoList(Arrays.asList(), Arrays.asList(1), 0, 2));
     }
 
     @Test

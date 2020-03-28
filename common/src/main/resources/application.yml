@@ -1,5 +1,7 @@
 server:
   port: 80
+  servlet:
+    context-path: /union
 
 spring:
   # @ResponseBody返回的json字符集校正
@@ -109,6 +111,7 @@ spring:
         # 配置消息投递速率
         concurrency: 5
         prefetch: 5 #限制每次发送接受5条数据。
+
 
 
 # mybatis-plus相关配置

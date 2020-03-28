@@ -108,8 +108,17 @@ public class CoreController {
                     default:{}
                 }
             }
+            handleInterceptors.sort((o1, o2) -> {
+                if (o1.order() > o2.order()) {
+                    return 1;
+                } else if (o1.order() == o2.order()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            });
             for (WXInterceptor handleInterceptor : handleInterceptors) {
-                handleInterceptor.handle(request,response);
+                handleInterceptor.handle(request,response,wxXmlMessage);
             }
         } catch (Exception e) {
             e.printStackTrace();

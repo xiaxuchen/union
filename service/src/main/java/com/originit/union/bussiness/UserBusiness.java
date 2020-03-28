@@ -89,7 +89,6 @@ public class UserBusiness {
                 userInfoVO.setPhone(origin.getPhone());
                 userInfoVO.setId(origin.getId());
                 if (wxUser.getSubscribe_time() != null) {
-                    // TODO 微信传递过来的是秒
                     userInfoVO.setSubscribeTime(Long.parseLong(wxUser.getSubscribe_time()) * 1000);
                 }
                 // 更新填充后的实体
@@ -127,6 +126,7 @@ public class UserBusiness {
      * 批量获取所有的用户信息
      */
     public void batchGetAllUser(Consumer<List<UserBindEntity>> consumer) {
+        log.info("开始批量获取");
         List<String> userOpenIds = getAllUserOpenIds();
         List<UserBindEntity> users = new ArrayList<>(HANDLE_SIZE);
         // 子列表的开始位置
