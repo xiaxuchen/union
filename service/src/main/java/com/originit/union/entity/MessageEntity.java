@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 @TableName("message")
 public class MessageEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     public interface TYPE{
         int TEXT = 0;
         int IMAGE = 1;

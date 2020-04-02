@@ -1,6 +1,6 @@
 package com.originit.union.exception.user;
 
-import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.enums.ResultCode;
 import com.originit.common.exceptions.BusinessException;
 
 public class UserException extends BusinessException {

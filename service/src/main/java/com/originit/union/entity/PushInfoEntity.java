@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 @TableName("push_info")
 public class PushInfoEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     public interface STATUS {
         // 发送中
         Integer SENDIND = 0;

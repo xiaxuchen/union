@@ -99,6 +99,10 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
             if (tagUserAddDto.getPhone() != null && tagUserAddDto.getPhone().trim() != "") {
                 userQw.eq(UserBindEntity::getPhone,tagUserAddDto.getPhone());
             }
+            // 如果编号不为空就需要匹配
+            if (tagUserAddDto.getId() != null) {
+                userQw.eq(UserBindEntity::getId,tagUserAddDto.getId());
+            }
             final UserBindEntity user = userDao.selectOne(userQw);
             if (user == null) {
                 // TODO 添加错误报告处理
@@ -122,6 +126,22 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
         }
         sqlSession.flushStatements();
         sqlSession.commit();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addTagOfUser(String openId, Long tagId) {
+        final UserBindEntity userBindEntity = userDao.selectOne(new QueryWrapper<UserBindEntity>().lambda().select(UserBindEntity::getId).
+                eq(UserBindEntity::getOpenId, openId));
+        if (userBindEntity == null) {
+            // TODO 改成特定的异常子类
+            throw new BusinessException("该用户不存在");
+        }
+        // 插入
+        UserTagEntity userTagEntity = new UserTagEntity();
+        userTagEntity.setTagId(tagId);
+        userTagEntity.setBindUserId(userBindEntity.getId());
+        userTagDao.insert(userTagEntity);
     }
 
     @Override

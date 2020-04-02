@@ -22,6 +22,7 @@ import com.originit.union.exception.file.FileException;
 import com.originit.union.service.*;
 import com.originit.union.util.ExcelParseUtil;
 import com.xxc.response.anotation.ResponseResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.shiro.SecurityUtils;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/sysuser")
 @ResponseResult
+@Slf4j
 public class UserController {
 
     public static final String TOKEN = "token";
@@ -137,8 +139,12 @@ public class UserController {
      */
     @PostMapping("/logout")
     public void logout () {
+        final SysUserEntity userInfo = ShiroUtils.getUserInfo();
         SecurityUtils.getSubject().logout();
-        ShiroUtils.deleteCache(ShiroUtils.getUserInfo().getUserId(),true);
+        if (userInfo != null) {
+            ShiroUtils.deleteCache(userInfo.getUserId(),true);
+        }
+        log.info("用户登出成功");
     }
 
     /**
@@ -267,5 +273,13 @@ public class UserController {
             pageSize = 10;
         }
         return userAgentService.pagerUserAgent(agentId,curPage,pageSize);
+    }
+
+    /**
+     * 用户未登录，用于shiro拦截的重定向，从而通知客户端，否则返回状态码500
+     */
+    @RequestMapping("/notLogin")
+    public void notLogin () {
+        throw new UserNotLoginException();
     }
 }

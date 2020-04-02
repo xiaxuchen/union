@@ -37,12 +37,11 @@ import java.util.Map;
  * @CreateTime 2019/6/10 17:42
  */
 @Configuration
-//@Profile("beta")
 public class ShiroConfig {
 
     private final String CACHE_KEY = "shiro:cache:";
     private final String SESSION_KEY = "shiro:session:";
-    // session存在8个小时
+    // session存在30分钟
     public static final int EXPIRE = 1800;
 
     /**
@@ -59,8 +58,6 @@ public class ShiroConfig {
     /**
      * 开启Shiro-aop注解支持
      * @Attention 使用代理方式所以需要开启代码支持
-     * @Author Sans
-     * @CreateTime 2019/6/12 8:38
      */
     @Bean
     public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
@@ -71,8 +68,6 @@ public class ShiroConfig {
 
     /**
      * Shiro基础配置
-     * @Author Sans
-     * @CreateTime 2019/6/12 8:42
      */
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactory(){
@@ -85,13 +80,13 @@ public class ShiroConfig {
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         // 注意过滤器配置顺序不能颠倒
         // 配置过滤:不会被拦截的链接
-        filterChainDefinitionMap.put("/static/**", "anon");
         filterChainDefinitionMap.put("/websocket/**","anon");
+        filterChainDefinitionMap.put("/union/**","anon");
         filterChainDefinitionMap.put("/sysuser/login", "anon");
         filterChainDefinitionMap.put("/sysuser/permit","anon");
         filterChainDefinitionMap.put("/core/**","anon");
-        filterChainDefinitionMap.put("/resource/file/**","anon");
-        // 聊天的websocket忽略
+        filterChainDefinitionMap.put("/resource/**","anon");
+//        // 聊天的websocket忽略
         filterChainDefinitionMap.put("/chat/**","anon");
         filterChainDefinitionMap.put("/**", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
@@ -100,8 +95,6 @@ public class ShiroConfig {
 
     /**
      * 安全管理器
-     * @Author Sans
-     * @CreateTime 2019/6/12 10:34
      */
     @Bean
     public SecurityManager securityManager() {
@@ -117,8 +110,6 @@ public class ShiroConfig {
 
     /**
      * 身份验证器
-     * @Author Sans
-     * @CreateTime 2019/6/12 10:37
      */
     @Bean
     public ShiroRealm shiroRealm() {
@@ -130,8 +121,6 @@ public class ShiroConfig {
     /**
      * 凭证匹配器
      * 将密码校验交给Shiro的SimpleAuthenticationInfo进行处理,在这里做匹配配置
-     * @Author Sans
-     * @CreateTime 2019/6/12 10:48
      */
     @Bean
     public HashedCredentialsMatcher hashedCredentialsMatcher() {
@@ -146,8 +135,6 @@ public class ShiroConfig {
     /**
      * 配置Redis管理器
      * @Attention 使用的是shiro-redis开源插件
-     * @Author Sans
-     * @CreateTime 2019/6/12 11:06
      */
     @Bean
     public RedisManager redisManager() {
@@ -163,8 +150,6 @@ public class ShiroConfig {
      * 配置Cache管理器
      * 用于往Redis存储权限和角色标识
      * @Attention 使用的是shiro-redis开源插件
-     * @Author Sans
-     * @CreateTime 2019/6/12 12:37
      */
     @Bean
     public RedisCacheManager cacheManager() {
@@ -172,14 +157,12 @@ public class ShiroConfig {
         redisCacheManager.setRedisManager(redisManager());
         redisCacheManager.setKeyPrefix(CACHE_KEY);
         // 配置缓存的话要求放在session里面的实体类必须有个id标识
-        redisCacheManager.setPrincipalIdFieldName("id");
+        redisCacheManager.setPrincipalIdFieldName("userId");
         return redisCacheManager;
     }
 
     /**
      * SessionID生成器
-     * @Author Sans
-     * @CreateTime 2019/6/12 13:12
      */
     @Bean
     public ShiroSessionIdGenerator sessionIdGenerator(){
@@ -190,8 +173,6 @@ public class ShiroConfig {
     /**
      * 配置RedisSessionDAO
      * @Attention 使用的是shiro-redis开源插件
-     * @Author Sans
-     * @CreateTime 2019/6/12 13:44
      */
     @Bean
     public RedisSessionDAO redisSessionDAO() {
@@ -205,8 +186,6 @@ public class ShiroConfig {
 
     /**
      * 配置Session管理器
-     * @Author Sans
-     * @CreateTime 2019/6/12 14:25
      */
     @Bean
     public ShiroSessionManager sessionManager() {

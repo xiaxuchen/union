@@ -9,6 +9,13 @@ import java.util.Date;
 
 public class DateUtil {
 
+    public static LocalDateTime toLocalDateTime (String time) {
+        if (time == null) {
+            return null;
+        }
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return LocalDateTime.parse(time,df);
+    }
     /**
      * 返回unix时间戳 (1970年至今的秒数)
      *
@@ -23,7 +30,7 @@ public class DateUtil {
      *
      * @return
      */
-    public static String getYestoryDate() {
+    public static String getYesterdayDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

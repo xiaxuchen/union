@@ -1,6 +1,6 @@
 package com.originit.union.exception.file;
 
-import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.enums.ResultCode;
 
 /**
  * 文件找不到异常

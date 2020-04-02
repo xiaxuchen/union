@@ -2,6 +2,8 @@ package com.originit.union.entity.enums;
 
 import lombok.Getter;
 
+import java.io.Serializable;
+
 /**
  * 消息队列的枚举
  * @author xxc、

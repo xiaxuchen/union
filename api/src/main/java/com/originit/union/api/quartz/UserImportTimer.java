@@ -1,5 +1,6 @@
 package com.originit.union.api.quartz;
 
+import com.originit.common.util.RedisCacheProvider;
 import com.originit.union.constant.SystemConstant;
 import com.originit.union.service.RedisService;
 import com.originit.union.service.WeChatUserService;
@@ -16,35 +17,33 @@ import java.time.LocalDateTime;
 @Slf4j
 public class UserImportTimer extends QuartzJobBean {
 
+    @Autowired
     private WeChatUserService userService;
 
-    private RedisService redisService;
-
     @Autowired
-    public void setUserService(WeChatUserService userService) {
-        this.userService = userService;
-    }
+    private RedisCacheProvider provider;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        log.info("importing users start:" + DateUtil.timeStampToStr(System.currentTimeMillis()/1000));
+        log.info("importing users start...");
         final Integer[] preUserStatistic = userService.getUserStatistic();
         userService.importUsers();
         final Integer[] afterUserStatistic = userService.getUserStatistic();
         // 更新统计数据
-        redisService.set(SystemConstant.ALL_USER_COUNT,afterUserStatistic[0]);
-        redisService.set(SystemConstant.USER_BIND_COUNT,afterUserStatistic[1]);
+        provider.set(SystemConstant.ALL_USER_COUNT,afterUserStatistic[0]);
+        provider.set(SystemConstant.USER_BIND_COUNT,afterUserStatistic[1]);
         final int yesterdayAddition = afterUserStatistic[1] - preUserStatistic[1];
-        redisService.set(SystemConstant.USER_YESTERDAY_ADDITION,yesterdayAddition);
+        provider.set(SystemConstant.USER_YESTERDAY_ADDITION,yesterdayAddition);
 
         //更新当月的增量
-        Integer nowCount = redisService.get(SystemConstant.USER_MONTH_ADDITION,Integer.class);
+        Integer nowCount = (Integer) provider.get(SystemConstant.USER_MONTH_ADDITION);
         if (nowCount == null || LocalDateTime.now().getDayOfMonth() == 1)
         {
             nowCount = yesterdayAddition;
         } else {
             nowCount += yesterdayAddition;
         }
-        redisService.set(SystemConstant.USER_MONTH_ADDITION,nowCount);
+        provider.set(SystemConstant.USER_MONTH_ADDITION,nowCount);
+        log.info("import users end");
     }
 }

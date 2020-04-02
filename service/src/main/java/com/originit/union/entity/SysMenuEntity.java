@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @TableName("sys_menu")
 public class SysMenuEntity implements Serializable {
 
+
 	public interface STATE {
 		/**
 		 * 禁用

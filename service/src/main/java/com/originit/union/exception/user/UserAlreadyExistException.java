@@ -1,6 +1,6 @@
 package com.originit.union.exception.user;
 
-import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.enums.ResultCode;
 
 /**
  * 用户已存在异常

@@ -2,8 +2,12 @@ package com.originit.union.entity.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class MaterialVO {
+public class MaterialVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * updateTime : 2019年12月13日

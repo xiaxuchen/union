@@ -1,1 +1,6 @@
-# TODO 日志设置
+# 日志设置
+logging:
+  path: /var/log/union/
+  level:
+    root: info
+    com.originit.union.mapper: info

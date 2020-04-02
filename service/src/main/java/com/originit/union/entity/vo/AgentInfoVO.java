@@ -4,13 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author xxc、
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AgentInfoVO {
+public class AgentInfoVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     /**
      * 客户经理id
      */

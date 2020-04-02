@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.originit.common.exceptions.DataConflictException;
 import com.originit.common.exceptions.DataNotFoundException;
+import com.originit.common.exceptions.UserException;
 import com.originit.common.page.Pager;
 import com.originit.common.util.FileUDUtil;
 import com.originit.common.util.SpringUtil;
@@ -25,10 +26,10 @@ import com.originit.union.entity.vo.ChatUserVO;
 import com.originit.union.exception.chat.ChatException;
 import com.originit.union.exception.chat.ChatUserAlreadyReceiveException;
 import com.originit.union.exception.chat.ChatUserOfflineException;
+import com.originit.union.exception.chat.UserIsNotAgentException;
 import com.originit.union.service.ChatService;
 import com.originit.union.util.DataUtil;
 import com.originit.union.websocket.ChatServer;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -232,6 +233,9 @@ public class ChatServiceImpl implements ChatService {
                 .build());
         // 3. 发送接入通知给聊天用户
         AgentIntroduceVO agentInfo = agentInfoDao.selectAgentInfo (id);
+        if (agentInfo == null) {
+            throw new UserIsNotAgentException();
+        }
         clientServeBusiness.sendAgentIntroduce(openId,agentInfo.getName(),agentInfo.getDes(), FileUDUtil.getSystemURL(agentInfo.getHeadImg()));
         // 4. 通知所有的经理该用户已被接受，同时更新当前的数量
         messagingTemplate.convertAndSend(ChatConstant.WS_USER_RECEIVED,DataUtil.mapBuilder()

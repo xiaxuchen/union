@@ -27,13 +27,6 @@ public class MvcConfig implements WebMvcConfigurer {
 
     private CorsInterceptor corsInterceptor;
 
-    private ShiroAnnotationInterceptor annotationInterceptor;
-
-    @Autowired
-    public void setAnnotationInterceptor(ShiroAnnotationInterceptor annotationInterceptor) {
-        this.annotationInterceptor = annotationInterceptor;
-    }
-
     @Autowired
     public void setCorsInterceptor(CorsInterceptor corsInterceptor) {
         this.corsInterceptor = corsInterceptor;
@@ -42,7 +35,6 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(corsInterceptor).addPathPatterns("/**");
-        registry.addInterceptor(annotationInterceptor).addPathPatterns("/**");
     }
 
     /**
@@ -60,7 +52,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/union/**").addResourceLocations("classpath:/static/");
     }
 
     @Bean

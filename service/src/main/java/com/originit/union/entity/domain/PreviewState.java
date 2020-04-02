@@ -11,6 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PreviewState implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     /**
      * 预览id
      */

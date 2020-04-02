@@ -67,8 +67,9 @@ public class TimerRunner implements ApplicationRunner {
         String group = UserImportTimer.class.getName();
         //创建任务
         JobDetail jobDetail = JobBuilder.newJob(UserImportTimer.class).withIdentity(name,group).build();
-        //创建任务触发器,指定每天凌晨一点执行任务
+        //创建任务触发器,指定每天凌晨一点执行任务,启动的时候开始一次导入
         Trigger trigger = TriggerBuilder.newTrigger().withIdentity(name,group)
+                .startNow()
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 ? * *")).build();
         //将触发器与任务绑定到调度器内
         scheduler.scheduleJob(jobDetail, trigger);
@@ -88,4 +89,5 @@ public class TimerRunner implements ApplicationRunner {
         //将触发器与任务绑定到调度器内
         scheduler.scheduleJob(jobDetail, trigger);
     }
+
 }

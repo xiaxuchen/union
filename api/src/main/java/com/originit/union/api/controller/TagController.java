@@ -70,12 +70,12 @@ public class TagController {
 
     /**
      * 添加用户标签
-     * @param id 用户id
+     * @param id 用户openId
      * @param tagId  标签id
      */
     @PostMapping("/user")
-    public void userAddTag (@RequestParam Long id,@RequestParam Long tagId) {
-        tagService.addTagOfUser(Arrays.asList(new TagUserAddDto(id,null)), tagId);
+    public void userAddTag (@RequestParam String id,@RequestParam Long tagId) {
+        tagService.addTagOfUser(id, tagId);
     }
 
     @DeleteMapping("/user/{userTagId}")

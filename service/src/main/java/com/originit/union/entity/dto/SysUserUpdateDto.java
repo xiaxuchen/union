@@ -3,11 +3,15 @@ package com.originit.union.entity.dto;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import java.io.Serializable;
+
 /**
  * 更新系统用户的dto
  */
 @Data
-public class SysUserUpdateDto {
+public class SysUserUpdateDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * 用户id

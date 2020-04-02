@@ -1,4 +1,4 @@
-package com.originit.common.enums;
+package com.originit.common.exceptions.enums;
 
 import com.originit.common.exceptions.*;
 import org.springframework.http.HttpStatus;

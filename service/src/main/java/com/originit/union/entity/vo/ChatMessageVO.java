@@ -2,6 +2,7 @@ package com.originit.union.entity.vo;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.time.LocalDateTime;
 
@@ -12,7 +13,9 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
-public class ChatMessageVO {
+public class ChatMessageVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
 

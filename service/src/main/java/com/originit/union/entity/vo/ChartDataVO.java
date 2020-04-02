@@ -2,8 +2,12 @@ package com.originit.union.entity.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class ChartDataVO {
+public class ChartDataVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     /**
      * date : 19/01/03
      * allCount : 80

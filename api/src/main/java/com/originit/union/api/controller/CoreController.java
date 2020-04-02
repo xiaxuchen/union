@@ -9,6 +9,9 @@ import com.soecode.wxtools.api.WxMessageRouter;
 import com.soecode.wxtools.bean.*;
 import com.soecode.wxtools.exception.WxErrorException;
 import com.soecode.wxtools.util.xml.XStreamTransformer;
+import com.xxc.logger.annotation.Log;
+import com.xxc.response.anotation.OriginResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Controller
 @RequestMapping("/core")
+@Slf4j
 public class CoreController {
 
     private static Set<WXInterceptor> interceptors = new CopyOnWriteArraySet<>();
@@ -46,19 +50,43 @@ public class CoreController {
      * 使用ResponseBody返回字符串
      */
     @GetMapping
-    @ResponseBody
-    public String check(@RequestParam String signature, @RequestParam String timestamp, @RequestParam String nonce, @RequestParam String echostr, HttpServletRequest request) {
-        //直接调用IService的checkSignature方法即可校验
+    @OriginResponse
+    public void check(String signature, String timestamp, String nonce, String echostr,HttpServletRequest request,HttpServletResponse response) {
+        log.info("服务器验证");
+        log.info("参数:signature:{} timestamp:{} nonce:{} echostr:{}",signature,timestamp,nonce,echostr);
         if (iService.checkSignature(signature, timestamp, nonce, echostr)) {
-            final ServletContext context = request.getServletContext();
-            context.setAttribute("signature",signature);
-            context.setAttribute("timestamp",timestamp);
-            context.setAttribute("nonce",nonce);
-            context.setAttribute("appId",WxConfig.getInstance().getAppId());
-            return echostr;
+            log.info("校验成功:{}",echostr);
+            try {
+                final ServletContext context = request.getServletContext();
+                context.setAttribute("signature",signature);
+                context.setAttribute("timestamp",timestamp);
+                context.setAttribute("nonce",nonce);
+                context.setAttribute("appId",WxConfig.getInstance().getAppId());
+                response.getWriter().print(echostr);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
     }
+
+    @GetMapping("/test")
+    @ResponseBody
+    @Log
+    public String test () {
+        return "hello";
+    }
+//    public String check(String signature, String timestamp, String nonce, String echostr, HttpServletRequest request) {
+//        log.info("服务器验证");
+//        log.info("参数:signature:{} timestamp:{} nonce:{} echostr:{}",signature,timestamp,nonce,echostr);
+//        //直接调用IService的checkSignature方法即可校验
+//        if (iService.checkSignature(signature, timestamp, nonce, echostr)) {
+//            log.info("校验成功");
+//            final ServletContext context = request.getServletContext();
+//            return echostr;
+//        }
+//        log.info("校验失败");
+//        return null;
+//    }
 
     /**
      * 接入jssdk

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * headImg : https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1579165101420&di=15b492e796aaf49d330fc00929bf4e7b&imgtype=jpg&src=http://img2.touxiang.cn/file/20171113/b213c1ac58be0e02906ea1424781b31b.jpg
  * phone : 17779911413
@@ -19,7 +21,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatUserVO {
+public class ChatUserVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String headImg;
     private String phone;

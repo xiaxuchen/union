@@ -51,6 +51,7 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
     public ShiroSessionManager (RedisSessionDAO redisSessionDAO) {
         this();
         setSessionDAO(redisSessionDAO);
+        // 一开始会去存储微信的公用session
         WECHAT_SESSION.setId(WECHAT_COMMON_SESSION_ID);
         redisSessionDAO.update(WECHAT_SESSION);
         log.info("保存微信端的公共session");
@@ -62,10 +63,8 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
         this.setDeleteInvalidSessions(true);
     }
     /**
-     * 重写方法实现从请求头获取Token便于接口统一
+     * 这里是获取sesionId,重写方法实现从请求头获取Token便于接口统一
      * 每次请求进来,Shiro会去从请求头找Authorization这个key对应的Value(Token)
-     * @Author Sans
-     * @CreateTime 2019/6/13 8:47
      */
     @Override
     public Serializable getSessionId(ServletRequest request, ServletResponse response) {
@@ -84,49 +83,42 @@ public class ShiroSessionManager extends DefaultWebSessionManager {
             request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_IS_VALID, Boolean.TRUE);
             return token;
         } else {
-            // 按默认规则从Cookie取Token
-             return super.getSessionId(request, response);
+             return null;
         }
     }
 
+
     /**
-     * 缓存Session到request中
+     * 获取session
      * @param sessionKey
      * @return
      * @throws UnknownSessionException
      */
     @Override
     protected Session retrieveSession(SessionKey sessionKey) throws UnknownSessionException {
-        WebSessionKey webSessionKey = (WebSessionKey) sessionKey;
-        final ServletRequest servletRequest = webSessionKey.getServletRequest();
-        final Serializable sessionId = webSessionKey.getSessionId();
+        Serializable sessionId = getSessionId(sessionKey);
         // 如果是微信的请求直接返回微信的无效的Session
         if (WECHAT_COMMON_SESSION_ID.equals(sessionId)) {
             return WECHAT_SESSION;
         }
-        ServletContext servletContext = null;
-        if(sessionId != null && servletRequest != null)
-        {
-            servletContext = servletRequest.getServletContext();
-            if (servletContext != null) {
-                Session session =  (Session) servletContext.getAttribute(sessionId.toString());
-                if (session != null) {
-                    return session;
-                }
+        ServletRequest request = null;
+            if (sessionKey instanceof WebSessionKey){
+            request = (ServletRequest) ((WebSessionKey) sessionKey).getServletRequest();
+        }
+            if (request!=null&&sessionId!=null) {
+            Session session = (Session) request.getAttribute(sessionId.toString());
+            if(session!=null)
+            {
+                return session;
             }
         }
-        final Session session = super.retrieveSession(sessionKey);
-        if(servletContext != null)
-        {
-            if(session != null) {
-                servletContext.setAttribute(session.getId().toString(),session);
-            }
+        Session session = super.retrieveSession(sessionKey);
+            if(request!=null &&sessionId!=null){
+            request.setAttribute(sessionId.toString(),session);
         }
-        if (session == null) {
-            return null;
-        }
+        // 刷新用户的session键
         final SysUserEntity userInfo = ShiroUtils.getUserInfo(session);
-        if (userInfo != null) {
+            if (userInfo != null) {
             final String userKey = ShiroUtils.generateUserKey(userInfo.getUserId());
             provider.expire(userKey, ShiroConfig.EXPIRE);
             log.info("刷新用户的session键(用户快速查找用户的session)");

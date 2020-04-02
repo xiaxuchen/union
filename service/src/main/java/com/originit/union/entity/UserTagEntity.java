@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @TableName("user_tag")
 public class UserTagEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @TableId
     private Long id;
 

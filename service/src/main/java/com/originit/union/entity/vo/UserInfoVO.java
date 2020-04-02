@@ -3,6 +3,7 @@ package com.originit.union.entity.vo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,9 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class UserInfoVO {
+public class UserInfoVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * headImg : https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1579165101420&amp;di=15b492e796aaf49d330fc00929bf4e7b&amp;imgtype=jpg&amp;src=http://img2.touxiang.cn/file/20171113/b213c1ac58be0e02906ea1424781b31b.jpg

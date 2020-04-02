@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class AgentInfoEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @TableId
     private Long id;
 

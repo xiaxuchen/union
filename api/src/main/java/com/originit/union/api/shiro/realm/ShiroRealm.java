@@ -20,14 +20,12 @@ package com.originit.union.api.shiro.realm;
 //import java.util.List;
 //import java.util.Set;
 
-import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.enums.ResultCode;
 import com.originit.common.exceptions.UserException;
-import com.originit.common.exceptions.UserNotLoginException;
 import com.originit.union.api.util.ShiroUtils;
 import com.originit.union.entity.SysMenuEntity;
 import com.originit.union.entity.SysRoleEntity;
 import com.originit.union.entity.SysUserEntity;
-import com.originit.union.service.RedisService;
 import com.originit.union.service.SysMenuService;
 import com.originit.union.service.SysRoleService;
 import com.originit.union.service.SysUserService;
@@ -106,7 +104,6 @@ public class ShiroRealm extends AuthorizingRealm {
         if (user == null) {
             throw new UserException(ResultCode.USER_NOT_EXIST);
         }
-        // TODO 测试 判断账号是否被冻结
         if (user.getState()==null || SysUserEntity.FORBID == user.getState()){
             throw new UserException(ResultCode.USER_ACCOUNT_FORBIDDEN);
         }

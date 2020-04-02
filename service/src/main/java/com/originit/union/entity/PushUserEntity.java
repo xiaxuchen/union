@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
@@ -11,7 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @TableName("push_user")
-public class PushUserEntity {
+public class PushUserEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @TableId
     private Long id;

@@ -1,7 +1,5 @@
 server:
   port: 80
-  servlet:
-    context-path: /union
 
 spring:
   # @ResponseBody返回的json字符集校正
@@ -10,9 +8,9 @@ spring:
       force: true
     multipart:
       enabled: true
-  # 激活Profile
+  # 激活Profile,不同的环境，dev开发环境，prod生产环境
   profiles:
-    active: dev
+    active: prod
   quartz:
     #相关属性配置
     properties:
@@ -138,6 +136,8 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 system:
+  file:
+    path: \images
   # 聊天
   chat:
     # 用户等待的超时时间,单位秒

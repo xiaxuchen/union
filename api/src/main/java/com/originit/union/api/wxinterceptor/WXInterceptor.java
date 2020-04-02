@@ -13,15 +13,15 @@ import javax.xml.ws.Action;
 public interface WXInterceptor {
 
     /**
-     * 禁止其他拦截器共享
+     * 禁止其他拦截器共享，当同时有两个拦截器对一个请求返回该值，将抛出异常，帮助开发人员修改
      */
     int FORRBIDE_OTHER = -1;
     /**
-     * 和其他共享，值越大越在后面执行
+     * 拦截信息并与其他拦截的拦截器共享
      */
     int SHARED_OTHER = 1;
     /**
-     * 不拦截
+     * 不拦截，不会执行handle方法
      */
     int NOT_INTEREST = 0;
 

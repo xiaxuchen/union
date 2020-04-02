@@ -1,6 +1,6 @@
 package com.originit.union.exception.chat;
 
-import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.enums.ResultCode;
 
 public class ChatUserAlreadyReceiveException extends ChatException {
 

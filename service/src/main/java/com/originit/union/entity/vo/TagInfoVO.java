@@ -3,9 +3,13 @@ package com.originit.union.entity.vo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
-public class TagInfoVO {
+public class TagInfoVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * id 标签的id

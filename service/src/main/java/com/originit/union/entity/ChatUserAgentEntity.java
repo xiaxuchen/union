@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatUserAgentEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * wechatMessageId
      */

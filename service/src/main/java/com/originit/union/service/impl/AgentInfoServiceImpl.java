@@ -2,6 +2,7 @@ package com.originit.union.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.originit.union.annotation.LockKey;
 import com.originit.union.entity.AgentInfoEntity;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.union.dao.AgentInfoDao;

@@ -4,6 +4,7 @@ import com.originit.union.entity.vo.AgentInfoVO;
 import com.originit.union.entity.vo.RoleVO;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,7 +13,8 @@ import java.util.List;
  * @author xxc、
  */
 @Data
-public class SysUserInfo {
+public class SysUserInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * 用户ID
      */

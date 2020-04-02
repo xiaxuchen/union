@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
  * 这里添加了{@link Anon}注解将请求标注为无需登录的请求
  * @author xxc、
  */
-@Component
 public class ShiroAnnotationInterceptor implements HandlerInterceptor {
 
     /**

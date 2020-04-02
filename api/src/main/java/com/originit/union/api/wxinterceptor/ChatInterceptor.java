@@ -3,6 +3,7 @@ package com.originit.union.api.wxinterceptor;
 import com.originit.common.annotation.Interceptor;
 import com.originit.union.entity.MessageEntity;
 import com.originit.union.mq.producer.MessageProducer;
+import com.originit.union.service.ChatService;
 import com.originit.union.util.DateUtil;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxXmlMessage;
@@ -22,12 +23,11 @@ import javax.servlet.http.HttpServletResponse;
 public class ChatInterceptor implements WXInterceptor {
 
 
+    @Autowired
     private MessageProducer producer;
 
     @Autowired
-    public void setProducer(MessageProducer producer) {
-        this.producer = producer;
-    }
+    private ChatService chatService;
 
     @Override
     public int intercept(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -59,8 +59,8 @@ public class ChatInterceptor implements WXInterceptor {
                 return;
             }
         }
-        // 将消息打入消息队列
-        producer.sendMessage(MessageEntity.builder()
+        // 不使用消息队列，直接使用service
+        chatService.sendMessageForServe(MessageEntity.builder()
                 .content(content)
                 .wechatMessageId(message.getMsgId())
                 .fromUser(true)
@@ -69,5 +69,7 @@ public class ChatInterceptor implements WXInterceptor {
                 .state(MessageEntity.STATE.WAIT)
                 .gmtCreate(DateUtil.toLocalDateTime(message.getCreateTime()))
                 .build());
+        // 将消息打入消息队列
+//        producer.sendMessage();
     }
 }

@@ -5,15 +5,18 @@ import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.sound.sampled.Port;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.URLEncoder;
@@ -25,8 +28,28 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.UUID;
 
+@Component
 public class FileUDUtil {
-    public static final String PATH = "\\images";
+
+    private static Integer PORT;
+
+    public static String PATH;
+
+    private static String IP;
+
+    static {
+        IP = IpUtil.getLocalIP();
+    }
+
+    @Value("${server.port}")
+    public void setPort(Integer port) {
+        FileUDUtil.PORT = port;
+    }
+
+    @Value("${system.file.path}")
+    public void setPath (String path) {
+        FileUDUtil.PATH = path;
+    }
 
     /**
      * 处理下载文件时的文件名中文乱码问题，兼容浏览器
@@ -190,15 +213,8 @@ public class FileUDUtil {
         if (code == null) {
             return null;
         }
-        try {
-            final String hostAddress = InetAddress.getLocalHost().getHostAddress();
-            String url = "http://" + hostAddress + "/union" + "/resource/file/" + code;
-            logger.warn("the ip is {}",url);
-            return url;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            logger.error("the ip is null,error {}",ExceptionUtil.buildErrorMessage(e));
-        }
-        return null;
+        String url = "http://" + IP +":" + PORT + "/resource/file/" + code;
+        logger.warn("the ip is {}",url);
+        return url;
     }
 }

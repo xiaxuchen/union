@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 @Builder
 public class AgentStateEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     public interface STATE {
         /**
          * 离线

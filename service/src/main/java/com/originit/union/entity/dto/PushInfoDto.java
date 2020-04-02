@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,7 +19,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PushInfoDto {
+public class PushInfoDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Size(min = 2,groups = CreateGroup.class,message = "至少要有两个人才能推送")
     private List<String> users;

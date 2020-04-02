@@ -2,8 +2,12 @@ package com.originit.union.entity.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class SysUserQueryDto {
+public class SysUserQueryDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     /**
      * 用户姓名
      */

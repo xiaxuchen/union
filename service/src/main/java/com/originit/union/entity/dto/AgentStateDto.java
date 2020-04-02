@@ -3,12 +3,15 @@ package com.originit.union.entity.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * 用户更新经理设置的传输对象
  */
 @Data
-public class AgentStateDto {
+public class AgentStateDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * 经理的Id

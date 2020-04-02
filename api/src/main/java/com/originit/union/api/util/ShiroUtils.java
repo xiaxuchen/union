@@ -1,5 +1,6 @@
 package com.originit.union.api.util;
 
+import com.originit.common.util.RedisCacheProvider;
 import com.originit.union.entity.SysUserEntity;
 import com.originit.common.util.SpringUtil;
 import com.originit.union.service.RedisService;
@@ -26,8 +27,9 @@ public class ShiroUtils {
 
     private static RedisSessionDAO redisSessionDAO = SpringUtil.getBean(RedisSessionDAO.class);
 
-	private static RedisService redisService = SpringUtil.getBean(RedisService.class);
+	private static RedisCacheProvider redisService = SpringUtil.getBean(RedisCacheProvider.class);
 
+	private static RedisCacheProvider provider = SpringUtil.getBean(RedisCacheProvider.class);
     /**
      * 获取当前用户Session
      * @Author Sans
@@ -66,7 +68,7 @@ public class ShiroUtils {
      * @Return void
      */
     public static void deleteCache(Long userId, boolean isRemoveSession){
-        String sessionId = redisService.get(generateUserKey(userId), String.class);
+        String sessionId = (String) redisService.get(generateUserKey(userId));
         if (sessionId == null) {
             return;
         }
@@ -77,6 +79,8 @@ public class ShiroUtils {
         } catch (Exception e) {
             log.error("session with wechatMessageId {} is not exist",sessionId);
         }
+        provider.del(generateUserKey(userId));
+        log.info("delete session key");
         if (session == null) {
             return;
         }
@@ -87,6 +91,8 @@ public class ShiroUtils {
         //删除session
         if (isRemoveSession) {
             redisSessionDAO.delete(session);
+            provider.del(sessionId);
+            log.info("delete cache for {}",userId);
         }
         //删除Cache，在访问受限接口时会重新授权
         DefaultWebSecurityManager securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();

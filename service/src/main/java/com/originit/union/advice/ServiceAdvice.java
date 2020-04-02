@@ -1,5 +1,7 @@
 package com.originit.union.advice;
 
+import com.originit.common.exceptions.BusinessException;
+import com.originit.common.util.RedisLock;
 import com.originit.union.annotation.LockKey;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -74,6 +76,9 @@ public class ServiceAdvice {
 //        this.lock = lock;
 //    }
 //
+//    @Autowired
+//    RedisLock lock;
+//
 //    @Around("@annotation(com.originit.union.annotation.LockKey)")
 //    public Object redisAutoLock (ProceedingJoinPoint point) throws Throwable {
 //        final Method method = ((MethodSignature) point.getSignature()).getMethod();
@@ -86,7 +91,20 @@ public class ServiceAdvice {
 //            return point.proceed();
 //        }
 //        log.info("auto lock");
+//        final String 锁 = lockKey.value();
+//        String 钥匙 = lock.lock(锁);
+//        final Object ret;
+//        if (钥匙 != null) {
+//            // 这里就获取到了锁，别人不能同步访问，你可以操作边界数据
+//            try {
+//                ret = point.proceed();
+//            } finally {
+//                lock.unlock(锁,钥匙);
+//            }
+//        } else {
+//            throw new BusinessException("系统正忙");
+//        }
 //        // 包装上加锁逻辑
-//        return lock.commonLock(lockKey.value(), point::proceed);
+//        return ret;
 //    }
 }

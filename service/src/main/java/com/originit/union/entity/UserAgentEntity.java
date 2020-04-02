@@ -6,12 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @TableName("user_agent")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UserAgentEntity {
+public class UserAgentEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
 

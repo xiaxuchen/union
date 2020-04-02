@@ -5,10 +5,13 @@ import com.soecode.wxtools.api.WxService;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class WechatConfig {
+
     @Bean
+    @Profile("dev")
     public IService iService () {
         String proxyHost = "127.0.0.1";
         String proxyPort = "1080";
@@ -24,5 +27,11 @@ public class WechatConfig {
                 this.httpClient = HttpClients.createSystem();
             }
         };
+    }
+
+    @Bean
+    @Profile("prod")
+    public IService iservice () {
+        return new WxService();
     }
 }

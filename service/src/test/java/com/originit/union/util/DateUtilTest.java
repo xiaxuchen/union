@@ -10,4 +10,9 @@ public class DateUtilTest {
     public void timeStampToStr() {
         System.out.println(DateUtil.timeStampToStr(1572663395L));
     }
+
+    @Test
+    public void toLocalDateTime() {
+        System.out.println(DateUtil.toLocalDateTime("2018-4-4"));
+    }
 }

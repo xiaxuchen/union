@@ -53,6 +53,13 @@ public interface TagService extends IService<TagEntity> {
     void addTagOfUser(List<TagUserAddDto> userInfo, Long tagId);
 
     /**
+     * 给指定openId的用户添加标签
+     * @param openId 用户openId
+     * @param tagId 标签id
+     */
+    void addTagOfUser(String openId, Long tagId);
+
+    /**
      * 删除用户的标签
      * @param userTagId 用户标签关系的id
      */

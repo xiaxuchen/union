@@ -1,4 +1,4 @@
-package com.originit.common.enums;
+package com.originit.common.exceptions.enums;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,7 @@ public enum ResultCode {
     FILE_ERROR(33051,"文件异常"),
     FILE_NOT_FOUND_ERROR(33052,"文件找不到"),
     FILE_CODE_NOT_EXIST(33053,"文件找不到"),
+    USER_IS_NOT_AGENT(33054,"用户不是经理"),
 
     /* 系统错误：40001-49999 */
     SYSTEM_INNER_ERROR(40001, "系统繁忙，请稍后重试"),

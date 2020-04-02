@@ -5,14 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class IndexStatisticVO {
-
+public class IndexStatisticVO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * theMonthPushCount : 50

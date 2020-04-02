@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import java.util.List;
  * @author xxc、
  */
 @Data
-public class SysUserVO {
+public class SysUserVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     /**
      * 用户ID
      */

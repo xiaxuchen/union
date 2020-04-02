@@ -1,7 +1,7 @@
 package com.originit.common.exceptions;
 
 
-import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.enums.ResultCode;
 
 /**
  * @author zhumaer

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -17,7 +18,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @TableName("file_ref")
-public class FileRefEntity {
+public class FileRefEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     /**
      * 图片的id
       */

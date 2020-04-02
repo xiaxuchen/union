@@ -1,9 +1,6 @@
-# 配置数据库连接池和数据库
 spring:
-  #数据库地址
   datasource:
-    url: jdbc:mysql://47.105.61.4:3306/union?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&serverTimezone=GMT%2B8
-
+    url: jdbc:mysql://localhost:3306/union?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&serverTimezone=GMT%2B8
 # 日志设置
 logging:
   path: D:/log/

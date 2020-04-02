@@ -34,8 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import sun.rmi.runtime.Log;
-
 import java.time.LocalDateTime;
 
 /**
@@ -128,7 +126,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
         }
         // 2. 获取更新前的用户的头像信息，等到最后删除掉原来的头像，防止空间的浪费
         final SysUserEntity sysUserEntity = baseMapper.selectOne(new QueryWrapper<SysUserEntity>()
-                .lambda().select(SysUserEntity::getHeadImg)
+                .lambda().select(SysUserEntity::getUserId,SysUserEntity::getHeadImg)
                 .eq(SysUserEntity::getUserId, sysUserDto.getUserId()));
         if (sysUserEntity == null) {
             throw new UserNotExistException("该用户不存在");
@@ -185,12 +183,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
     @Override
     public void updatePwd(Long id,String originPwd, String newPwd) {
         if (originPwd.equals(newPwd)) {
-            throw new IllegalArgumentException("新旧密码不能一样");
+            throw new BusinessException("新旧密码不能一样");
         }
         // 1. 查找用户的密码
         final SysUserEntity sysUserEntity = baseMapper.selectOne(new QueryWrapper<SysUserEntity>().lambda()
-                .select(SysUserEntity::getPassword, SysUserEntity::getSalt)
+                .select(SysUserEntity::getUserId,SysUserEntity::getPassword, SysUserEntity::getSalt)
                 .eq(SysUserEntity::getUserId, id));
+
+        // 如果用户为空就不存在
+        if (sysUserEntity == null) {
+            throw new UserNotExistException();
+        }
 
         // 2. 比对
         if (!sysUserEntity.getPassword().equals(SHA256Util.sha256(originPwd,sysUserEntity.getSalt()))) {

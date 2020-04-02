@@ -1,7 +1,7 @@
 package com.originit.common.exceptions;
 
-import com.originit.common.enums.BusinessExceptionEnum;
-import com.originit.common.enums.ResultCode;
+import com.originit.common.exceptions.enums.BusinessExceptionEnum;
+import com.originit.common.exceptions.enums.ResultCode;
 import com.originit.common.util.StringUtil;
 import lombok.Data;
 

@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @TableName("chat_user")
 public class ChatUserEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     public interface STATE {
         /**
