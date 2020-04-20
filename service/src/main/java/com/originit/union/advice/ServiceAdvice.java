@@ -2,7 +2,6 @@ package com.originit.union.advice;
 
 import com.originit.common.exceptions.BusinessException;
 import com.originit.common.util.RedisLock;
-import com.originit.union.annotation.LockKey;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

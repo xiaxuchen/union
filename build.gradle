@@ -69,6 +69,7 @@ this.afterEvaluate {
     subprojects.each {Project pro ->
         pro.tasks.getByName('clean').doLast {
             file(pro.getProjectDir().absolutePath + '/out').deleteDir()
+            print("删除out文件夹")
         }
     }
 }

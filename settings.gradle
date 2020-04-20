@@ -2,5 +2,4 @@ rootProject.name = 'union'
 include 'api'
 include 'service'
 include 'common'
-include 'buildSrc'
 

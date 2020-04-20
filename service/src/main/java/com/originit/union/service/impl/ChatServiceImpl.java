@@ -29,7 +29,6 @@ import com.originit.union.exception.chat.ChatUserOfflineException;
 import com.originit.union.exception.chat.UserIsNotAgentException;
 import com.originit.union.service.ChatService;
 import com.originit.union.util.DataUtil;
-import com.originit.union.websocket.ChatServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
