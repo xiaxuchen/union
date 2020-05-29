@@ -1,5 +1,8 @@
 package com.originit.union.api.controller;
 
+import com.originit.common.util.RedisCacheProvider;
+import com.originit.union.constant.SystemConstant;
+import com.originit.union.service.RedisService;
 import com.originit.union.service.WeChatUserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -20,10 +24,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDateTime;
 
-@RunWith(SpringRunner.class)
+
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@ActiveProfiles("dev")
+//@ActiveProfiles("dev")
 public class UserControllerTest {
 
     @Autowired
@@ -62,6 +68,34 @@ public class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
+    @Autowired
+    RedisCacheProvider provider;
+
+    @Autowired
+    RedisService redisService;
+
+    @Test
+    public void testImport() {
+        provider.set("test", 1);
+        System.out.println(provider.get("test").getClass());
+//        final Integer[] preUserStatistic = userService.getUserStatistic();
+//        final Integer[] afterUserStatistic = userService.getUserStatistic();
+//        // 更新统计数据
+//        provider.set(SystemConstant.ALL_USER_COUNT,afterUserStatistic[0]);
+//        provider.set(SystemConstant.USER_BIND_COUNT,afterUserStatistic[1]);
+//        final int yesterdayAddition = afterUserStatistic[1] - preUserStatistic[1];
+//        provider.set(SystemConstant.USER_YESTERDAY_ADDITION,yesterdayAddition);
+//
+//        //更新当月的增量
+//        Integer nowCount = (Integer) provider.get(SystemConstant.USER_MONTH_ADDITION);
+//        if (nowCount == null || LocalDateTime.now().getDayOfMonth() == 1)
+//        {
+//            nowCount = yesterdayAddition;
+//        } else {
+//            nowCount += yesterdayAddition;
+//        }
+//        provider.set(SystemConstant.USER_MONTH_ADDITION,nowCount);
+    }
 
     @Test
     public void test1() {

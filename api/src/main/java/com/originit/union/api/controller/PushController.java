@@ -243,10 +243,10 @@ public class PushController {
     @GetMapping("/index")
     public IndexStatisticVO getIndexStatistic (@RequestParam(required = false) String start,@RequestParam(required = false) String end) {
         final IndexStatisticVO pushStatistic = pushService.getPushStatistic(start, end);
-        pushStatistic.setAllUserCount(redisService.get(SystemConstant.ALL_USER_COUNT,Integer.class));
-        pushStatistic.setBindUserCount(redisService.get(SystemConstant.USER_BIND_COUNT,Integer.class));
-        pushStatistic.setLastDayUserAddCount(redisService.get(SystemConstant.USER_YESTERDAY_ADDITION,Integer.class));
-        pushStatistic.setTheMonthUserAddCount(redisService.get(SystemConstant.USER_MONTH_ADDITION,Integer.class));
+        pushStatistic.setAllUserCount((Integer) redisCacheProvider.get(SystemConstant.ALL_USER_COUNT));
+        pushStatistic.setBindUserCount((Integer) redisCacheProvider.get(SystemConstant.USER_BIND_COUNT));
+        pushStatistic.setLastDayUserAddCount((Integer) redisCacheProvider.get(SystemConstant.USER_YESTERDAY_ADDITION));
+        pushStatistic.setTheMonthUserAddCount((Integer) redisCacheProvider.get(SystemConstant.USER_MONTH_ADDITION));
         return pushStatistic;
     }
 }

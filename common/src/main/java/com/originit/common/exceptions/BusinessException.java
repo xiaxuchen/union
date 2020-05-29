@@ -4,6 +4,7 @@ import com.originit.common.exceptions.enums.BusinessExceptionEnum;
 import com.originit.common.exceptions.enums.ResultCode;
 import com.originit.common.util.StringUtil;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author zhumaer
@@ -11,6 +12,7 @@ import lombok.Data;
  * @since 9/18/2017 3:00 PM
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class BusinessException extends RuntimeException {
 
     private static final long serialVersionUID = 194906846739586856L;
