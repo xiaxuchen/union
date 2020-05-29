@@ -6,6 +6,7 @@ import com.originit.union.service.RedisService;
 import com.originit.union.service.WeChatUserService;
 import com.originit.union.util.DateUtil;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @ConfigurationProperties(prefix = "system.chat")
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class ClearWaitTimeoutTimer extends QuartzJobBean {
 
     private Long waitTimeOut;

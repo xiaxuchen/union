@@ -8,6 +8,7 @@ import com.originit.union.service.PushService;
 import com.originit.union.util.DateUtil;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxXmlMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 
@@ -16,8 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * .推送结果的拦截器
+ * 当发送推送之后，不会立刻收到推送，而是由微信服务器去排队发送，
+ * 中间需要一点时间，当推送发送成功或者失败，都会发送一个推送结果事件告知，
+ * 我们通过该拦截器去拦截事件并记录推送结果
  */
 @Interceptor
+@Slf4j
 public class PushResultInterceptor implements WXInterceptor{
 
     private PushService pushService;
@@ -44,6 +49,8 @@ public class PushResultInterceptor implements WXInterceptor{
     @Override
     @Async
     public void handle(HttpServletRequest request, HttpServletResponse response,WxXmlMessage message) throws Exception {
+        if (message != null)
+            log.info("【推送反馈】信息:{}",message.toString());
         // 更新推送消息
         pushService.update(new UpdateWrapper<PushInfoEntity>().lambda()
                 .set(PushInfoEntity::getSendCount,message.getSentCount())

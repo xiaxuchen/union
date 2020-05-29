@@ -16,6 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 用户聊天的拦截
+ * 当用户消息给服务器，将会根据消息去选择不处理、排队等待用户经理处理、关闭聊天会或者发送消息
+ * 只有在聊天中的用户才可以发送聊天消息给当前接代的客户经理
+ * 排队中的用户或正在聊天的用户可以关闭会话
+ * 不在聊天中的用户可以申请排队
  * @author xxc、
  */
 @Interceptor
@@ -55,7 +59,7 @@ public class ChatInterceptor implements WXInterceptor {
                 break;
             }
             default: {
-                log.error("message can't handle with wechatMessageId:" + message.getMsgId());
+                log.error("【用户消息】暂时无法处理该类型消息,type={},id={}", message.getMsgType(), message.getMsgId());
                 return;
             }
         }

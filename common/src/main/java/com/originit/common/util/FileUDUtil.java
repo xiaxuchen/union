@@ -1,27 +1,19 @@
 package com.originit.common.util;
 
-import com.originit.common.exceptions.InternalServerException;
-import lombok.val;
-import org.apache.commons.io.FileUtils;
+import com.originit.common.exceptions.BusinessException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
-import sun.misc.BASE64Encoder;
+import org.springframework.util.FileCopyUtils;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.sound.sampled.Port;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,26 +21,31 @@ import java.util.Base64;
 import java.util.UUID;
 
 @Component
+@Slf4j
 public class FileUDUtil {
+    public static Logger logger = LoggerFactory.getLogger(FileUDUtil.class);
 
-    private static Integer PORT;
+    public static String PATH = "\\images";
 
-    public static String PATH;
+    // 是否在项目外部
+    public static Boolean EXTERNAL = false;
 
-    private static String IP;
-
-    static {
-        IP = IpUtil.getLocalIP();
-    }
-
-    @Value("${server.port}")
-    public void setPort(Integer port) {
-        FileUDUtil.PORT = port;
-    }
-
-    @Value("${system.file.path}")
-    public void setPath (String path) {
+    @Value("${custom.file-path:/images}")
+    public void setPath(String path){
         FileUDUtil.PATH = path;
+        File file = new File(path);
+        if (!file.exists() || file.isFile()){
+            file.mkdirs();
+        }
+        if (path == null || path.trim().isEmpty())
+            return;
+        log.info("【初始化文件上传工具类】set the FileUDUtil's path with {}",path);
+    }
+
+    @Value("${custom.external:false}")
+    public void setExternal(Boolean external){
+        FileUDUtil.EXTERNAL = external;
+        log.info("【初始化文件上传工具类】set the FileUDUtil's external with {}",external);
     }
 
     /**
@@ -57,29 +54,33 @@ public class FileUDUtil {
      * @param agent 浏览器的user-agent
      */
     private static String resolveDownloadFileName(String filename, String agent){
-        String filenameEncoder = null;
         try {
-            if(agent.contains("MSIE")) {
+            if (agent.contains("MSIE"))
+            {
                 // IE浏览器
-                filenameEncoder = URLEncoder.encode(filename, "utf-8");
-                filenameEncoder = filenameEncoder.replace("+", " ");
+                filename = URLEncoder.encode(filename, "utf-8");
+                filename = filename.replace("+", " ");
             }
-            else if (agent.contains("Firefox")) {
+            else if (agent.contains("Firefox"))
+            {
                 // 火狐浏览器
-                BASE64Encoder base64Encoder = new BASE64Encoder();
-                filenameEncoder = "=?utf-8?B?" + base64Encoder.encode(filename.getBytes(Charset.forName("utf-8"))) + "?=";
+                filename = new String(filename.getBytes(), "ISO8859-1");
             }
-            else { // 其它浏览器
-                try {
-                    filenameEncoder = URLEncoder.encode(filename, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+            else if (agent.contains("Chrome"))
+            {
+                // google浏览器
+                filename = URLEncoder.encode(filename, "utf-8");
+            }
+            else
+            {
+                // 其它浏览器
+                filename = URLEncoder.encode(filename, "utf-8");
             }
         } catch (Exception e) {
-            throw new InternalServerException("文件名编码异常");
+            logger.error(ExceptionUtil.buildErrorMessage(e));
+            throw new BusinessException("文件名编码异常");
         }
-        return filenameEncoder;
+        return filename;
     }
 
     /**
@@ -91,8 +92,9 @@ public class FileUDUtil {
     public static void downloadFile(String code, String filename, String agent, HttpServletResponse resp) {
         String realPath = new String(Base64.getDecoder().decode(code), StandardCharsets.UTF_8);
         if (filename == null) {
-            filename = realPath.substring(realPath.lastIndexOf("\\") + 1);
+            filename = realPath.substring(realPath.lastIndexOf(File.separator) + 1);
         }
+        log.info("【初始化文件上传工具类】current download file name is {}", filename);
         downloadFileWithPath("",realPath,filename,agent,resp);
     }
 
@@ -106,13 +108,19 @@ public class FileUDUtil {
         }
         String realPath = new String(Base64.getDecoder().decode(code), StandardCharsets.UTF_8);
         // 获取目录下的资源
-        return new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), realPath);
+        return getFileByPath(realPath);
     }
 
     public static void downloadFileWithPath (String relativePath,String realPath, String filename, String agent, HttpServletResponse resp) {
         try {
-           // 获取目录下的资源
-            File file = new File(FileUDUtil.class.getClassLoader().getResource(relativePath).getPath(), realPath);
+            File file;
+            // 获取目录下的资源,如果指定了相对的路径就使用相对路径
+            if (relativePath == null || relativePath.trim().isEmpty()){
+                file = getFileByPath(realPath);
+            } else {
+                file = new File(FileUDUtil.class.getClassLoader().getResource(relativePath).getPath(), realPath);
+            }
+
             resp.reset();
 //          // 让浏览器显示下载文件对话框
             resp.setContentType(MediaType.parseMediaType(Files.probeContentType(Paths.get(file.getAbsolutePath()))).getType());
@@ -141,7 +149,7 @@ public class FileUDUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new InternalServerException("文件下载异常");
+            throw new BusinessException("文件下载异常");
         }
     }
 
@@ -167,7 +175,7 @@ public class FileUDUtil {
         //得到名为1到16的下下及文件夹
         int dir2 = (hashcode & 0xf0) >> 4;
         //得到文件路径
-        String dir = PATH + "\\" + dir1 + "\\" + dir2 + "\\" +
+        String dir = PATH + File.separator + dir1 + File.separator + dir2 + File.separator +
                 UUID.randomUUID().toString().replace("-","") +
                 filename.substring(filename.lastIndexOf("."));
         return dir;
@@ -182,13 +190,15 @@ public class FileUDUtil {
         try {
             String path = getPath(filename);
             mkdirIfNotExist(path);
-            File file = new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), path);
-            FileUtils.copyInputStreamToFile(inputStream,file);
+            File file = getFileByPath(path);
+            // TODO 修改
+            FileCopyUtils.copy(inputStream,new FileOutputStream(file));
+            log.info("save file at the position path in {}",file.getAbsolutePath());
             // 返回base64编码
             return  Base64.getEncoder().encodeToString(path.getBytes(StandardCharsets.UTF_8));
         }catch (Exception e) {
             e.printStackTrace();
-            throw new InternalServerException("文件上传异常");
+            throw new BusinessException("文件上传异常");
         }
     }
 
@@ -197,13 +207,12 @@ public class FileUDUtil {
      * @param path 路径
      */
     private static void mkdirIfNotExist(String path) {
-        File file = new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), path.substring(0,path.lastIndexOf("\\")));
+        File file = getFileByPath(path.substring(0,path.lastIndexOf(File.separator)));
         if (!file.exists()) {
             file.mkdirs();
         }
     }
 
-    public static Logger logger = LoggerFactory.getLogger(FileUDUtil.class);
     /**
      * 获取文件的系统url
      * @param code 编码code
@@ -213,8 +222,27 @@ public class FileUDUtil {
         if (code == null) {
             return null;
         }
-        String url = "http://" + IP +":" + PORT + "/resource/file/" + code;
-        logger.warn("the ip is {}",url);
-        return url;
+        try {
+            final String hostAddress = InetAddress.getLocalHost().getHostAddress();
+            String url = "http://" + hostAddress + "/union" + "/resource/file/" + code;
+            logger.warn("the ip is {}",url);
+            return url;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            logger.error("the ip is null,error {}",ExceptionUtil.buildErrorMessage(e));
+        }
+        return null;
+    }
+
+    /**
+     * 统一的获取文件
+     * @param path 文件路径
+     * @return 文件
+     */
+    private static File getFileByPath(String path){
+        if (EXTERNAL) {
+            return new File(path);
+        }
+        return  new File(FileUDUtil.class.getClassLoader().getResource("").getPath(), path);
     }
 }

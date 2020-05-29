@@ -1,13 +1,17 @@
 server:
   port: 80
 
+custom:
+  # 文件上传的位置
+  file-path: /opt/union
+  # 是在内部还是在外部
+  external: true
+
 spring:
   # @ResponseBody返回的json字符集校正
   http:
     encoding:
       force: true
-    multipart:
-      enabled: true
   # 激活Profile,不同的环境，dev开发环境，prod生产环境
   profiles:
     active: prod

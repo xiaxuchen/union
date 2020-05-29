@@ -8,6 +8,7 @@ import com.originit.union.entity.domain.PreviewState;
 import com.originit.union.util.EventUtil;
 import com.soecode.wxtools.api.WxConsts;
 import com.soecode.wxtools.bean.WxXmlMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -18,8 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 预览推送消息扫码事件拦截
+ * 当客户经理请求预览就会生成二维码，扫描二维码手机会发出事件给服务器，由该拦截器拦截，根据id更新二维码状态
  */
 @Interceptor
+@Slf4j
 public class PreviewQRCodeInterceptor implements WXInterceptor {
 
     private MessageBusiness messageBusiness;
@@ -58,6 +61,8 @@ public class PreviewQRCodeInterceptor implements WXInterceptor {
         if (previewState == null) {
             return;
         }
+        // id是在客户经理发送请求的时候生成的
+        log.info("【预览推送二维码】生成二维码,id={}", id);
         // 发送预览消息，并校正状态
         ListenableFuture<Long> future = messageBusiness.preview(wxXmlMessage.getFromUserName(), previewState.getType(), previewState.getContent());
         future.addCallback(new ListenableFutureCallback<Long>() {

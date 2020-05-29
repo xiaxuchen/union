@@ -12,4 +12,12 @@ public class SHA256UtilTest {
         System.out.println(SHA256Util.sha256("123456", salt));
         System.out.println(salt);
     }
+
+    @Test
+    public void test12() {
+        // 测试发现null可以转换成基本类型
+        Object i = null;
+        Integer i2 = (Integer) i;
+        System.out.println(i2);
+    }
 }
